@@ -29,7 +29,7 @@ const ALLOW_EXACT = ['plugins/plugins.json'];
  * men ALDRI rot-index.html, og aldri under reserverte mapper.
  */
 const PAGE_INDEX_RE = /^[a-z0-9][a-z0-9-]*\/index\.html$/;
-const RESERVED_SLUGS = ['admin', 'api', 'assets', 'content', 'media', 'plugins', 'functions'];
+const RESERVED_SLUGS = ['admin', 'api', 'assets', 'content', 'media', 'plugins', 'functions', 'readme'];
 
 /** Felles normalisering: skråstreker, og avvis absolutte stier og `..`. */
 function normalizePath(path) {
@@ -72,8 +72,7 @@ export const OWNED_PATTERNS = [
   '_headers',
   'speculation-rules.json',
   'README.md',
-  'README-en.md',
-  'README-tr.md',
+  'readme/**',
   'admin/**',
   'assets/engine/**',
   'assets/urd/**',

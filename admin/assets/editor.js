@@ -2723,7 +2723,7 @@ Sr([
 	"change"
 ]);
 //#endregion
-//#region ../template/assets/engine/0.6.9/imageTools.js
+//#region ../template/assets/engine/0.6.10/imageTools.js
 var Hi = 1600, Ui = .82, Wi = .6;
 async function Gi(e, t = Hi) {
 	if (qi(e)) return Ji(await e.text());
@@ -2787,7 +2787,7 @@ function $i(e) {
 	return t.toString(16).padStart(8, "0");
 }
 //#endregion
-//#region ../template/assets/engine/0.6.9/glyphs.js
+//#region ../template/assets/engine/0.6.10/glyphs.js
 var ea = "urd-recent-glyphs", ta = [
 	["glyphCat.symbols", "★ ☆ ✦ ✧ ✩ ✪ ✫ ✭ ✮ ✯ ✵ ✳ ✴ ❖ ❋ ✿ ❀ ❁ ✾ ❃ ☘ ◆ ◇ ● ○ ◎ ■ □ ▣ ▲ △ ▼ ▽ ⬡ ⬢ ♦ ♠ ♣ ♥ ♡ ✓ ✔ ✕ ✖ ✗ ✘ ✚ ✜ ☀ ☾ ♪ ♫ ♬ ☮ ☯ ⚜ ⚓ ⚡ ☂ ✂ ✏ ✒ ✉ ☎ ⌛ ⏳ ♻ ⚠ ☑ ⚙ § © ® ™ ° ± × ÷ ∞ ≈ ≠ ≤ ≥ € £ ¥ • ‣ ⁂"],
 	["glyphCat.arrows", "→ ← ↑ ↓ ↔ ↕ ↗ ↘ ↙ ↖ ⇒ ⇐ ⇑ ⇓ ⇔ ➜ ➤ ➔ ↩ ↪ ⤴ ⤵ ↺ ↻ ⟲ ⟳ « » ‹ ›"],
@@ -2818,7 +2818,7 @@ function ia(e) {
 	return t;
 }
 //#endregion
-//#region ../template/assets/engine/0.6.9/icons.js
+//#region ../template/assets/engine/0.6.10/icons.js
 var aa = "fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"", oa = "fill=\"currentColor\" stroke=\"none\"", sa = {
 	facebook: {
 		label: "Facebook",
@@ -3548,7 +3548,7 @@ function ja(e, t) {
 	return n;
 }
 //#endregion
-//#region ../template/assets/engine/0.6.9/plugins.js
+//#region ../template/assets/engine/0.6.10/plugins.js
 function Ma(e) {
 	let t = /^(\d+)\.(\d+)\.(\d+)$/.exec(String(e).trim());
 	return t ? [
@@ -3578,12 +3578,12 @@ function Ia(e) {
 	return (e.entry !== void 0 || !n) && (typeof e.entry != "string" || !e.entry.endsWith(".js")) && t.push("entry mangler eller er ikke en .js-fil"), (e.provides !== void 0 || !n) && (!e.provides || typeof e.provides != "object") && t.push("provides mangler"), e.languages !== void 0 && t.push(...yi(e.languages)), e.locales !== void 0 && typeof e.locales != "boolean" && t.push("locales må være boolsk"), e.names !== void 0 && (typeof e.names != "object" || e.names === null || Array.isArray(e.names) || Object.values(e.names).some((e) => typeof e != "string" || !e)) && t.push("names må være et objekt med språkkode til navn"), t;
 }
 //#endregion
-//#region ../template/assets/engine/0.6.9/sections/presets.js
+//#region ../template/assets/engine/0.6.10/sections/presets.js
 function La(e) {
 	return typeof crypto < "u" && crypto.randomUUID ? `${e}-${crypto.randomUUID().slice(0, 8)}` : `${e}-${[...crypto.getRandomValues(/* @__PURE__ */ new Uint8Array(4))].map((e) => e.toString(16).padStart(2, "0")).join("")}`;
 }
 //#endregion
-//#region ../template/assets/engine/0.6.9/theme.js
+//#region ../template/assets/engine/0.6.10/theme.js
 function Ra(e, t) {
 	let n = e.tokens || {}, r = e.scheme === "dark" ? "dark" : "light";
 	if (!e.alt?.tokens || t === r) return n;
@@ -3679,7 +3679,7 @@ function Ka(e, t) {
 	return n == null || r == null ? null : (Math.max(n, r) + .05) / (Math.min(n, r) + .05);
 }
 //#endregion
-//#region ../template/assets/engine/0.6.9/backgrounds/color.js
+//#region ../template/assets/engine/0.6.10/backgrounds/color.js
 var qa = {
 	version: 1,
 	label: "Farge",
@@ -3983,7 +3983,7 @@ var jo = {
 	}
 };
 //#endregion
-//#region ../template/assets/engine/0.6.9/galleri-model.js
+//#region ../template/assets/engine/0.6.10/galleri-model.js
 function Mo(e, t, n) {
 	return !Number.isFinite(n) || n < 1 ? 0 : (((Number.isFinite(e) ? e : 0) + t) % n + n) % n;
 }
@@ -3995,7 +3995,7 @@ function Po(e, { min: t = 2, fallback: n = 5 } = {}) {
 	return !Number.isFinite(r) || r <= 0 ? n : Math.max(t, r);
 }
 //#endregion
-//#region ../template/assets/engine/0.6.9/backgrounds/bildegalleri.js
+//#region ../template/assets/engine/0.6.10/backgrounds/bildegalleri.js
 var Fo = {
 	version: 1,
 	label: "Bildegalleri",
@@ -4054,7 +4054,7 @@ var Fo = {
 	}
 };
 //#endregion
-//#region ../template/assets/engine/0.6.9/footer-thumb.js
+//#region ../template/assets/engine/0.6.10/footer-thumb.js
 function Io(e = {}) {
 	let t = "#2fd6b6", n = "#5c6b64", r = e.mega ? "#16221d" : "#0e1512", i = e.cols ?? 0, a = e.social ?? 0, o = `<svg viewBox="0 0 160 80" preserveAspectRatio="none" aria-hidden="true"><rect width="160" height="80" fill="${r}"/>`;
 	if (e.mega && (o += `<circle cx="20" cy="6" r="34" fill="${t}" opacity="0.18"/>`), e.bigcta) return o += `<rect x="45" y="18" width="70" height="8" rx="3" fill="${n}" opacity="0.85"/>`, o += `<rect x="56" y="32" width="48" height="4" rx="2" fill="${n}" opacity="0.5"/>`, o += `<rect x="62" y="43" width="36" height="10" rx="3" fill="${t}"/>`, o += Lo(n, e.baselineLinks), o + "</svg>";
@@ -4082,7 +4082,7 @@ function Lo(e, t = 0) {
 	return n += `<rect x="8" y="70" width="40" height="3" rx="1.5" fill="${e}" opacity="0.6"/>`, t && (n += `<g fill="${e}" opacity="0.6">` + Array.from({ length: t }, (e, t) => `<rect x="${120 - t * 16}" y="70" width="12" height="3" rx="1.5"/>`).join("") + "</g>"), n;
 }
 //#endregion
-//#region ../template/assets/engine/0.6.9/animations/core.js
+//#region ../template/assets/engine/0.6.10/animations/core.js
 var Ro = () => ({
 	duration: 600,
 	delay: 0
@@ -4143,7 +4143,7 @@ var Ro = () => ({
 	["font.courier", "'Courier New', monospace"]
 ];
 //#endregion
-//#region ../template/assets/engine/0.6.9/place.js
+//#region ../template/assets/engine/0.6.10/place.js
 function Vo(e) {
 	let t = (e) => Math.round(e * 100) / 100, n = Math.max(0, t(100 - e.w)), r = Math.min(n, Math.max(0, t(e.x - e.w / 2))), i = Math.max(0, e.y - e.h / 2), a = e.snap === !1 || e.grid?.snap === !1, o = e.grid?.size || 8;
 	return i = a ? Math.round(i) : Math.round(i / o) * o, {
@@ -6582,7 +6582,8 @@ function dl(e, t) {
 		"content",
 		"media",
 		"plugins",
-		"functions"
+		"functions",
+		"readme"
 	];
 	function Er(e, t = null) {
 		return e ? Tr.includes(e) ? Q("error.reservedName", { slug: e }) : V(A).pages.some((n) => n.id !== t && (n.path === `/${e}` || n.id === e)) ? Q("error.pageExists") : null : Q("error.pageNeedsName");

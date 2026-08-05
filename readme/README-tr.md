@@ -1,7 +1,17 @@
 <p align="center">
-  <a href="README.md">🇳🇴 Bokmål</a> ·
-  <a href="README-en.md">🇬🇧 English</a> ·
+  <img src="https://raw.githubusercontent.com/Artiscow/Urd/main/docs/brand/urd-logo-turkis.svg" alt="Urd" width="180">
+</p>
+
+<p align="center">
+  <a href="../README.md">🇬🇧 English</a> ·
+  <a href="README-nb.md">🇳🇴 Bokmål</a> ·
   <strong>🇹🇷 Türkçe</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Artiscow/Urd/blob/main/docs/languages/setup-publication/SETUP-tr.md"><strong>Kurulum kılavuzu</strong></a> ·
+  <a href="https://github.com/Artiscow/Urd/blob/main/docs/languages/user-guide/GUIDE-tr.md"><strong>Kullanıcı kılavuzu</strong></a> ·
+  <a href="https://github.com/Artiscow/Urd"><strong>Ana depo</strong></a>
 </p>
 
 # Urd
@@ -23,7 +33,7 @@ Yönetici panelindeki **Güncelleme** bölümünü açın: şablon deposuyla kar
 ## İçerik ve yapı
 
 - `content/` sizin içeriğinizdir (sayfalar, tema, koleksiyonlar) - yönetici panelinin yazdığı her şey burada ve `media/` içinde yaşar.
-- `plugins/` eklentileri barındırır: bir eklenti klasörü ekleyin ve Eklentiler panelinden etkinleştirin. Bkz. [plugins/README.md](plugins/README.md); daha fazlası GitHub'daki `urd-plugin` konusuyla bulunabilir.
+- `plugins/` eklentileri barındırır: bir eklenti klasörü ekleyin ve Eklentiler panelinden etkinleştirin. Bkz. [plugins/README.md](../plugins/README.md); daha fazlası GitHub'daki `urd-plugin` konusuyla bulunabilir.
 - `assets/engine/` ve `admin/` Urd'un kendisidir ve Güncelleme paneli tarafından bakımı yapılır; elle düzenlemeyin.
 
 ## Belgeler

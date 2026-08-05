@@ -5,4 +5,4 @@
  * dette skallet re-eksporterer derfra og oppdateres ved fase-slipp.
  * Hardkod aldri den versjonerte stien i en plugin.
  */
-export * from '../engine/0.6.9/i18n.js';
+export * from '../engine/0.6.10/i18n.js';
