@@ -1,0 +1,50 @@
+# Sikkerhetsheadere for Cloudflare Pages.
+# CSP-en er stram: kun egne skript og stiler; bilder også som data:/blob:
+# (upubliserte opplastinger og genererte teksturer). frame-ancestors 'self'
+# lar admin-editoren vise siden i iframe, men blokkerer fremmede sider.
+# frame-src har BEVISSTE unntak for personvernvennlige innbygginger som
+# følger med Urd: video-blokkens to verter (youtube-nocookie og Vimeo med
+# dnt=1) og kart-pluginens OpenStreetMap. Andre embeds krever at eieren
+# legger verten til her (jf. ADR-0006; plugin-manifestet deklarerer behovet
+# og admin viser den eksakte linjen).
+
+# Speculation Rules leveres som EGEN fil via header (ikke inline): et inline
+# <script type="speculationrules"> ville krevd 'inline-speculation-rules' i
+# script-src, altså det første script-src-unntaket i prosjektet, stikk i strid
+# med grunnen til at boot.js er en egen fil. Regelsettet (prerender av interne
+# lenker, admin utelatt) bor i speculation-rules.json og kan justeres der.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://player.vimeo.com https://www.openstreetmap.org; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'
+  Speculation-Rules: "/speculation-rules.json"
+
+# Regelsettet MÅ serveres som application/speculationrules+json, ellers avviser
+# nettleseren det. Cloudflare Pages gir .json som application/json, så vi setter
+# typen eksplisitt her.
+/speculation-rules.json
+  Content-Type: application/speculationrules+json
+
+# Media er innholdsadressert (media/<slug>-<hash>.webp): nytt innhold gir nytt
+# navn, så filene kan caches for alltid uten revalidering. De tyngste bytene på
+# en side hentes dermed kun én gang per besøker.
+/media/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Motoren er versjonsadressert (assets/engine/<versjon>/..., ADR-0013): ny
+# motor gir ny mappe, så modulene kan caches for alltid. Regelen er BEVISST
+# versjonsnøytral (/assets/engine/* dekker enhver versjonert mappe), så denne
+# håndredigerbare fila aldri trenger endring ved motor-bump. De stabile
+# plugin-API-skallene i /assets/urd/ står UTENFOR og revalideres normalt.
+/assets/engine/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# base.css refereres alltid med innholdsstemplet ?v=<hash> fra HTML-skallene:
+# nytt innhold gir ny URL, så også den kan caches for alltid.
+/assets/styles/base.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/admin/*
+  X-Robots-Tag: noindex

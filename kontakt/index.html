@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Urd</title>
+  <!-- Standard Urd-ikon; nettstedsikonet fra site.json overstyrer ved lasting -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0e14'/%3E%3Cpath d='M19.2 51.2V16l25.6 10.4V51.2' fill='none' stroke='%2315b39a' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/assets/styles/base.css?v=50edfaae">
+  <!-- Sidens materialiserte tema (light-dark()): render-blokkerende og lastet
+       ETTER base.css så den vinner. Skrives ved publisering (buildThemeCss).
+       Mangler den (fersk klon før første publisering) står base.css sitt
+       @supports-standardtema igjen; ingen brudd, kun standardfarger. -->
+  <link rel="stylesheet" href="/content/theme.css">
+  <!--
+    Motoren serveres som rå ES-moduler. Uten forhåndslasting oppdager
+    nettleseren importene lag for lag (serielt fossefall). Disse
+    modulepreload-lenkene er den fulle STATISKE import-lukningen av boot.js,
+    så hele grafen hentes i én parallell bølge. Editor-laget (preview-edit.js
+    m.fl.) lastes dynamisk og skal IKKE stå her. Lista holdes i synk med
+    kilden av tests/modulepreload.test.mjs (feiler bygget ved drift).
+  -->
+  <link rel="modulepreload" href="/assets/engine/0.6.9/boot.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/urd.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/i18n.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/locales/site/nb.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/registry.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/migrate.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/theme.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/render.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/nav.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/nav-model.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/footer.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/footer-model.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/footer-cta.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/sanitize.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/box-style.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/icons.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/samlinger.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/galleri-model.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/sticky.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/sticky-model.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/plugins.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/blocks/text.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/blocks/image.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/blocks/button.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/blocks/shape.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/blocks/video.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/blocks/icon.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/blocks/samling.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/blocks/galleri.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/blocks/faq.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/backgrounds/color.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/backgrounds/gradient.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/backgrounds/glow.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/backgrounds/grain.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/backgrounds/image.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/backgrounds/bildegalleri.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/animations/core.js">
+  <link rel="modulepreload" href="/assets/engine/0.6.9/sections/presets.js">
+  <!-- Lagret lys/mørk-valg settes som data-urd-theme før paint (manuelt valg skal
+       ikke blinke). Eksternt klassisk skript pga. CSP (script-src 'self', ingen inline). -->
+  <script src="/assets/engine/0.6.9/theme-init.js"></script>
+</head>
+<body>
+  <header id="urd-nav"></header>
+  <main id="urd-root">
+    <noscript>Denne siden trenger JavaScript for å vises.</noscript>
+  </main>
+
+  <script type="module" src="/assets/engine/0.6.9/boot.js"></script>
+</body>
+</html>

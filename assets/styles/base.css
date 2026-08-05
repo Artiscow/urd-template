@@ -1,0 +1,3763 @@
+/* Urd basestiler: reset + theme-token-variabler.
+   :root under er Urds STANDARDtema som trygg fallback (enkeltverdier). Sidens
+   EGNE farger kommer fra content/theme.css (materialisert ved publisering, lastet
+   rett etter denne fila) og theme.js sin injiserte <style>; begge vinner. */
+
+:root {
+  --urd-color-bg: #f7f8fb;
+  --urd-color-surface: #ffffff;
+  --urd-color-text: #14161c;
+  --urd-color-accent: #7c5cff;
+  --urd-font-heading: system-ui, sans-serif;
+  --urd-font-body: system-ui, sans-serif;
+  --urd-radius-sm: 6px;
+  --urd-radius-md: 12px;
+  --urd-space-section: clamp(3rem, 8vw, 6rem);
+}
+
+/* Standardtemaet følger OS-lyshet der light-dark() støttes (Baseline 2024): fjerner
+   FOUC-en de gamle mørke default-tokenene ga (malt før JS/innhold lastet). color-scheme
+   får nettleser-chrome (scrollbar/formfelt) til å matche; et manuelt valg overstyrer
+   via data-urd-theme (satt av theme-init.js før paint). Sidens egen theme.css vinner. */
+@supports (color: light-dark(#000, #fff)) {
+  :root {
+    color-scheme: light dark;
+    --urd-color-bg: light-dark(#f7f8fb, #0b0e14);
+    --urd-color-surface: light-dark(#ffffff, #151a23);
+    --urd-color-text: light-dark(#14161c, #e8eaf0);
+  }
+  :root[data-urd-theme="light"] { color-scheme: light; }
+  :root[data-urd-theme="dark"] { color-scheme: dark; }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Lerretsbakgrunnen (bak body): på skjermer med brøkskalering runder 100vh
+     av og etterlater en sub-piksel stripe nederst der dette laget vises. Med
+     surface matcher stripen footeren/panelene, så det ikke blir en mørk linje. */
+  background: var(--urd-color-surface);
+}
+
+body {
+  background: var(--urd-color-bg);
+  color: var(--urd-color-text);
+  font-family: var(--urd-font-body);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--urd-font-heading);
+  line-height: 1.15;
+}
+
+img, video {
+  max-width: 100%;
+  display: block;
+}
+
+/* Seksjonscontainer: posisjoneringskontekst for blokk-frames.
+   Klipper ALDRI innhold: blokker kan bevisst henge over seksjonslinjen,
+   og editor og publisert side skal se identiske ut. */
+.urd-section {
+  position: relative;
+}
+
+/* Roterte/overhengende blokker skal ikke gi sidescrolling */
+html {
+  overflow-x: clip;
+}
+
+/* Bakgrunnslag fyller seksjonen og ligger bak blokkene */
+.urd-bg-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Lagbasert bakgrunn for nav og footer (delt med seksjoner): en backdrop-
+   container bak innholdet. z-index -1 legger lagene bak nav/footer-innholdet,
+   men foran elementets egen flate; overflow klipper bildelag til (avrundede)
+   kanter. Verten (.urd-nav / .urd-footer) er en stacking context. */
+.urd-nav-bg,
+.urd-footer-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Slank scrollbar i temaets farger (matcher editorens, og ser bedre ut
+   enn nettleser-standarden på mørke sider) */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--urd-color-text) 25%, transparent) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--urd-color-text) 25%, transparent);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Blokker posisjoneres absolutt av render.js (frameToCss) */
+.urd-block {
+  position: absolute;
+}
+
+/* Auto-avledet mobil-layout: vanlig flyt i én kolonne (render.js) */
+.urd-flow {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+.urd-block-flow {
+  position: static;
+}
+
+/* Innhold i tekstblokker: lister, sitater og lenker fra
+   formateringslinjen (global reset nuller ellers listeinnrykk) */
+.urd-text ul,
+.urd-text ol {
+  padding-left: 1.3em;
+}
+
+.urd-text blockquote {
+  border-left: 3px solid var(--urd-color-accent);
+  padding-left: 0.8em;
+  opacity: 0.9;
+}
+
+.urd-text a {
+  color: var(--urd-color-accent);
+}
+
+/* Tekstboks: tekstblokk med innholdet i et kort (props.box på tekstblokken).
+   Følger temaets flatefarge og radius. */
+.urd-text-box {
+  box-sizing: border-box;
+  background: var(--urd-color-surface);
+  /* Temaets tynne kantlinje: synlig nok til å lese som en kant (var 12 %,
+     nesten usynlig). «Egen farge» i kortstilen overstyrer den. */
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 22%, transparent);
+  border-radius: var(--urd-radius-md);
+  padding: 1rem 1.25rem;
+}
+
+/* FAQ-akkordeonen: spørsmålskort (deler .urd-text-box-basisstilen) der
+   svaret foldes ut med grid-rows-overgangen (0fr -> 1fr). */
+.urd-faq {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Hvert spørsmål er et native <details>. */
+.urd-faq-item {
+  padding: 0.75rem 1.25rem;
+}
+
+/* <summary>: skjul standard-trekanten (flex fjerner den i Chromium; list-style
+   og webkit-markøren dekker resten). */
+.urd-faq-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.urd-faq-head::-webkit-details-marker {
+  display: none;
+}
+
+.urd-faq-q {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.urd-faq-toggle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: var(--urd-color-text);
+}
+
+.urd-faq-toggle svg {
+  transition: transform 0.25s ease;
+}
+
+.urd-faq-item[open] .urd-faq-toggle svg {
+  transform: rotate(180deg);
+}
+
+.urd-faq-a > .urd-text {
+  padding-top: 0.5rem;
+}
+
+/* Myk utfolding der nettleseren støtter ::details-content + interpolate-size
+   (Chromium tidlig 2026): svaret glir ut/inn i høyde. Uten støtte folder native
+   <details> svaret ut momentant. content-visibility-overgangen (allow-discrete)
+   holder innholdet synlig gjennom sammenleggingen. */
+@supports (interpolate-size: allow-keywords) {
+  .urd-faq {
+    interpolate-size: allow-keywords;
+  }
+
+  .urd-faq-item::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition: block-size 0.25s ease, content-visibility 0.25s allow-discrete;
+  }
+
+  .urd-faq-item[open]::details-content {
+    block-size: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-faq-toggle svg {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @supports (interpolate-size: allow-keywords) {
+    .urd-faq-item::details-content {
+      transition: none;
+    }
+  }
+}
+
+/* Formateringslinjen for tekstfelt (kun preview-modus): vises over
+   blokken så lenge feltet redigeres. To faste rader (Office-stil) stables
+   i en kolonne; de utvidbare underradene legger seg under. */
+.urd-text-toolbar {
+  position: fixed;
+  z-index: 100002;
+  display: none;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  max-width: min(760px, calc(100vw - 16px));
+  padding: 4px 6px;
+  background: #151a23;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
+}
+
+/* Hver faste rad: knappegrupper som radbryter ved trang plass. */
+.urd-tt-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.urd-tt-row + .urd-tt-row {
+  border-top: 1px solid rgb(255 255 255 / 10%);
+  padding-top: 4px;
+  margin-top: 4px;
+}
+
+/* Grupper radbrytes SAMLET (ingen enslige knapper på egen linje), med skillelinje mellom */
+.urd-tt-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.urd-tt-group + .urd-tt-group {
+  border-left: 1px solid rgb(255 255 255 / 18%);
+  padding-left: 6px;
+  margin-left: 2px;
+}
+
+/* Størrelsesfeltet: smalt, sentrert tall mellom minus/pluss. De innebygde
+   opp/ned-pilene skjules (− / + gjør jobben); feltet kan fremdeles skrives i. */
+.urd-tt-size {
+  width: 3.2em;
+  text-align: center;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.urd-tt-size::-webkit-outer-spin-button,
+.urd-tt-size::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hevet/senket-knappene: A med liten 2-er. */
+.urd-tt-supsub {
+  font: 600 12px/1 system-ui, sans-serif;
+}
+
+.urd-text-toolbar sup {
+  font-size: 8px;
+}
+
+/* Aktiv formatknapp: markøren står i formatet (fet, justering, lister ...).
+   Nøytral markering (uavhengig av sidens tema), tydelig mot den mørke linjen. */
+.urd-text-toolbar button.active {
+  background: rgb(120 160 255 / 34%);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgb(120 160 255 / 55%);
+}
+
+.urd-text-toolbar button.active:hover {
+  background: rgb(120 160 255 / 44%);
+}
+
+/* Linjeavstand-knappene i avstandsraden. */
+.urd-text-toolbar .urd-tt-lh {
+  min-width: 0;
+  padding: 0 6px;
+  font: 12px/1 system-ui, sans-serif;
+}
+
+
+/* Inline lenkefelt (egen underrad i linjen når lenkeknappen er aktiv) */
+.urd-tt-linkrow {
+  display: none;
+  gap: 4px;
+  align-items: center;
+  padding-top: 4px;
+  margin-top: 2px;
+  border-top: 1px solid rgb(255 255 255 / 14%);
+}
+
+.urd-tt-linkrow.vis {
+  display: flex;
+}
+
+/* Fargeraden (nedtrekket bak palettikonet): egen underrad, som lenkefeltet */
+.urd-tt-colorrow {
+  display: none;
+  gap: 2px;
+  align-items: center;
+  padding-top: 4px;
+  margin-top: 2px;
+  border-top: 1px solid rgb(255 255 255 / 14%);
+}
+
+.urd-tt-colorrow.vis {
+  display: flex;
+}
+
+/* Avstandsraden (bak avstandsknappen): linjeavstand-preset + bokstavavstand */
+.urd-tt-spacerow {
+  display: none;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
+  padding-top: 4px;
+  margin-top: 2px;
+  border-top: 1px solid rgb(255 255 255 / 14%);
+}
+
+.urd-tt-spacerow.vis {
+  display: flex;
+}
+
+.urd-tt-typolabel {
+  font: 600 10px/1.2 system-ui, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(232 234 240 / 60%);
+}
+
+/* Tallfeltene (størrelse, bokstavavstand); tomt felt = arv fra tema */
+.urd-tt-num {
+  width: 4em;
+  font: 12px/1.3 system-ui, sans-serif;
+  color: #e8eaf0;
+  background: rgb(255 255 255 / 6%);
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 5px;
+  padding: 3px 4px;
+}
+
+/* Tegnraden (nedtrekket bak smilefjes-knappen): rullbart rutenett med
+   tegn og emoji, samme utvalg som ikon-blokkens tegnvelger */
+.urd-tt-glyphrow {
+  display: none;
+  flex-basis: 100%;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-top: 4px;
+  margin-top: 2px;
+  border-top: 1px solid rgb(255 255 255 / 14%);
+}
+
+.urd-tt-glyphrow.vis {
+  display: block;
+}
+
+.urd-tt-glyphhead {
+  font: 600 10px/1.2 system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(232 234 240 / 60%);
+  padding: 6px 2px 3px;
+}
+
+.urd-tt-glyphgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
+  gap: 2px;
+}
+
+.urd-text-toolbar .urd-tt-glyphgrid button {
+  font-size: 15px;
+  font-weight: 400;
+}
+
+/* «Egen tekstfarge»: A med regnbueunderstrek */
+.urd-text-toolbar .urd-tt-acolor {
+  display: inline-block;
+  padding: 1px 3px 2px;
+  border-bottom: 3px solid transparent;
+  border-image: linear-gradient(to right, #e05252, #e2b84a, #4ac26b, #4a90e2, #a45ce2) 1;
+}
+
+.urd-tt-linkrow input {
+  flex: 1;
+  font: 12px/1.3 system-ui, sans-serif;
+  color: #e8eaf0;
+  background: rgb(255 255 255 / 6%);
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 5px;
+  padding: 4px 6px;
+  min-width: 0;
+}
+
+.urd-tt-linkrow button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-size: 11px;
+  padding: 4px 8px;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 5px;
+}
+
+.urd-text-toolbar.vis {
+  display: flex;
+}
+
+.urd-text-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  font: 600 12px/1 system-ui, sans-serif;
+  color: #e8eaf0;
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  padding: 0 5px;
+  cursor: pointer;
+}
+
+.urd-text-toolbar button:hover {
+  background: rgb(255 255 255 / 12%);
+}
+
+.urd-tt-sep {
+  width: 1px;
+  height: 18px;
+  margin: 0 3px;
+  background: rgb(255 255 255 / 18%);
+}
+
+.urd-tt-level {
+  font: 12px/1.2 system-ui, sans-serif;
+  color: #e8eaf0;
+  background: transparent;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 5px;
+  padding: 4px 6px;
+  color-scheme: dark;
+}
+
+.urd-tt-color {
+  width: 22px;
+  height: 22px;
+  padding: 1px;
+  background: transparent;
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.urd-text-toolbar .urd-text-swatch {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 30%);
+}
+
+/* Justeringsikoner: tre streker med ulik linjering */
+.urd-ticon {
+  display: grid;
+  gap: 3px;
+  width: 14px;
+}
+
+.urd-ticon i {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  border-radius: 1px;
+}
+
+.urd-ticon-left i:nth-child(2),
+.urd-ticon-right i:nth-child(2) {
+  width: 60%;
+}
+
+.urd-ticon-right i:nth-child(2) {
+  justify-self: end;
+}
+
+.urd-ticon-center i:nth-child(2) {
+  width: 60%;
+  justify-self: center;
+}
+
+/* Listeikoner: punkt/nummer + strek per rad */
+.urd-licon {
+  display: grid;
+  gap: 3px;
+  width: 14px;
+}
+
+.urd-licon i {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 4px;
+  font-style: normal;
+  font-size: 4px;
+  line-height: 1;
+}
+
+.urd-licon i::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.urd-licon-ol i::before {
+  content: none;
+}
+
+.urd-licon i::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.urd-text-toolbar sub {
+  font-size: 8px;
+}
+
+/* Uthevingsknappen: A på aksentfarget «tusj»-bakgrunn; fri-varianten har omriss */
+.urd-text-toolbar .urd-tt-hl {
+  display: inline-block;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text, #fff);
+}
+
+.urd-text-toolbar .urd-tt-hl-free {
+  background: transparent;
+  color: #e8eaf0;
+  border: 1px dashed rgb(255 255 255 / 45%);
+}
+
+/* «Fjern utheving»: A-chip med rød skråstrek over */
+.urd-text-toolbar .urd-tt-hl-none {
+  background: linear-gradient(to top right, transparent 44%, #e05252 44% 56%, transparent 56%);
+  color: #e8eaf0;
+  border: 1px solid rgb(255 255 255 / 30%);
+}
+
+body.urd-chrome-off .urd-text-toolbar {
+  display: none !important;
+}
+
+/* Den felles fargevelgeren (color-picker.js): flytende kort i preview-modus */
+.urd-cp {
+  position: fixed;
+  z-index: 100003;
+  width: 236px;
+  display: grid;
+  /* Bind kolonnen til boksbredden: uten dette blir den implisitte grid-
+     kolonnen max-content-bred (RGB-feltene) og innholdet flyter ut av boksen. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  padding: 10px;
+  background: #151a23;
+  color: #e8eaf0;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 10px;
+  box-shadow: 0 12px 36px rgb(0 0 0 / 55%);
+  font: 12px/1.4 system-ui, sans-serif;
+}
+
+.urd-cp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.urd-cp-close {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font-size: 15px;
+  line-height: 1;
+  padding: 2px 7px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.urd-cp-close:hover {
+  background: rgb(255 255 255 / 12%);
+}
+
+.urd-cp-area {
+  position: relative;
+  height: 120px;
+  border-radius: 8px;
+  background-image: linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.urd-cp-cursor {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 55%);
+  pointer-events: none;
+}
+
+.urd-cp-hue {
+  width: 100%;
+  height: 12px;
+  appearance: none;
+  border-radius: 999px;
+  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+
+.urd-cp-hue::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: transparent;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 45%);
+}
+
+.urd-cp-hue::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: transparent;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 45%);
+}
+
+/* Gjennomsiktighetsglideren: sjakkbrett + fargegradient settes inline (følger fargen) */
+.urd-cp-alpha {
+  width: 100%;
+  height: 12px;
+  appearance: none;
+  border-radius: 999px;
+}
+
+.urd-cp-alpha::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: transparent;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 45%);
+}
+
+.urd-cp-alpha::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: transparent;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 45%);
+}
+
+.urd-cp-fields {
+  display: flex;
+  gap: 4px;
+}
+
+.urd-cp-fields input {
+  font: 11px/1.3 ui-monospace, monospace;
+  color: inherit;
+  background: rgb(255 255 255 / 6%);
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 5px;
+  padding: 4px 5px;
+  min-width: 0;
+}
+
+.urd-cp-hex {
+  flex: 1.6;
+}
+
+.urd-cp-fields input[type='number'] {
+  flex: 1;
+  appearance: textfield;
+}
+
+.urd-cp-eye {
+  flex: 0 0 auto;
+  color: inherit;
+  background: rgb(255 255 255 / 8%);
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 5px;
+  padding: 0 7px;
+  cursor: pointer;
+}
+
+.urd-cp-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.urd-cp-tokens {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.urd-cp-token {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 35%);
+  cursor: pointer;
+  padding: 0;
+}
+
+.urd-cp-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.urd-cp-add {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: inherit;
+  background: rgb(255 255 255 / 8%);
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 5px;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.urd-cp-add:hover {
+  background: rgb(255 255 255 / 15%);
+}
+
+.urd-cp-saved {
+  position: relative;
+  display: inline-flex;
+}
+
+.urd-cp-del {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 13px;
+  height: 13px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #e05252;
+  color: #fff;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.urd-cp-saved:hover .urd-cp-del {
+  display: flex;
+}
+
+body.urd-chrome-off .urd-cp {
+  display: none !important;
+}
+
+/* Hjelpechipen (ADR-0008) styles seg selv: engine/hint.js injiserer sin egen
+   style-tag, så chipen aldri kan stå ustylet med en utdatert base.css. */
+
+/* Den felles bildeeditoren (image-editor.js): flytende panel i preview-modus */
+.urd-imged {
+  position: fixed;
+  z-index: 100002;
+  width: 260px;
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  background: #151a23;
+  color: #e8eaf0;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 10px;
+  box-shadow: 0 12px 36px rgb(0 0 0 / 55%);
+  font: 13px/1.4 system-ui, sans-serif;
+}
+
+.urd-imged-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.urd-imged-close {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font-size: 15px;
+  line-height: 1;
+  padding: 2px 7px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.urd-imged-close:hover {
+  background: rgb(255 255 255 / 12%);
+}
+
+.urd-imged-thumb {
+  position: relative;
+  height: 130px;
+  border-radius: 8px;
+  background-size: cover;
+  background-position: center;
+  background-color: rgb(255 255 255 / 6%);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.urd-imged-thumb-empty::after {
+  content: 'Ingen bilde ennå';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.urd-imged-dot {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: rgb(0 0 0 / 35%);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 45%);
+  pointer-events: none;
+}
+
+.urd-imged-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.urd-imged-hint {
+  font-size: 10.5px;
+  line-height: 1.35;
+  opacity: 0.62;
+}
+
+/* Tredelingsgitter (som i kameraer): over bildet på lerretet mens editoren
+   er åpen, og i panelets miniatyr. Svake linjer på tredjedelene. */
+.urd-imged-grid,
+.urd-imged-thumbgrid {
+  background-image:
+    linear-gradient(to right, transparent calc(33.33% - 1px), rgb(255 255 255 / 40%) 0 33.33%, transparent 0 calc(66.67% - 1px), rgb(255 255 255 / 40%) 0 66.67%, transparent 0),
+    linear-gradient(to bottom, transparent calc(33.33% - 1px), rgb(255 255 255 / 40%) 0 33.33%, transparent 0 calc(66.67% - 1px), rgb(255 255 255 / 40%) 0 66.67%, transparent 0);
+}
+
+.urd-imged-grid {
+  position: fixed;
+  z-index: 100001;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.urd-imged-thumbgrid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+body.urd-chrome-off .urd-imged-grid {
+  display: none !important;
+}
+
+.urd-imged-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.urd-imged-btn {
+  flex: 1;
+  font: inherit;
+  color: inherit;
+  background: rgb(255 255 255 / 8%);
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 6px;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+
+.urd-imged-btn:hover {
+  background: rgb(255 255 255 / 15%);
+}
+
+.urd-imged-danger {
+  flex: 0 0 auto;
+  border-color: color-mix(in srgb, #e05252 60%, transparent);
+}
+
+.urd-imged-row {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.urd-imged-row input[type='range'] {
+  width: 100%;
+  accent-color: #7c5cff;
+}
+
+.urd-imged-slider {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.urd-imged-value {
+  flex: 0 0 auto;
+  width: 30px;
+  text-align: right;
+  font: 10px/1 ui-monospace, monospace;
+  opacity: 0.7;
+}
+
+.urd-imged-row input:not([type='range']) {
+  font: inherit;
+  color: inherit;
+  background: rgb(255 255 255 / 6%);
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 6px;
+  padding: 4px 6px;
+  min-width: 0;
+  color-scheme: dark;
+}
+
+/* Segmenterte valg (Tilpasning/Avrunding): stylet erstatning for native select */
+.urd-imged-seg {
+  display: flex;
+  padding: 2px;
+  background: rgb(255 255 255 / 6%);
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 6px;
+}
+
+.urd-imged-seg button {
+  flex: 1;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: 11px/1.2 system-ui, sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.urd-imged-seg button:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+.urd-imged-seg button.valgt {
+  background: #7c5cff;
+  color: #fff;
+}
+
+body.urd-chrome-off .urd-imged {
+  display: none !important;
+}
+
+/* Animasjoner (Urd.animations). Inngangsanimasjonene starter usynlige og
+   glir inn når .urd-anim-in settes (IntersectionObserver i animations/
+   core.js). Varighet/forsinkelse settes som CSS-variabler per element.
+   Blokker med rotasjon har inline transform som vinner: da spilles kun
+   opacity-delen, bevisst. */
+.urd-anim-fade-in,
+.urd-anim-slide-up,
+.urd-anim-zoom-in {
+  opacity: 0;
+  transition:
+    opacity var(--urd-anim-duration, 600ms) ease var(--urd-anim-delay, 0ms),
+    transform var(--urd-anim-duration, 600ms) ease var(--urd-anim-delay, 0ms);
+}
+
+.urd-anim-slide-up {
+  transform: translateY(24px);
+}
+
+.urd-anim-zoom-in {
+  transform: scale(0.92);
+}
+
+.urd-anim-in {
+  opacity: 1;
+  transform: none;
+}
+
+.urd-anim-hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Kombinasjon: en blokk med BÅDE inngangsanimasjon OG «Løft ved peker».
+   Uten dette overstyrer hover-lift-regelen (senere i CSS-en) inngangens
+   transition, så opasiteten/formen hopper i stedet for å tone/gli inn.
+   Her dekker transitionen både inngangen (varighet/forsinkelse) og hover
+   (box-shadow). Fade-in bruker ikke transform til inngangen, så der er
+   hover-løftet snappy (0.2s); slide/zoom deler inngangens varighet. */
+.urd-anim-fade-in.urd-anim-hover-lift {
+  transition:
+    opacity var(--urd-anim-duration, 600ms) ease var(--urd-anim-delay, 0ms),
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.urd-anim-slide-up.urd-anim-hover-lift,
+.urd-anim-zoom-in.urd-anim-hover-lift {
+  transition:
+    opacity var(--urd-anim-duration, 600ms) ease var(--urd-anim-delay, 0ms),
+    transform var(--urd-anim-duration, 600ms) ease var(--urd-anim-delay, 0ms),
+    box-shadow 0.2s ease;
+}
+
+.urd-anim-hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-anim-fade-in,
+  .urd-anim-slide-up,
+  .urd-anim-zoom-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .urd-anim-hover-lift,
+  .urd-anim-hover-lift:hover {
+    transform: none;
+    transition: none;
+  }
+
+  /* Galleri- og bakgrunnstoningene: JS-en nekter alt å spille automatisk
+     ved redusert bevegelse; dette fjerner også selve toningen ved manuell
+     blaing i lysbildevisningen. */
+  .urd-galleri-slide,
+  .urd-bg-slide {
+    transition: none;
+  }
+}
+
+/* Samling-blokken (ADR-0007): tre visninger over strukturerte innslag.
+   Indre layout er flyt/grid, aldri frames per innslag. */
+.urd-samling {
+  width: 100%;
+}
+
+.urd-samling-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.urd-samling-card {
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+  background: var(--urd-color-surface);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 12%, transparent);
+  border-radius: var(--urd-radius-md);
+  padding: 1rem;
+}
+
+/* Bildeinnpakningen: rammen eier form/avrunding og klipper zoom-beskjæringen */
+.urd-samling-imgwrap {
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.urd-samling-imgwrap img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.urd-samling-image {
+  width: calc(100% + 2rem);
+  margin: -1rem -1rem 0.35rem;
+  height: 150px;
+  border-radius: var(--urd-radius-md) var(--urd-radius-md) 0 0;
+}
+
+.urd-samling-date {
+  font-size: 0.78em;
+  opacity: 0.65;
+}
+
+.urd-samling-title {
+  font-family: var(--urd-font-heading);
+  font-weight: 600;
+  color: inherit;
+}
+
+a.urd-samling-title {
+  color: var(--urd-color-accent);
+  text-decoration: none;
+}
+
+a.urd-samling-title:hover {
+  text-decoration: underline;
+}
+
+.urd-samling-text {
+  font-size: 0.9em;
+  opacity: 0.85;
+}
+
+.urd-samling-list {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.urd-samling-row {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+}
+
+.urd-samling-badge {
+  flex: 0 0 auto;
+  width: 3.2rem;
+  text-align: center;
+  padding: 0.35rem 0;
+  background: var(--urd-color-surface);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 15%, transparent);
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-samling-badge strong {
+  display: block;
+  font-size: 1.15em;
+  line-height: 1.1;
+}
+
+.urd-samling-badge span {
+  font-size: 0.7em;
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+.urd-samling-thumb {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-samling-year {
+  margin: 1rem 0 0.5rem;
+  opacity: 0.85;
+}
+
+.urd-samling-archive .urd-samling-year:first-child {
+  margin-top: 0;
+}
+
+/* Redigering i preview: tittel/tekst er klikk-og-skriv, bilder byttes med klikk */
+.urd-preview .urd-samling-editable:hover {
+  outline: 1px dashed color-mix(in srgb, var(--urd-color-accent) 60%, transparent);
+  outline-offset: 2px;
+}
+
+.urd-preview .urd-samling-placeholder:empty::before {
+  content: attr(data-placeholder);
+  opacity: 0.45;
+}
+
+.urd-preview .urd-samling-image-edit {
+  cursor: pointer;
+}
+
+.urd-preview .urd-samling-image-edit:hover {
+  outline: 2px dashed color-mix(in srgb, var(--urd-color-accent) 60%, transparent);
+  outline-offset: -2px;
+}
+
+.urd-preview .urd-samling-image-adder {
+  min-height: 56px;
+  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 35%, transparent);
+  border-radius: var(--urd-radius-sm);
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  font: inherit;
+  font-size: 0.8em;
+}
+
+.urd-samling-card .urd-samling-image-adder {
+  width: calc(100% + 2rem);
+  margin: -1rem -1rem 0.35rem;
+  min-height: 90px;
+  border-radius: var(--urd-radius-md) var(--urd-radius-md) 0 0;
+}
+
+.urd-samling-row .urd-samling-image-adder {
+  flex: 0 0 auto;
+  width: 56px;
+}
+
+/* Tomtilstand: kun i editorens preview (besøkende ser ingenting), samme mønster som bildeblokken */
+.urd-preview .urd-samling-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 90px;
+  padding: 1rem;
+  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 30%, transparent);
+  border-radius: var(--urd-radius-md);
+  font-size: 0.85em;
+  opacity: 0.6;
+  text-align: center;
+}
+
+/* Video-blokken: plassholder uten URL, og klikkskjold i redigering
+   (klikk skal markere blokken, ikke starte spilleren) */
+.urd-video-empty {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  opacity: 0.65;
+  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 30%, transparent);
+  border-radius: var(--urd-radius-md);
+}
+
+.urd-video-shield {
+  position: absolute;
+  inset: 0;
+}
+
+/* Ikon-blokken: glyfen sentreres i rammen */
+.urd-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Tom bildeblokk: plassholder kun i editoren */
+.urd-image-empty {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.6;
+  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 30%, transparent);
+  border-radius: var(--urd-radius-md);
+}
+
+/* Bilderammen: klipper bildet, så avrunding vises uansett tilpasning og
+   zoom beskjæres rent inn mot fokuspunktet. */
+.urd-image-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.urd-image-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Bildeblokk med lightbox: zoom-peker hos besøkende og i Ren visning;
+   med chrome på eier redigeringen klikket, så pekeren er nøytral der. */
+.urd-lightbox-able {
+  cursor: zoom-in;
+}
+
+.urd-preview:not(.urd-chrome-off) .urd-lightbox-able {
+  cursor: inherit;
+}
+
+/* Galleri-blokken: tre visninger (rutenett/karusell/lysbilde) over samme
+   bildeliste. Flisene er rammer som klipper (som .urd-image-frame);
+   klikkbare fliser er button/a uten egen knappestil. */
+.urd-galleri {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.urd-galleri-tile {
+  display: block;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: default;
+}
+
+button.urd-galleri-tile,
+a.urd-galleri-tile {
+  cursor: zoom-in;
+}
+
+.urd-preview:not(.urd-chrome-off) .urd-galleri-edit {
+  cursor: pointer;
+}
+
+.urd-galleri-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.urd-galleri-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--urd-galleri-cols, 3), 1fr);
+  gap: var(--urd-galleri-gap, 12px);
+  height: auto;
+}
+
+.urd-galleri-grid .urd-galleri-tile {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+/* Karusell: sidescroll med snap; pilene ruller et skjermbreddehopp. */
+.urd-galleri-track {
+  display: flex;
+  gap: var(--urd-galleri-gap, 12px);
+  height: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+
+.urd-galleri-track .urd-galleri-tile {
+  flex: 0 0 auto;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+  scroll-snap-align: start;
+}
+
+/* Lysbilde: stablede slides, kun .on er synlig (og klikkbar). */
+.urd-galleri-slides {
+  height: 100%;
+  overflow: hidden;
+}
+
+.urd-galleri-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.urd-galleri-slide.on {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.urd-galleri-slide .urd-galleri-tile {
+  width: 100%;
+  height: 100%;
+}
+
+.urd-galleri-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--urd-color-bg) 65%, transparent);
+  color: var(--urd-color-text);
+  cursor: pointer;
+}
+
+.urd-galleri-nav:hover {
+  background: color-mix(in srgb, var(--urd-color-accent) 35%, var(--urd-color-bg));
+}
+
+.urd-galleri-nav:focus-visible {
+  outline: 2px solid var(--urd-color-accent);
+  outline-offset: 2px;
+}
+
+.urd-galleri-prev {
+  left: 10px;
+}
+
+.urd-galleri-next {
+  right: 10px;
+}
+
+.urd-galleri-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 7px;
+}
+
+.urd-galleri-dot {
+  top: auto;
+  transform: none;
+  position: static;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--urd-color-text) 45%, transparent);
+}
+
+.urd-galleri-dot.on {
+  background: var(--urd-color-accent);
+}
+
+/* Tom-tilstand: kun i editorens preview, samme mønster som bildeblokken */
+.urd-galleri-empty {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.6;
+  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 30%, transparent);
+  border-radius: var(--urd-radius-md);
+}
+
+/* Scrollås mens en modal dialog er åpen (lysboksen i dag, enhver framtidig
+   showModal-flate automatisk): native :has()/:modal i stedet for JS-bokføring
+   av body.style.overflow. Uten :has-støtte (utenfor baseline-halen) mangler
+   kun låsen; dialogen selv virker som før. */
+body:has(dialog:modal) {
+  overflow: hidden;
+}
+
+/* Lightbox (engine/lightbox.js): fullskjermvisning hos besøkende og i Ren
+   visning. Over nav (5000), under editor-chromen (99999+). Mørk uansett
+   tema: den er et fotovisningsrom, ikke en temaflate. */
+/* Native <dialog> (showModal): top-layer, så ingen z-index trengs. UA-stilene
+   for margin/border/padding/maks nullstilles; den mørke bakgrunnen er ::backdrop.
+   display gates på [open] så den aldri vises mellom appendChild og showModal. */
+.urd-lightbox {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  align-items: center;
+  justify-content: center;
+}
+
+.urd-lightbox[open] {
+  display: flex;
+}
+
+.urd-lightbox::backdrop {
+  background: rgb(0 0 0 / 88%);
+}
+
+.urd-lightbox-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  max-width: 92vw;
+  max-height: 88vh;
+}
+
+.urd-lightbox-img {
+  max-width: 92vw;
+  max-height: 82vh;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.urd-lightbox-caption {
+  color: #e8eaf0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+  text-align: center;
+}
+
+.urd-lightbox button {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 10%);
+  color: #fff;
+  cursor: pointer;
+}
+
+.urd-lightbox button:hover {
+  background: rgb(255 255 255 / 24%);
+}
+
+.urd-lightbox button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.urd-lightbox-close {
+  top: 16px;
+  right: 16px;
+}
+
+.urd-lightbox-prev {
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.urd-lightbox-next {
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Bildegalleri-bakgrunnslaget: to stablede bilder som krysstoner. */
+.urd-bg-galleri {
+  overflow: hidden;
+}
+
+.urd-bg-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--urd-bgg-fade, 1.5s) ease;
+}
+
+.urd-bg-slide.on {
+  opacity: 1;
+}
+
+/* «+ Ny blokk» (hover-vist, kun preview): øverst til høyre i seksjonen,
+   under seksjonsverktøylinjen. Absolutt posisjon: pillen skal aldri
+   delta i flyten (en flyt-marg kollapset tidligere ut av seksjonen og
+   ga et bakgrunnsløst bånd øverst i alle seksjoner). */
+.urd-preview .urd-add-block {
+  position: absolute;
+  top: 46px;
+  right: 10px;
+  /* Over blokk-løftet (99999): en overhengende blokk skal ikke dekke knappen */
+  z-index: 100000;
+  display: grid;
+  justify-items: end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+/* Editor-menyene (blokkmenyen og seksjonsgalleriet) følger Urd-adminens
+   fargetema, ikke siden som redigeres: editoren melder temaet inn som
+   --urd-admin-*-variabler (urd-admin-theme), og her overstyres sidens
+   variabler lokalt. Fallbackene er adminens standardtema («grå»), så
+   menyene er lesbare også når previewen åpnes utenfor admin. */
+.urd-preview .urd-add-block,
+.urd-preview .urd-add-section {
+  --urd-color-bg: var(--urd-admin-bg, #0e0f11);
+  --urd-color-surface: var(--urd-admin-surface, #191b1e);
+  --urd-color-accent: var(--urd-admin-accent, #5f6a75);
+  --urd-color-text: var(--urd-admin-text, #e6e8ea);
+}
+
+.urd-preview .urd-section:hover .urd-add-block {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Åpnet med dobbeltklikk: menyen står alene ved pekeren, chip-knappen
+   skjules, og menyen holdes synlig uavhengig av hover-reglene. Hevet OVER
+   seksjons-chromet (+ Ny seksjon 100001, seksjonslinjene 100000), så det
+   ligger UNDER menyen i stedet for å stikke gjennom den. */
+.urd-preview .urd-add-block.urd-at-pointer {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 100002;
+}
+
+.urd-preview .urd-add-block.urd-at-pointer .urd-add-block-open {
+  display: none;
+}
+
+.urd-preview .urd-add-block-open {
+  font: 500 12px/1 system-ui, sans-serif;
+  color: var(--urd-color-text);
+  background: color-mix(in srgb, var(--urd-color-surface) 85%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 35%, transparent);
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.urd-preview .urd-add-block-open:hover {
+  border-color: var(--urd-color-accent);
+}
+
+.urd-preview .urd-add-block-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  grid-template-columns: repeat(2, minmax(6.5rem, 1fr));
+  gap: 4px;
+  padding: 6px;
+  background: var(--urd-color-surface);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 15%, transparent);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 45%);
+}
+
+/* Formene: utfoldbar undermeny som spenner begge kolonnene */
+.urd-preview .urd-add-block-shapes-toggle {
+  grid-column: 1 / -1;
+}
+
+/* Plugin-blokkene: egen merket seksjon under det innebygde */
+.urd-preview .urd-add-block-plugins {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  padding-top: 6px;
+  border-top: 1px solid color-mix(in srgb, var(--urd-color-text) 15%, transparent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.urd-preview .urd-add-block-shapes {
+  display: none;
+  grid-column: 1 / -1;
+  /* minmax(0, 1fr): innrykket skal aldri presse høyrekolonnen ut av menyen */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px 0 4px 8px;
+  border-left: 2px solid color-mix(in srgb, var(--urd-color-accent) 45%, transparent);
+}
+
+.urd-preview .urd-add-block-shapes.open {
+  display: grid;
+}
+
+.urd-preview .urd-add-block-menu.open {
+  display: grid;
+}
+
+.urd-preview .urd-add-block-menu button {
+  font: 12px/1.2 system-ui, sans-serif;
+  color: var(--urd-color-text);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 18%, transparent);
+  border-radius: 6px;
+  padding: 6px 8px;
+  text-align: left;
+  cursor: pointer;
+  /* Lange etiketter uten mellomrom (f.eks. plugin-visninger) skal aldri
+     sprenge cellen: bryt ordet i stedet for å flyte utenfor menyen. */
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.urd-preview .urd-add-block-menu button:hover {
+  border-color: var(--urd-color-accent);
+  background: color-mix(in srgb, var(--urd-color-accent) 12%, transparent);
+}
+
+/* Plassholder for ukjente typer: nøytral, aldri ødeleggende */
+.urd-placeholder {
+  display: grid;
+  place-items: center;
+  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 30%, transparent);
+  border-radius: var(--urd-radius-sm);
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+/* Navigasjon */
+.urd-nav {
+  /* Basispaddingen settes av størrelsesklassene (urd-nav-size-*); pillen
+     skalerer den ned med calc, så størrelse og variant komponerer.
+     --urd-nav-shrink er scroll-krympen (urd-nav-compact på verten):
+     faktor 1 uten krymp, så alle varianter komponerer med den. */
+  --urd-nav-pad: calc(var(--urd-nav-base-pad, 0.9rem) * var(--urd-nav-shrink, 1));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: var(--urd-nav-pad) clamp(1rem, 4vw, 2.5rem);
+  /* Bakgrunn og blur bor i varer (settes av nav.js fra nav.style):
+     undermenyer og mobilpanelet gjenbruker samme flate som selve menyen.
+     Blur må gå via custom property fordi backdrop-filter ikke arver. */
+  background: var(--urd-nav-bg, color-mix(in srgb, var(--urd-color-surface) 85%, transparent));
+  backdrop-filter: var(--urd-nav-blur, blur(8px));
+  color: var(--urd-color-text);
+  /* Ankerpunkt for mobilpanelet, og egen stacking context så nedtrekk og
+     panel ligger over etterfølgende innhold også når menyen ikke er sticky */
+  position: relative;
+  z-index: 5000;
+}
+
+.urd-preview .urd-nav {
+  z-index: 100001;
+}
+
+/* Klistret meny: sticky ligger på verten (header-elementet), som kan
+   forlate sin plass i flyten - nav-en selv kan ikke (se nav.js) */
+.urd-nav-sticky {
+  position: sticky;
+  top: 0;
+  /* Over innholdet: det skal gli under menyen, ikke gjennom den */
+  z-index: 5000;
+}
+
+/* I preview løftes menyen over seksjonshåndtakene (100000), så barene
+   fortsatt glir under den; editorpanelene (100001+) ligger over alt */
+.urd-preview .urd-nav-sticky {
+  z-index: 100001;
+}
+
+/* Scroll-adferd (nav.scroll, tilstandsklassene settes av nav.js fra ren
+   navScrollState): 'hide' glir verten ut over toppen med translate
+   (kompositor, aldri top/margin), 'shrink' krymper paddingen via
+   --urd-nav-shrink-faktoren (engangs-overgang, ikke scroll-drevet).
+   Overgangene ligger på modusklassen, så menyer uten scroll-adferd
+   aldri får transition. */
+.urd-nav-scroll {
+  transition: translate 0.28s ease;
+}
+
+.urd-nav-scroll .urd-nav {
+  transition: padding 0.22s ease;
+}
+
+.urd-nav-hidden {
+  /* Ekstra klaring så skygge/glød følger med ut av synsfeltet */
+  translate: 0 calc(-100% - 24px);
+}
+
+.urd-nav-compact {
+  --urd-nav-shrink: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-nav-scroll,
+  .urd-nav-scroll .urd-nav {
+    transition: none;
+  }
+}
+
+.urd-nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--urd-font-heading);
+  font-weight: 700;
+  color: inherit;
+  text-decoration: none;
+}
+
+.urd-nav-logo img {
+  height: var(--urd-logo-size, 2rem);
+  display: block;
+  /* Store logoer vokser UT av linjen (inn i padding/innholdet under),
+     ikke linjen selv - menyhøyden styres ikke av bildet. Margen skalerer
+     med bildehøyden, så bidraget til barhøyden er konstant uansett
+     størrelse (fast del kalibrert mot 2rem-logoen). */
+  margin-block: calc(-1 * var(--urd-nav-pad) + 2px - (var(--urd-logo-size, 2rem) - 2rem) / 2);
+}
+
+.urd-nav-list {
+  display: flex;
+  /* Listen spenner barens innerhøyde og sentrerer punktene selv: da kan
+     punkter med undermeny strekkes til full høyde, så undermenyens
+     top: 100 % lander NØYAKTIG på barens bunn (aldri oppå baren, selv når
+     verktøyklyngen er høyere enn tekstpunktene) */
+  align-self: stretch;
+  align-items: center;
+  gap: 1.25rem;
+  list-style: none;
+}
+
+/* Menypunktenes plassering (nav.layout): logoen står alltid først.
+   right er standard (dagens utseende via space-between). */
+.urd-nav-center .urd-nav-list {
+  margin: 0 auto;
+}
+
+.urd-nav-center,
+.urd-nav-left {
+  justify-content: flex-start;
+}
+
+.urd-nav-left {
+  gap: 2rem;
+}
+
+
+.urd-nav-list a {
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.85;
+}
+
+/* Hover-tekstfargen kan overstyres (nav.style.hoverTextColor); standard
+   er aksentfargen som før */
+.urd-nav-list a:hover,
+.urd-nav-list a:focus-visible {
+  opacity: 1;
+  color: var(--urd-nav-hover-text, var(--urd-color-accent));
+}
+
+/* Synlig tastaturfokus på alt interaktivt i menyen */
+.urd-nav a:focus-visible,
+.urd-nav button:focus-visible {
+  outline: 2px solid var(--urd-color-accent);
+  outline-offset: 2px;
+  border-radius: var(--urd-radius-sm);
+}
+
+/* Verktøy-klyngen ytterst til høyre: lys/mørk-bryter og burger.
+   Tom klynge (intet alt-tema, desktop) skjules helt, så menylisten
+   fortsatt ender helt ute på kanten. */
+.urd-nav-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.urd-nav-tools:empty {
+  display: none;
+}
+
+/* Med verktøy-klyngen etter listen må plasseringen styres av auto-marger,
+   ikke space-between (tre barn ville blitt spredt jevnt utover) */
+.urd-nav-right .urd-nav-list {
+  margin-left: auto;
+}
+
+.urd-nav-left .urd-nav-tools {
+  margin-left: auto;
+}
+
+/* Lys/mørk-bryteren (vises kun når temaet har et alt-motstykke) */
+.urd-nav-theme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.35rem;
+  opacity: 0.85;
+}
+
+.urd-nav-theme:hover,
+.urd-nav-theme:focus-visible {
+  opacity: 1;
+  color: var(--urd-color-accent);
+}
+
+/* Burgeren (mobilmenyens åpner): skjult på desktop, vises via body.urd-mobile */
+.urd-nav-burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.35rem;
+}
+
+/* Undermenyer (disclosure): punktet er lenke + pilknapp (split) eller én
+   knapp med tittel + pil (toggle); pilen snur når menyen er åpen */
+.urd-nav-has-sub {
+  position: relative;
+  display: flex;
+  /* Full barhøyde (se .urd-nav-list): undermenyens anker er punktets
+     underkant, og den skal være barens bunn */
+  align-self: stretch;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.urd-nav-caret,
+.urd-nav-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0.2rem;
+  opacity: 0.85;
+}
+
+.urd-nav-caret:hover,
+.urd-nav-toggle:hover,
+.urd-nav-caret:focus-visible,
+.urd-nav-toggle:focus-visible {
+  opacity: 1;
+  color: var(--urd-nav-hover-text, var(--urd-color-accent));
+}
+
+.urd-nav-caret svg,
+.urd-nav-toggle svg {
+  transition: transform 0.15s ease;
+}
+
+.urd-nav-caret[aria-expanded="true"] svg,
+.urd-nav-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.urd-nav-sub {
+  display: none;
+  position: absolute;
+  /* Ankres UNDER baren, ikke rett under menypunktet: punktet er midtstilt
+     i baren, så top: 100% alene ville landet inni den (over nav-teksten) */
+  top: calc(100% + var(--urd-nav-pad, 0.9rem));
+  left: 0;
+  z-index: 1;
+  min-width: 12rem;
+  margin: 0;
+  padding: 0.5rem;
+  list-style: none;
+  /* Egen flate-var: som standard kun fargesløret, aldri bakgrunnsbildet
+     (nav.style.subImage skrur bildet på; nav.js setter varen) */
+  background: var(--urd-nav-sub-bg, color-mix(in srgb, var(--urd-color-surface) 85%, transparent));
+  /* Varen arver fra nav-en, også når nav.style skrur bluren av */
+  backdrop-filter: var(--urd-nav-blur, blur(8px));
+  border-radius: var(--urd-radius-sm);
+  /* Skyggen skal kun falle nedover: kortet ligger kant i kant med barens
+     bunn, og blur uten negativ spredning ville blødd oppover og lagt et
+     mørkt bånd på baren (samme fargebug som utfall-varianten hadde) */
+  box-shadow: 0 14px 28px -8px color-mix(in srgb, var(--urd-color-text) 18%, transparent);
+  grid-template-columns: repeat(var(--urd-nav-sub-cols, 1), 1fr);
+}
+
+/* Med menypunktene til høyre må undermenyen holde seg innenfor kanten */
+.urd-nav-right .urd-nav-sub {
+  left: auto;
+  right: 0;
+}
+
+.urd-nav-has-sub.open > .urd-nav-sub {
+  display: grid;
+}
+
+.urd-nav-sub a {
+  display: block;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--urd-radius-sm);
+  white-space: nowrap;
+}
+
+/* Undermeny-design (nav.style.subStyle, additivt fra v0.6): standarden er
+   kortet over (card); variantklassen står på nav-elementet. Kolonnetallet
+   (--urd-nav-sub-cols) settes av nav.js og virker i alle variantene. */
+.urd-nav-sub-flat .urd-nav-sub {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.urd-nav-sub-pills .urd-nav-sub {
+  background: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  padding: 0.4rem 0;
+  gap: 0.35rem;
+}
+
+.urd-nav-sub-pills .urd-nav-sub a {
+  /* Egen pillefarge (nav.style.subPillColor) med undermeny-flaten som
+     standard; skyggen kun nedover (se kortet over) */
+  background: var(--urd-nav-sub-pill, var(--urd-nav-sub-bg, color-mix(in srgb, var(--urd-color-surface) 92%, transparent)));
+  backdrop-filter: var(--urd-nav-blur, blur(8px));
+  border-radius: 999px;
+  padding: 0.45rem 1.1rem;
+  box-shadow: 0 6px 14px -4px color-mix(in srgb, var(--urd-color-text) 15%, transparent);
+}
+
+.urd-nav-sub-lines .urd-nav-sub {
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0.25rem 0;
+}
+
+.urd-nav-sub-lines .urd-nav-sub a {
+  border-radius: 0;
+  padding: 0.55rem 1rem;
+}
+
+.urd-nav-sub-lines .urd-nav-sub li + li {
+  border-top: 1px solid color-mix(in srgb, var(--urd-color-text) 15%, transparent);
+}
+
+/* Utfall: undermenyen spenner hele menybredden. Punktet slipper å være
+   ankeret (position: static), så nav-en selv (position: relative) blir
+   beholderen, og top: 100% lander rett under baren. */
+.urd-nav-sub-flyout .urd-nav-has-sub {
+  position: static;
+}
+
+.urd-nav-sub-flyout .urd-nav-sub {
+  left: 0;
+  right: 0;
+  top: 100%;
+  border-radius: 0 0 var(--urd-radius-md) var(--urd-radius-md);
+  /* Skyggen skal kun falle nedover: negativ spredning hindrer at blur-en
+     blør oppover og legger et mørkt bånd på selve baren */
+  box-shadow: 0 16px 24px -8px color-mix(in srgb, var(--urd-color-text) 15%, transparent);
+}
+
+/* Mobilmeny: burgeren erstatter listen; åpen liste blir et kolonnepanel
+   under menyen med egen flate (--urd-nav-sub-bg, uten bakgrunnsbildet),
+   og undermenyene blir statiske trekkspill i stedet for svevende bokser.
+   (Sidestilt på trange vinduer trenger ingen egne regler: nav.js rendrer
+   den som vanlig topplinje - effektiv variant bar - under 900px.)
+   Tvilling-selektorene .urd-nav-mobile (klasse på nav-en, satt av nav.js
+   fra FAKTISK bredde) gir burgeren også i previewens desktop-modus, der
+   body.urd-mobile eies av editorens viewport-valg - hold dem alltid
+   samlet i samme regelblokk. */
+body.urd-mobile .urd-nav-list,
+.urd-nav-mobile .urd-nav-list {
+  display: none;
+}
+
+body.urd-mobile .urd-nav-burger,
+.urd-nav-mobile .urd-nav-burger {
+  display: inline-flex;
+}
+
+body.urd-mobile .urd-nav.urd-nav-open .urd-nav-list,
+.urd-nav-mobile.urd-nav-open .urd-nav-list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.25rem;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.75rem clamp(1rem, 4vw, 2.5rem) 1rem;
+  background: var(--urd-nav-sub-bg, color-mix(in srgb, var(--urd-color-surface) 85%, transparent));
+  backdrop-filter: var(--urd-nav-blur, blur(8px));
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--urd-color-text) 15%, transparent);
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+
+body.urd-mobile .urd-nav-list a,
+.urd-nav-mobile .urd-nav-list a {
+  display: block;
+  padding: 0.5rem 0;
+  /* Hover-pillens 999px-radius skal ikke ligge på fullbredde mobilrader */
+  border-radius: var(--urd-radius-sm);
+}
+
+body.urd-mobile .urd-nav-has-sub,
+.urd-nav-mobile .urd-nav-has-sub {
+  flex-wrap: wrap;
+}
+
+body.urd-mobile .urd-nav-has-sub > a,
+.urd-nav-mobile .urd-nav-has-sub > a {
+  flex: 1;
+}
+
+body.urd-mobile .urd-nav-sub,
+.urd-nav-mobile .urd-nav-sub {
+  position: static;
+  width: 100%;
+  min-width: 0;
+  padding: 0 0 0.25rem 1rem;
+  background: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+/* Flytende variant (nav.variant, additivt fra v0.6): løsrevet pille med
+   luft mot kantene. Verten (header) er fortsatt sticky i full bredde;
+   pillen sentreres inni den og fester dermed med toppluft. */
+/* Verten tas ut av flyten når pillen flyter: innholdet starter øverst og
+   pillen svever over hero-en. Sticky gir fixed (følger med ved scrolling),
+   ellers absolute (blir igjen øverst). pointer-events slippes gjennom
+   stripene ved siden av pillen, så innholdet bak kan klikkes. */
+.urd-nav-float {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5000;
+  pointer-events: none;
+}
+
+.urd-preview .urd-nav-float {
+  z-index: 100001;
+}
+
+.urd-nav-float.urd-nav-sticky {
+  position: fixed;
+}
+
+.urd-nav-float .urd-nav {
+  pointer-events: auto;
+}
+
+/* Overlay (nav.overlay, kun variant bar): fullbredde-linjen tas ut av flyten
+   og legges oppå toppseksjonen, så toppseksjonens bakgrunn fyller helt opp og
+   en gjennomsiktig meny avslører hero bak seg. Sticky blir fixed, som float. */
+.urd-nav-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5000;
+}
+
+.urd-nav-overlay.urd-nav-sticky {
+  position: fixed;
+}
+
+.urd-preview .urd-nav-overlay {
+  z-index: 100001;
+}
+
+.urd-nav-var-floating {
+  /* Padding via varen, ikke padding-block: logobildets negative
+     margin-triks er kalibrert mot --urd-nav-pad og må følge med.
+     Pillen skalerer basispaddingen ned, så størrelsesvalget komponerer. */
+  --urd-nav-pad: calc(var(--urd-nav-base-pad, 0.9rem) * 0.67 * var(--urd-nav-shrink, 1));
+  margin: 0.75rem auto 0;
+  width: min(1100px, calc(100% - 2rem));
+  border-radius: 999px;
+}
+
+/* Firkant-varianten (nav.variant floating-square): pillen uten avrunding */
+.urd-nav-var-floating.urd-nav-square {
+  border-radius: 0;
+}
+
+/* Tab-varianten (nav.variant floating-tab): firkant topp, kun de to nedre
+   hjørnene avrundet - henger ned fra toppen. Arver luft over + sidemarg fra
+   basen; med topGap: false (urd-nav-flush) blir det en nedhengende header. */
+.urd-nav-var-floating.urd-nav-tab {
+  border-radius: 0 0 var(--urd-radius-md) var(--urd-radius-md);
+}
+
+/* Glød rundt pillen: tilvalg (av som standard) */
+.urd-nav-glow {
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--urd-color-accent) 35%, transparent);
+}
+
+/* Uten luft over: pillen ligger helt i toppen (nav.style.topGap: false) */
+.urd-nav-var-floating.urd-nav-flush {
+  margin-top: 0;
+}
+
+/* Fire størrelser (nav.style.size, additivt fra v0.6): md er standard og
+   trenger ingen klasse. Basispaddingen driver også logokalibreringen og
+   undermeny-ankeret, så alt følger med størrelsen. */
+.urd-nav-size-sm {
+  --urd-nav-base-pad: 0.55rem;
+  font-size: 0.85rem;
+}
+
+.urd-nav-size-lg {
+  --urd-nav-base-pad: 1.25rem;
+  font-size: 1.05rem;
+}
+
+.urd-nav-size-xl {
+  --urd-nav-base-pad: 1.7rem;
+  font-size: 1.15rem;
+}
+
+/* Sidestilt meny (nav.variant side-left/side-right): fast kolonne langs
+   kanten; body får innholds-padding på samme side (urd-side-*). Sticky
+   er irrelevant her - kolonnen står alltid fast. */
+.urd-nav-side-host {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  /* Bredden styres av nav.style.width via variabelen (settes av nav.js på
+     body, så innholds-paddingen under leser samme verdi) */
+  width: var(--urd-nav-side-width, 250px);
+  z-index: 5000;
+}
+
+.urd-nav-side-host-right {
+  left: auto;
+  right: 0;
+}
+
+.urd-preview .urd-nav-side-host {
+  z-index: 100001;
+}
+
+body.urd-side-left {
+  padding-left: var(--urd-nav-side-width, 250px);
+}
+
+body.urd-side-right {
+  padding-right: var(--urd-nav-side-width, 250px);
+}
+
+.urd-nav-side-host .urd-nav {
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+  padding: 1.2rem 1rem;
+  overflow-y: auto;
+}
+
+.urd-nav-side-host .urd-nav-logo {
+  justify-content: center;
+}
+
+/* Kolonneretning: auto-margene fra topplinje-oppsettet nullstilles */
+.urd-nav-side-host .urd-nav-list {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.35rem;
+  margin: 1.5rem 0 0;
+}
+
+/* Ekstra spesifisitet med vilje: kolonneraden skal vinne over
+   hover-stilenes display/padding (de står senere i fila) */
+.urd-nav-side-host .urd-nav .urd-nav-list a {
+  display: block;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--urd-radius-sm);
+}
+
+/* Verktøy-klyngen (bryter) nederst i kolonnen */
+.urd-nav-side-host .urd-nav-tools {
+  margin: auto 0 0;
+  justify-content: center;
+}
+
+/* Undermenyer blir trekkspill i kolonnen (som i mobilpanelet) */
+.urd-nav-side-host .urd-nav-has-sub {
+  flex-wrap: wrap;
+}
+
+.urd-nav-side-host .urd-nav-has-sub > a {
+  flex: 1;
+}
+
+.urd-nav-side-host .urd-nav-sub {
+  position: static;
+  width: 100%;
+  min-width: 0;
+  padding: 0 0 0.25rem 1rem;
+  background: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+/* Logobildets negative margin-triks gjelder topplinjen, ikke kolonnen */
+.urd-nav-side-host .urd-nav-logo img {
+  margin-block: 0;
+}
+
+/* Vertikal plassering i kolonnen (nav.style.sidePlacement): standard er
+   øverst, uavhengig av nav.layout (topplinjens begrep). Auto-margene
+   fordeler restplassen; verktøy-klyngen slipper sin auto-marg så listen
+   styrer. */
+.urd-nav-side-host .urd-nav-splace-middle .urd-nav-list {
+  margin: auto 0;
+}
+
+.urd-nav-side-host .urd-nav-splace-bottom .urd-nav-list {
+  margin: auto 0 0;
+}
+
+.urd-nav-side-host .urd-nav-splace-middle .urd-nav-tools,
+.urd-nav-side-host .urd-nav-splace-bottom .urd-nav-tools {
+  margin-top: 1rem;
+}
+
+/* Pille-punkter og understrek-liste gjelder også trekkspillet i kolonnen;
+   kolonneradens radius/padding (den ekstra spesifikke regelen over) må
+   overstyres her, senere i fila med samme spesifisitet */
+.urd-nav-side-host .urd-nav-sub-pills .urd-nav-sub a {
+  border-radius: 999px;
+  padding: 0.45rem 1.1rem;
+}
+
+.urd-nav-side-host .urd-nav-sub-lines .urd-nav-sub a {
+  border-radius: 0;
+}
+
+/* Tekstjustering av punktene i kolonnen (nav.style.sideAlign) */
+.urd-nav-side-host .urd-nav-salign-center .urd-nav-list a,
+.urd-nav-side-host .urd-nav-salign-center .urd-nav-toggle {
+  text-align: center;
+  justify-content: center;
+}
+
+.urd-nav-side-host .urd-nav-salign-right .urd-nav-list a,
+.urd-nav-side-host .urd-nav-salign-right .urd-nav-toggle {
+  text-align: right;
+  justify-content: flex-end;
+}
+
+/* Undermeny-pilen følger tekstjusteringen i kolonnen (eiers regel 23. juli
+   2026): høyrestilt tekst får pilen på VENSTRE side; midtstilt tekst
+   sentreres uten at pilen skyver på den (pilen står absolutt i kanten). */
+.urd-nav-side-host .urd-nav-salign-right .urd-nav-has-sub > .urd-nav-caret {
+  order: -1;
+}
+
+.urd-nav-side-host .urd-nav-salign-right .urd-nav-toggle svg {
+  order: -1;
+}
+
+.urd-nav-side-host .urd-nav-salign-center .urd-nav-has-sub {
+  position: relative;
+  justify-content: center;
+}
+
+.urd-nav-side-host .urd-nav-salign-center .urd-nav-has-sub > a {
+  flex: 0 0 auto;
+}
+
+.urd-nav-side-host .urd-nav-salign-center .urd-nav-has-sub > .urd-nav-caret {
+  position: absolute;
+  right: 0;
+  top: 0.1rem;
+}
+
+/* Dra-håndtak for kolonnebredden (kun preview; nav.js legger det på) */
+.urd-nav-side-resize {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -3px;
+  width: 8px;
+  cursor: ew-resize;
+  z-index: 2;
+}
+
+.urd-nav-side-host-right .urd-nav-side-resize {
+  right: auto;
+  left: -3px;
+}
+
+.urd-nav-side-resize:hover {
+  background: color-mix(in srgb, var(--urd-color-accent) 45%, transparent);
+}
+
+/* På mobil faller sidestilt tilbake til topplinjen med burger: kolonnen
+   blir vanlig sticky topplinje og body-paddingen fjernes. (Trange vinduer
+   under 900px håndteres i nav.js: effektiv variant bar, ingen egne regler.) */
+body.urd-mobile .urd-nav-side-host {
+  position: sticky;
+  bottom: auto;
+  width: auto;
+  right: 0;
+}
+
+body.urd-mobile .urd-nav-side-host .urd-nav {
+  flex-direction: row;
+  align-items: center;
+  height: auto;
+  overflow: visible;
+  padding: var(--urd-nav-pad) clamp(1rem, 4vw, 2.5rem);
+}
+
+body.urd-mobile .urd-nav-side-host .urd-nav-tools {
+  margin: 0;
+}
+
+body.urd-mobile.urd-side-left {
+  padding-left: 0;
+}
+
+body.urd-mobile.urd-side-right {
+  padding-right: 0;
+}
+
+/* Dra-håndtaket for kolonnebredden (kun preview) skjules når kolonnen er
+   falt til topplinje, og i Ren visning */
+body.urd-mobile .urd-nav-side-resize,
+body.urd-chrome-off .urd-nav-side-resize {
+  display: none;
+}
+
+/* Mobilpanelet skal ikke arve pillens fasong: eget lag med luft under */
+body.urd-mobile .urd-nav-var-floating.urd-nav-open .urd-nav-list,
+.urd-nav-mobile.urd-nav-var-floating.urd-nav-open .urd-nav-list {
+  top: calc(100% + 0.5rem);
+  border-radius: var(--urd-radius-md);
+}
+
+/* Hover-stiler for menylenkene (nav.style.hover, additivt fra v0.6).
+   Standard er aksentfarge-skiftet over; klassene under legger på mer.
+   Alt gjelder også :focus-visible, så tastatur får samme tilbakemelding. */
+.urd-nav-hover-underline .urd-nav-list a {
+  position: relative;
+}
+
+.urd-nav-hover-underline .urd-nav-list a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.2rem;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--urd-nav-hover, var(--urd-color-accent));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+.urd-nav-hover-underline .urd-nav-list a:hover::after,
+.urd-nav-hover-underline .urd-nav-list a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.urd-nav-hover-pill .urd-nav-list a {
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  transition: background-color 0.15s ease;
+}
+
+.urd-nav-hover-pill .urd-nav-list a:hover,
+.urd-nav-hover-pill .urd-nav-list a:focus-visible {
+  background: color-mix(in srgb, var(--urd-nav-hover, var(--urd-color-accent)) 15%, transparent);
+}
+
+.urd-nav-hover-lift .urd-nav-list a,
+.urd-nav-hover-lift-plain .urd-nav-list a {
+  display: inline-block;
+  transition: transform 0.15s ease, text-shadow 0.15s ease;
+}
+
+/* Gløden ligger som text-shadow BAK tegnene; styrken styres av
+   nav.style.hoverGlow (nav.js setter varen som ferdig prosent) */
+.urd-nav-hover-lift .urd-nav-list a:hover,
+.urd-nav-hover-lift .urd-nav-list a:focus-visible {
+  transform: translateY(-2px);
+  text-shadow: 0 4px 14px color-mix(in srgb, var(--urd-nav-hover, var(--urd-color-accent)) var(--urd-nav-hover-glow, 60%), transparent);
+}
+
+/* «Løft»: kun løftet, ingen glød */
+.urd-nav-hover-lift-plain .urd-nav-list a:hover,
+.urd-nav-hover-lift-plain .urd-nav-list a:focus-visible {
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-nav-caret svg,
+  .urd-nav-toggle svg,
+  .urd-nav-hover-underline .urd-nav-list a::after,
+  .urd-nav-hover-pill .urd-nav-list a,
+  .urd-nav-hover-lift .urd-nav-list a,
+  .urd-nav-hover-lift-plain .urd-nav-list a {
+    transition: none;
+  }
+
+  .urd-nav-hover-lift .urd-nav-list a:hover,
+  .urd-nav-hover-lift .urd-nav-list a:focus-visible,
+  .urd-nav-hover-lift-plain .urd-nav-list a:hover,
+  .urd-nav-hover-lift-plain .urd-nav-list a:focus-visible {
+    transform: none;
+  }
+}
+
+/* Smart guides: snappelinjer mot naboblokker under dra (kun preview) */
+.urd-preview .urd-smart-guide {
+  position: absolute;
+  z-index: 1001;
+  background: var(--urd-admin-accent, #5f6a75);
+  pointer-events: none;
+}
+
+.urd-preview .urd-smart-guide-v {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.urd-preview .urd-smart-guide-h {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+/* Multimarkering: utvalgsramme (marquee), medlems-markering og den
+   flytende juster/fordel-verktøylinjen */
+.urd-preview .urd-marquee {
+  position: absolute;
+  z-index: 1002;
+  border: 1px dashed var(--urd-admin-accent, #5f6a75);
+  background: color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 12%, transparent);
+  pointer-events: none;
+}
+
+body.urd-marqueeing {
+  user-select: none;
+}
+
+.urd-preview .urd-block.urd-multi-selected {
+  outline: 2px dashed var(--urd-admin-accent, #5f6a75);
+  outline-offset: 2px;
+}
+
+.urd-multi-toolbar {
+  position: fixed;
+  z-index: 100002;
+  display: none;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 6px;
+  background: #151a23;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
+}
+
+.urd-multi-toolbar.vis {
+  display: flex;
+}
+
+.urd-multi-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  color: #e8eaf0;
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  padding: 0 5px;
+  cursor: pointer;
+}
+
+.urd-multi-toolbar button:hover {
+  background: rgb(255 255 255 / 12%);
+}
+
+.urd-multi-count {
+  font: 600 11px/1 system-ui, sans-serif;
+  color: rgb(232 234 240 / 70%);
+  padding: 0 6px 0 2px;
+  white-space: nowrap;
+}
+
+/* Hjelpelinjer for hele siden (av/på-knappen ved visningsvalgene):
+   stiplet aksent, i motsetning til de heltrukne smarte dra-linjene.
+   Under smart-guidene i z, aldri klikkbare, aldri hos besøkende. */
+.urd-preview .urd-page-guide {
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.urd-preview .urd-page-guide-v {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--urd-admin-accent, #5f6a75) 0 6px,
+    transparent 6px 12px
+  );
+}
+
+.urd-preview .urd-page-guide-h {
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--urd-admin-accent, #5f6a75) 0 6px,
+    transparent 6px 12px
+  );
+}
+
+/* Delt footer (site.footer): vises på alle sider når show er på */
+#urd-footer .urd-footer {
+  padding: 2rem clamp(1rem, 4vw, 2.5rem);
+  background: var(--urd-color-surface);
+  color: color-mix(in srgb, var(--urd-color-text) 75%, transparent);
+  font-size: 0.9rem;
+  display: grid;
+  gap: 0.3rem;
+  /* Egen stacking context så en lagbasert bakgrunn (.urd-footer-bg, z-index -1)
+     ligger bak innholdet men foran footerens egen flate. */
+  position: relative;
+  isolation: isolate;
+}
+
+/* Påskrudd, men tom footer: en synlig, men helt tom flate (surface-bakgrunn),
+   ingen tekst. Fylles så snart noe legges inn i Footer-panelet. */
+#urd-footer .urd-footer-empty {
+  min-height: 4rem;
+}
+
+.urd-footer-center {
+  text-align: center;
+}
+
+.urd-footer-right {
+  text-align: right;
+}
+
+/* Rik footer: merkevare, kolonner, sosiale lenker og bunnlinje.
+   #urd-footer-prefiks kreves for å slå basisregelen (#urd-footer .urd-footer,
+   id+klasse) som ellers holder display: grid og gjør footeren til én kolonne. */
+#urd-footer .urd-footer-rich {
+  display: block;
+  padding: 0;
+  color: color-mix(in srgb, var(--urd-color-text) 72%, transparent);
+}
+.urd-footer-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2.6rem clamp(1rem, 4vw, 2.5rem) 1.4rem;
+}
+/* Merke + lenkekolonner i ETT rutenett: like brede kolonner (1fr), lik gap,
+   alltid på én rad. --n = antall spor (en bred kolonne teller to). Kollapser
+   responsivt til 2 og 1 kolonne. Sentrert/doormat/Stor CTA bruker flex-kolonne. */
+.urd-footer-top {
+  display: grid;
+  grid-template-columns: 1.7fr repeat(var(--n, 3), minmax(0, 1fr));
+  gap: 1.7rem 2.5rem;
+  align-items: start;
+}
+.urd-footer-brand {
+  min-width: 0;
+}
+.urd-footer-col {
+  min-width: 0;
+}
+/* Lang kolonne: spenner over to spor, lenkene deles i to underkolonner. */
+.urd-footer-col-wide {
+  grid-column: span 2;
+}
+.urd-footer-col-wide ul {
+  display: block;
+  columns: 2;
+  column-gap: 2.2rem;
+}
+.urd-footer-col-wide ul li {
+  break-inside: avoid;
+  margin-bottom: 0.55rem;
+}
+/* «Sentrert» kolonne-justering: den brede kolonnens overskrift midtstilles. */
+.urd-footer-cols-center .urd-footer-col-wide h4 {
+  text-align: center;
+}
+.urd-footer-rich.urd-footer-center .urd-footer-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.urd-footer-rich.urd-footer-center .urd-footer-brand {
+  max-width: 34rem;
+}
+@media (max-width: 780px) {
+  .urd-footer-top {
+    grid-template-columns: 1fr 1fr;
+  }
+  .urd-footer-top > .urd-footer-brand {
+    grid-column: 1 / -1;
+  }
+  .urd-footer-col-wide {
+    grid-column: auto;
+  }
+  .urd-footer-col-wide ul {
+    columns: 1;
+  }
+}
+@media (max-width: 480px) {
+  .urd-footer-top {
+    grid-template-columns: 1fr;
+  }
+}
+/* Merket: tekst, logo (bilde) eller begge (logo + tekst side ved side). */
+.urd-footer-brand-id {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.urd-footer-rich.urd-footer-center .urd-footer-brand-id {
+  justify-content: center;
+}
+.urd-footer-logo {
+  height: var(--urd-footer-logo-h, 40px);
+  width: auto;
+  max-width: 100%;
+  display: block;
+}
+.urd-footer-brand-top {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.4rem;
+}
+.urd-footer-brand-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--urd-color-text);
+}
+.urd-footer-tagline {
+  margin: 0.5rem 0 0;
+  max-width: 32ch;
+  line-height: 1.5;
+}
+.urd-footer-col h4 {
+  margin: 0 0 0.7rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--urd-color-text) 58%, transparent);
+}
+.urd-footer-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+.urd-footer-rich a {
+  color: inherit;
+  text-decoration: none;
+}
+.urd-footer-rich a:hover {
+  color: var(--urd-color-text);
+  text-decoration: underline;
+}
+.urd-footer-social {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+.urd-footer-rich.urd-footer-center .urd-footer-social {
+  justify-content: center;
+}
+.urd-footer-soc {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 18%, transparent);
+  display: grid;
+  place-items: center;
+  color: color-mix(in srgb, var(--urd-color-text) 70%, transparent);
+}
+.urd-footer-soc:hover {
+  color: var(--urd-color-text);
+  border-color: color-mix(in srgb, var(--urd-color-text) 40%, transparent);
+}
+.urd-footer-soc svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  display: block;
+}
+.urd-footer-baseline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.8rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid color-mix(in srgb, var(--urd-color-text) 12%, transparent);
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--urd-color-text) 55%, transparent);
+}
+.urd-footer-rich.urd-footer-center .urd-footer-baseline {
+  justify-content: center;
+}
+@media (max-width: 640px) {
+  .urd-footer-baseline {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/* Bunnlinja: tekst til venstre, valgfrie lenker til høyre. */
+.urd-footer-baseline-text {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1rem;
+}
+.urd-footer-baseline-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+}
+
+/* Doormat-lenkeraden (Sentrert / Stor CTA): én sentrert rad med lenker. */
+.urd-footer-linkrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.6rem;
+  justify-content: center;
+  margin-top: 1.4rem;
+}
+.urd-footer-social-center {
+  justify-content: center;
+}
+
+/* Handlingsoppfordring (CTA): overskrift + undertekst + knapp/nyhetsbrev. */
+.urd-footer-cta {
+  margin-top: 1.1rem;
+  max-width: 22rem;
+}
+.urd-footer-rich.urd-footer-center .urd-footer-cta {
+  margin-inline: auto;
+}
+.urd-footer-cta-h {
+  font-weight: 650;
+  color: var(--urd-color-text);
+  margin-bottom: 0.5rem;
+}
+.urd-footer-cta-sub {
+  margin: 0.3rem 0 0;
+  line-height: 1.5;
+}
+.urd-footer-cta-btn {
+  display: inline-block;
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text, #fff);
+  font: inherit;
+  font-weight: 600;
+  padding: 0.55rem 1.1rem;
+  border: none;
+  border-radius: 0.55rem;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.urd-footer-cta-btn:hover {
+  text-decoration: none;
+  filter: brightness(1.06);
+}
+/* Stor sentrert CTA (Stor CTA-malen). */
+.urd-footer-bigcta {
+  max-width: 40rem;
+  margin: 0 auto;
+  text-align: center;
+}
+.urd-footer-bigcta .urd-footer-cta-h {
+  font-size: clamp(1.4rem, 3.5vw, 2rem);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+.urd-footer-bigcta .urd-footer-cta-sub {
+  font-size: 1rem;
+  margin-top: 0.7rem;
+}
+.urd-footer-bigcta .urd-footer-cta-btn {
+  margin-top: 1.1rem;
+  padding: 0.7rem 1.4rem;
+}
+/* Nyhetsbrev-skjema. */
+.urd-footer-nl {
+  margin-top: 0.7rem;
+}
+.urd-footer-nl-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.urd-footer-rich.urd-footer-center .urd-footer-nl-row {
+  justify-content: center;
+}
+.urd-footer-nl-email {
+  flex: 1 1 12rem;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 22%, transparent);
+  border-radius: 0.55rem;
+  padding: 0.55rem 0.8rem;
+  background: color-mix(in srgb, var(--urd-color-text) 4%, transparent);
+  color: var(--urd-color-text);
+  font: inherit;
+}
+.urd-footer-nl-status {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  min-height: 1.1em;
+}
+.urd-footer-nl-status.ok {
+  color: var(--urd-color-accent);
+}
+.urd-footer-nl-status.feil {
+  color: #e5484d;
+}
+/* Honeypot: helt skjult for mennesker, synlig for bots. */
+.urd-footer-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/* Knapper */
+.urd-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0.5em 1.2em;
+  border-radius: var(--urd-radius-sm);
+  font-family: var(--urd-font-heading);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.urd-button-primary {
+  background: var(--urd-color-accent);
+  /* Tekst på aksent (additivt token fra v0.6): uten token brukes bakgrunns-
+     fargen som før, så eksisterende paletter rendres uendret */
+  color: var(--urd-color-accent-text, var(--urd-color-bg));
+}
+
+.urd-button-primary:hover {
+  filter: brightness(1.1);
+}
+
+.urd-button-secondary {
+  border: 1px solid var(--urd-color-accent);
+  color: var(--urd-color-accent);
+}
+
+/* Animert gradientbakgrunn (pan/orbit): gradienten males på en 200 %-løper
+   (gradient.js) som forskyves med transform på kompositor-tråden, aldri
+   background-position (repaint av laget per frame). Verten klipper
+   (urd-bg-loop-host). translate-% er av løperen selv, så -50 % = en hel
+   flatebredde/-høyde: samme reisevei som den gamle position-utgaven. */
+.urd-bg-pan-runner,
+.urd-bg-orbit-runner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+}
+
+.urd-bg-pan-runner {
+  animation: urd-bg-pan 18s ease-in-out infinite alternate;
+}
+
+@keyframes urd-bg-pan {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-50%, -50%); }
+}
+
+/* Én-veis panorering: sirkulær gjentakende gradient (siste farge glir
+   tilbake til første) på en oversized løper som forskyves nøyaktig én
+   periode langs gradientaksen per runde (px-mål fra loopGeometry i
+   gradient.js) - sømløst for enhver vinkel eieren setter. Verten
+   klipper, så løperen aldri stikker ut av seksjonen. */
+.urd-bg-loop-host {
+  overflow: hidden;
+}
+
+.urd-bg-loop-runner {
+  position: absolute;
+  inset: 0;
+  animation: urd-bg-loop 30s linear infinite;
+}
+
+@keyframes urd-bg-loop {
+  to { transform: translate(var(--urd-loop-dx, 0px), var(--urd-loop-dy, 0px)); }
+}
+
+/* Rotasjon: vinkelen spinner via den registrerte --urd-grad-spin
+   (CSS.registerProperty i gradient.js); uten støtte står den stille */
+.urd-bg-rotate {
+  animation: urd-bg-rotate 40s linear infinite;
+}
+
+@keyframes urd-bg-rotate {
+  to { --urd-grad-spin: 360deg; }
+}
+
+/* Pulsering (radiell): styrken puster rundt lagets egen opacity;
+   0/100 %-rammene arver inline-verdien, så pusten alltid starter der */
+.urd-bg-pulse {
+  animation: urd-bg-pulse 7s ease-in-out infinite;
+}
+
+@keyframes urd-bg-pulse {
+  50% { opacity: calc(var(--urd-bg-op, 1) * 0.45); }
+}
+
+/* Bane (radiell): løperen er forankret (inline left/top fra gradient.js)
+   så gradientens sentrum står på plass, og banen svinger den ±2 % av
+   egen størrelse (= 4 % av flaten, samme utslag som før) */
+.urd-bg-orbit-runner {
+  animation: urd-bg-orbit 26s ease-in-out infinite;
+}
+
+@keyframes urd-bg-orbit {
+  0%, 100% { transform: translate(-2%, 0); }
+  25% { transform: translate(0, -2%); }
+  50% { transform: translate(2%, 0); }
+  75% { transform: translate(0, 2%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-bg-pan-runner,
+  .urd-bg-orbit-runner,
+  .urd-bg-loop-runner,
+  .urd-bg-rotate,
+  .urd-bg-pulse {
+    animation: none;
+  }
+}
+
+/* Parallaks for bilde-bakgrunnslaget: scroll-drevet CSS på kompositor-tråden,
+   erstatter rAF/scroll-lytteren i backgrounds/image.js. Reiseveien settes som
+   --urd-px-shift (px) av mountParallaxCss (ved oppsett og resize, ikke scroll);
+   view()-tidslinjen scrubber translateY fra -shift (laget kommer inn nedenfra)
+   til +shift (laget forlater toppen), null i senter. Gates med @supports; uten
+   støtte kobler JS den rAF-drevne varianten i stedet. Stille (sluttilstand) på
+   mobil og ved redusert bevegelse. */
+@supports (animation-timeline: view()) {
+  .urd-bg-image.urd-parallax-css {
+    animation: urd-parallax-y linear both;
+    animation-timeline: view();
+  }
+
+  @keyframes urd-parallax-y {
+    from { transform: translateY(calc(-1 * var(--urd-px-shift, 0px))); }
+    to { transform: translateY(var(--urd-px-shift, 0px)); }
+  }
+
+  body.urd-mobile .urd-bg-image.urd-parallax-css {
+    animation: none;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-bg-image.urd-parallax-css {
+    animation: none;
+    transform: none;
+  }
+}
+
+/* Side-overganger (ADR-0011): cross-document View Transitions gir myk
+   krysstoning mellom sidene på det publiserte nettstedet, ren CSS uten JS.
+   Gaten er at-regelen selv: motorer uten støtte ignorerer den og navigerer
+   som før (sluttilstand). Editor-preview berøres aldri - der skjer
+   sidebytter via postMessage, ikke navigasjon. Nav og footer får egne
+   view-transition-name så side-chromen står i ro mens innholdet toner;
+   navnene er inerte utenom en aktiv overgang. */
+@view-transition {
+  navigation: auto;
+}
+
+#urd-nav {
+  view-transition-name: urd-nav;
+}
+
+#urd-footer {
+  view-transition-name: urd-footer;
+}
+
+/* Redusert bevegelse: overgangen beholdes (navigasjonen er like rask),
+   men all animasjon i den slås av, så byttet er et rent klipp. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
+
+/* Myk ankerscroll (blokk-lenker til #anker og «Til toppen»-pilen): native
+   scroll-behavior i stedet for JS-animasjon. Programmatiske scroll som skal
+   være umiddelbare (dra-kompensasjonen i preview-edit.js) sier behavior:
+   'instant' eksplisitt og berøres ikke. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* «Til toppen»-pilen (mountToTop i urd.js) */
+.urd-totop {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 90;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--urd-color-accent) 85%, black);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.urd-totop.vis {
+  opacity: 0.85;
+  pointer-events: auto;
+}
+
+.urd-totop.vis:hover {
+  opacity: 1;
+}
+
+/* Editorens mobilvisning: skjul viewport-scrollbaren i forhåndsvisningen
+   (scrolling virker fortsatt med hjul/touch) */
+html:has(body.urd-preview.urd-mobile) {
+  scrollbar-width: none;
+}
+
+html:has(body.urd-preview.urd-mobile)::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobilvisning i editoren: strukturverktøyene (add-barer, høydehåndtak)
+   skjules; mobil er layoutjustering og tilsyn */
+body.urd-mobile .urd-add-section,
+body.urd-mobile .urd-section-resize,
+body.urd-mobile .urd-section-resize-top {
+  display: none !important;
+}
+
+/* Mobil-tilsyn: seksjonen trenger en gjennomgang av mobil-layouten
+   (redaksjonelt flagg, kun i preview) */
+.urd-preview .urd-attention {
+  outline: 2px solid #e2b84a;
+  outline-offset: -2px;
+}
+
+/* Dekor-toggle på blokkverktøylinjen */
+.urd-preview .urd-edit-toolbar .urd-edit-decor.on {
+  background: #e2b84a;
+  color: #1a1508;
+}
+
+/* Editeringslaget - gjelder KUN i preview-modus (body.urd-preview,
+   satt av motoren inne i editorens iframe) */
+.urd-preview .urd-grid-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 30%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 30%, transparent) 1px, transparent 1px);
+}
+
+.urd-preview .urd-editable:hover {
+  outline: 1px dashed var(--urd-admin-accent, #5f6a75);
+  outline-offset: 2px;
+}
+
+.urd-preview .urd-edit-toolbar {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  /* Usynlig bro ned til blokk-kanten, så hover ikke mistes på veien
+     opp til håndtakene */
+  padding-bottom: 5px;
+  display: none;
+  gap: 2px;
+  z-index: 1000;
+}
+
+/* Verktøylinjen står ALLTID over blokken, også nær seksjonstoppen:
+   seksjoner klipper aldri, så det er ingenting å vike for (eiers valg). */
+
+.urd-preview .urd-editable:hover .urd-edit-toolbar,
+.urd-preview .urd-edit-toolbar:hover {
+  display: flex;
+}
+
+.urd-preview .urd-edit-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 24px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--urd-admin-accent, #5f6a75);
+  color: var(--urd-admin-accent-text, #fff);
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 6px;
+  cursor: grab;
+}
+
+.urd-preview .urd-edit-toolbar .urd-edit-delete {
+  cursor: pointer;
+  background: #c0392b;
+}
+
+.urd-preview .urd-edit-resize {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--urd-admin-accent, #5f6a75);
+  cursor: nwse-resize;
+  display: none;
+  z-index: 1000;
+}
+
+.urd-preview .urd-editable:hover .urd-edit-resize {
+  display: block;
+}
+
+/* Rotasjonshåndtak: liten sirkel i blokkens høyre overkant */
+.urd-preview .urd-edit-rotate {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  display: none;
+  place-items: center;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--urd-admin-accent-text, #fff);
+  border-radius: 50%;
+  background: var(--urd-admin-accent, #5f6a75);
+  cursor: grab;
+  user-select: none;
+  z-index: 1000;
+}
+
+.urd-preview .urd-editable:hover .urd-edit-rotate,
+.urd-preview .urd-block.urd-selected .urd-edit-rotate {
+  display: grid;
+}
+
+/* Aktiv seksjon (sist klikket): nye blokker fra paletten havner her */
+.urd-preview .urd-section-active {
+  box-shadow: inset 3px 0 0 var(--urd-admin-accent, #5f6a75);
+}
+
+/* Markert blokk: varig omriss og alltid synlige håndtak */
+.urd-preview .urd-block.urd-selected {
+  outline: 2px solid var(--urd-admin-accent, #5f6a75);
+  outline-offset: 2px;
+}
+
+/* Hele blokkflaten kan dras direkte; redigerbar tekst beholder tekstmarkør */
+.urd-preview .urd-editable {
+  cursor: move;
+}
+
+.urd-preview .urd-editable .urd-text[contenteditable='true'] {
+  cursor: text;
+}
+
+/* Under redigering løftes hovret/markert blokk visuelt øverst, slik at
+   håndtakene alltid kan nås selv om andre blokker ligger over (z-orden).
+   Ekte lagrekkefølge vises når blokken avmarkeres - og ALLTID i Ren
+   visning (chrome-off), som skal være nøyaktig det besøkende ser. */
+.urd-preview:not(.urd-chrome-off) .urd-editable:hover {
+  z-index: 99998 !important;
+}
+
+.urd-preview:not(.urd-chrome-off) .urd-block.urd-selected {
+  z-index: 99999 !important;
+}
+
+.urd-preview.urd-chrome-off .urd-block.urd-selected {
+  outline: none;
+}
+
+.urd-preview .urd-block.urd-selected .urd-edit-toolbar {
+  display: flex;
+}
+
+.urd-preview .urd-block.urd-selected .urd-edit-resize {
+  display: block;
+}
+
+/* «+ Ny seksjon»-barene svever OPPÅ skillet mellom seksjonene og tar
+   null plass i flyten, slik at seksjonene ligger kant i kant nøyaktig
+   som besøkende ser dem (kun i preview) */
+.urd-preview .urd-add-section {
+  position: relative;
+  height: 0;
+  overflow: visible;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  /* Over seksjonslinje-grepene (.urd-section-resize/-top, 100000): der
+     chippen står skal den kunne KLIKKES, ikke fanges av dra-flaten
+     (chippen drar uansett selv samme grense via wireHeightDrag). Baren
+     selv er 0 px høy og pointer-events: none, så det er kun chip-pillen
+     og galleriet som ligger over noe. */
+  z-index: 100001;
+  /* Skjult til musen er over en tilstøtende seksjon (eller baren selv):
+     mindre støy, og den øverste baren kolliderer ikke med menyen */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.urd-preview .urd-add-section:hover,
+.urd-preview .urd-section:hover + .urd-add-section,
+.urd-preview .urd-add-section:has(+ .urd-section:hover) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Tom side: den eneste baren har ingen naboseksjon å bli avslørt av, så
+   hover-reglene over kan aldri vise den. Da står den alltid framme og fyller
+   flaten som en tom-tilstand, ellers blir siden umulig å bygge videre på. */
+.urd-preview #urd-root > .urd-add-section:only-child {
+  opacity: 1;
+  pointer-events: auto;
+  height: min(55vh, 380px);
+  align-items: center;
+}
+.urd-preview #urd-root > .urd-add-section:only-child > button {
+  transform: none;
+}
+
+.urd-preview .urd-add-section::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 35%, transparent) 0 8px,
+    transparent 8px 16px
+  );
+}
+
+.urd-preview .urd-add-section button {
+  transform: translateY(-50%);
+  border: 1px dashed color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 60%, transparent);
+  border-radius: 999px;
+  background: var(--urd-color-bg);
+  color: var(--urd-color-text);
+  font-size: 12px;
+  padding: 3px 12px;
+  cursor: pointer;
+  opacity: 0.75;
+  height: fit-content;
+}
+
+.urd-preview .urd-add-section button:hover {
+  opacity: 1;
+  border-style: solid;
+}
+
+/* Den øverste baren ligger rett under den klistrede menyen: pillen
+   legges UNDER grenselinjen i stedet for oppå den, så den ikke
+   forsvinner bak menyen */
+#urd-root > .urd-add-section:first-child > button {
+  transform: translateY(4px);
+}
+
+/* Preset-galleriet (åpen «+ Ny seksjon»): gruppert panel med rulling.
+   Holdes synlig uavhengig av hover-reglene over via .open-klassen. */
+.urd-preview .urd-add-section.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.urd-preview .urd-preset-menu {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 340px;
+  max-height: 360px;
+  overflow-y: auto;
+  background: var(--urd-color-bg);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 45%, transparent);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 45%);
+  padding: 6px;
+  text-align: left;
+  z-index: 1003;
+}
+
+.urd-preview .urd-preset-menu.urd-preset-up {
+  top: auto;
+  bottom: 8px;
+}
+
+.urd-preview .urd-preset-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--urd-color-text);
+}
+
+.urd-preview .urd-preset-menu .urd-preset-close {
+  transform: none;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 7px;
+}
+
+.urd-preview .urd-preset-group {
+  padding: 8px 8px 3px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--urd-color-text) 55%, transparent);
+}
+
+.urd-preview .urd-preset-menu .urd-preset-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  transform: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  padding: 6px 8px;
+  text-align: left;
+  opacity: 1;
+}
+
+/* Auto-generert miniatyr (preset-thumb.js): skjematisk skisse av seksjonen */
+.urd-preview .urd-preset-thumb {
+  flex: 0 0 auto;
+  width: 84px;
+  height: 48px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 20%, transparent);
+  border-radius: 5px;
+}
+
+.urd-preview .urd-preset-thumb svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.urd-preview .urd-preset-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.urd-preview .urd-preset-menu .urd-preset-choice:hover {
+  background: color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 14%, transparent);
+  border-color: color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 45%, transparent);
+  border-style: solid;
+}
+
+.urd-preview .urd-preset-label {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.urd-preview .urd-preset-hint {
+  font-size: 11px;
+  color: color-mix(in srgb, var(--urd-color-text) 60%, transparent);
+}
+
+/* Seksjonens verktøylinje (flytt opp/ned, tilpass høyde, slett) - synlig
+   kun mens pekeren er i seksjonen; ligger alltid øverst (over løftede
+   blokker) */
+.urd-preview .urd-section-toolbar {
+  /* Klistret i seksjonen (ikke absolute): i seksjoner høyere enn viewporten følger
+     verktøylinjen med, så «+ kort»-knappen alltid kan nås ved gjentatte tillegg.
+     Verktøylinjen er seksjonens eneste flyt-element, så den starter alltid øverst. */
+  position: sticky;
+  top: 56px;
+  display: none;
+  gap: 2px;
+  width: fit-content;
+  margin-left: auto;
+  padding: 8px 8px 0 0;
+  z-index: 100001;
+}
+
+.urd-preview .urd-section:hover > .urd-section-toolbar {
+  display: flex;
+}
+
+.urd-preview .urd-section-toolbar button {
+  border: 0;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--urd-color-surface) 85%, transparent);
+  color: var(--urd-color-text);
+  font-size: 13px;
+  line-height: 1;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+
+.urd-preview .urd-section-toolbar button:hover {
+  background: var(--urd-admin-accent, #5f6a75);
+  color: var(--urd-admin-accent-text, #fff);
+}
+
+/* Ren visning: editoren kan skjule alle editeringshåndtak, slik at siden
+   ses nøyaktig som besøkende ser den */
+.urd-preview.urd-chrome-off .urd-add-block,
+.urd-preview.urd-chrome-off .urd-add-section,
+.urd-preview.urd-chrome-off .urd-edit-toolbar,
+.urd-preview.urd-chrome-off .urd-edit-resize,
+.urd-preview.urd-chrome-off .urd-edit-rotate,
+.urd-preview.urd-chrome-off .urd-video-shield,
+.urd-preview.urd-chrome-off .urd-section-toolbar,
+.urd-preview.urd-chrome-off .urd-section-resize,
+.urd-preview.urd-chrome-off .urd-section-resize-top,
+.urd-preview.urd-chrome-off .urd-smart-guide,
+.urd-preview.urd-chrome-off .urd-page-guide,
+.urd-preview.urd-chrome-off .urd-marquee,
+.urd-preview.urd-chrome-off .urd-multi-toolbar,
+.urd-preview.urd-chrome-off .urd-samling-image-adder,
+.urd-preview.urd-chrome-off .urd-samling-placeholder,
+.urd-preview.urd-chrome-off .urd-grid-overlay {
+  display: none !important;
+}
+
+.urd-preview.urd-chrome-off .urd-samling-editable:hover,
+.urd-preview.urd-chrome-off .urd-samling-image-edit:hover {
+  outline: none;
+}
+
+.urd-preview.urd-chrome-off .urd-editable:hover {
+  outline: none;
+}
+
+.urd-preview.urd-chrome-off .urd-multi-selected {
+  outline: none;
+}
+
+/* Redaksjonelle markeringer sitter som klasser på selve seksjonen og kan
+   ikke display:none-es: effektene nulles i stedet, så Ren visning er
+   identisk med publisert side. */
+.urd-preview.urd-chrome-off .urd-section-active {
+  box-shadow: none;
+}
+
+.urd-preview.urd-chrome-off .urd-attention {
+  outline: none;
+}
+
+/* Høyde-håndtaket i underkant av seksjonen: treffsonen er 10px, men den
+   synlige linjen ligger nøyaktig på seksjonens kant */
+/* Over blokk-løftet ved hover/markering (99998/99999): en blokk som henger
+   utover seksjonskanten skal aldri kunne stjele grepet på seksjonslinjen */
+.urd-preview .urd-section-resize {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 10px;
+  cursor: ns-resize;
+  z-index: 100000;
+}
+
+/* Hover-linjen tegnes som inset-skygge på selve seksjonen, så den alltid
+   ligger nøyaktig på den synlige bunnkanten */
+.urd-preview .urd-section:has(> .urd-section-resize:hover),
+.urd-preview .urd-section:has(> .urd-section-resize:active) {
+  box-shadow: inset 0 -2px 0 var(--urd-admin-accent, #5f6a75);
+}
+
+/* Toppkant-håndtaket: speiler bunnhåndtaket, men gir/fjerner luft ØVERST
+   i seksjonen (blokkene følger med, innholdet står stille) */
+.urd-preview .urd-section-resize-top {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 10px;
+  cursor: ns-resize;
+  z-index: 100000;
+}
+
+.urd-preview .urd-section:has(> .urd-section-resize-top:hover),
+.urd-preview .urd-section:has(> .urd-section-resize-top:active) {
+  box-shadow: inset 0 2px 0 var(--urd-admin-accent, #5f6a75);
+}
+
+/* Retningsvisende peker mens en seksjonsgrense dras (preview-edit setter
+   klassen på rotelementet): pil ned når man drar ned, pil opp når man
+   drar opp. !important fordi pekeren ellers følger elementet under. */
+html.urd-drag-down,
+html.urd-drag-down * {
+  cursor: s-resize !important;
+}
+
+html.urd-drag-up,
+html.urd-drag-up * {
+  cursor: n-resize !important;
+}

@@ -1,0 +1,31 @@
+{
+  "id": "kart",
+  "name": "Kart",
+  "names": {
+    "nb": "Kart",
+    "nn": "Kart",
+    "en-GB": "Map",
+    "se": "Kárta",
+    "tr": "Harita"
+  },
+  "locales": true,
+  "version": "1.0.0",
+  "requiresEngine": ">=0.6.8 <1.0.0",
+  "entry": "index.js",
+  "provides": {
+    "blocks": [
+      "kart"
+    ],
+    "sectionPresets": [
+      "finn-oss"
+    ],
+    "backgrounds": [],
+    "animations": [],
+    "maler": []
+  },
+  "csp": {
+    "frameSrc": [
+      "https://www.openstreetmap.org"
+    ]
+  }
+}
