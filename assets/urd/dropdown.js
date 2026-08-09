@@ -3,4 +3,4 @@
  * nedtrekket (ADR-0009) fra den versjonerte motoren. Hardkod aldri den
  * versjonerte stien i en plugin.
  */
-export * from '../engine/0.6.10/dropdown.js';
+export * from '../engine/0.6.11/dropdown.js';

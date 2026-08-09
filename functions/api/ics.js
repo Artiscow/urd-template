@@ -20,17 +20,17 @@ export async function onRequestGet({ request, env }) {
   try {
     target = new URL(raw);
   } catch {
-    return json({ error: 'Ugyldig kalenderadresse', code: 'badCalendarUrl' }, 400);
+    return json({ error: 'Invalid calendar address', code: 'badCalendarUrl' }, 400);
   }
   if (target.protocol !== 'https:' || target.username || target.password || target.port) {
-    return json({ error: 'Kun vanlige https-adresser uten innlogging', code: 'insecureCalendarUrl' }, 400);
+    return json({ error: 'Only plain https addresses without sign-in', code: 'insecureCalendarUrl' }, 400);
   }
 
   const allowed = new Set(['calendar.google.com',
     ...String(env.ICS_HOSTS ?? '').split(',').map((h) => h.trim().toLowerCase()).filter(Boolean)]);
   const hostOk = (host) => allowed.has(String(host).toLowerCase());
   if (!hostOk(target.hostname)) {
-    return json({ error: `Kalenderverten «${target.hostname}» er ikke godkjent. Legg den i miljøvariabelen ICS_HOSTS (kommaseparert) i hostingoppsettet.`, code: 'calendarHostNotAllowed', host: target.hostname }, 403);
+    return json({ error: `The calendar host «${target.hostname}» is not allowed. Add it to the ICS_HOSTS environment variable (comma-separated) in the hosting setup.`, code: 'calendarHostNotAllowed', host: target.hostname }, 403);
   }
 
   const controller = new AbortController();
@@ -44,23 +44,23 @@ export async function onRequestGet({ request, env }) {
     });
   } catch {
     clearTimeout(timer);
-    return json({ error: 'Fikk ikke kontakt med kalenderkilden', code: 'calendarUnreachable' }, 502);
+    return json({ error: 'Could not reach the calendar source', code: 'calendarUnreachable' }, 502);
   }
   clearTimeout(timer);
 
   // Omdirigeringer kan ha flyttet oss til en annen vert: valider slutten av kjeden.
   try {
     if (upstream.url && !hostOk(new URL(upstream.url).hostname)) {
-      return json({ error: 'Kalenderkilden pekte videre til en vert som ikke er godkjent', code: 'calendarRedirectBlocked' }, 502);
+      return json({ error: 'The calendar source redirected to a host that is not allowed', code: 'calendarRedirectBlocked' }, 502);
     }
   } catch { /* uleselig slutt-URL behandles som opprinnelig vert */ }
 
-  if (!upstream.ok) return json({ error: `Kalenderkilden svarte ${upstream.status}`, code: 'calendarUpstreamStatus', status: upstream.status }, 502);
+  if (!upstream.ok) return json({ error: `The calendar source responded ${upstream.status}`, code: 'calendarUpstreamStatus', status: upstream.status }, 502);
 
   const text = await upstream.text();
-  if (text.length > MAX_BYTES) return json({ error: 'Kalenderfilen er for stor', code: 'calendarTooLarge' }, 502);
+  if (text.length > MAX_BYTES) return json({ error: 'The calendar file is too large', code: 'calendarTooLarge' }, 502);
   if (!/BEGIN:VCALENDAR/i.test(text.slice(0, 4000))) {
-    return json({ error: 'Svaret fra kilden er ikke en iCal-fil', code: 'calendarNotIcs' }, 502);
+    return json({ error: 'The response from the source is not an iCal file', code: 'calendarNotIcs' }, 502);
   }
 
   return new Response(text, {

@@ -628,6 +628,7 @@ function hvaSkjerSection() {
 export function register(Urd) {
   Urd.blocks.define('kalender', {
     version: 1,
+    autoGrow: true,
     label: 'Kalender',
     labelKey: 'kalender.edit.blockLabel',
     defaults: () => ({ sources: [], view: 'list', limit: 6, showCategories: true, showSubscribe: true }),

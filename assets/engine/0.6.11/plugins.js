@@ -83,6 +83,7 @@ const KINDS = [
   ['sections', 'sectionPresets'],
   ['backgrounds', 'backgrounds'],
   ['animations', 'animations'],
+  ['maler', 'maler'],
 ];
 
 /**

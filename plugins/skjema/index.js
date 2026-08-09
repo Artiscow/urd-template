@@ -450,6 +450,7 @@ function kontaktSection() {
 export function register(Urd) {
   Urd.blocks.define('skjema', {
     version: 1,
+    autoGrow: true,
     label: 'Skjema',
     labelKey: 'skjema.edit.blockLabel',
     defaults: () => ({

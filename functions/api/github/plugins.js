@@ -38,9 +38,9 @@ export async function onRequestGet({ request, env }) {
     if (err.status === 404) return json({ plugins: [] });
     // Anonym ratebegrensning (403/429): editoren faller tilbake til sist bufrede liste.
     if (!token && (err.status === 403 || err.status === 429)) {
-      return json({ error: 'GitHub-ratebegrensning for anonym lesing - logg inn eller prøv igjen senere', code: 'rateLimited' }, 503);
+      return json({ error: 'GitHub rate limit for anonymous reads - sign in or try again later', code: 'rateLimited' }, 503);
     }
     console.error('Urd plugins:', err.message);
-    return json({ error: 'Kunne ikke lese plugin-listen fra GitHub', code: 'pluginListFailed' }, 502);
+    return json({ error: 'Could not read the plugin list from GitHub', code: 'pluginListFailed' }, 502);
   }
 }

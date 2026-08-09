@@ -19,7 +19,7 @@ export async function onRequestGet({ request, env }) {
   }
 
   const token = readCookie(request, 'urd_gh');
-  if (!token) return json({ error: 'Ikke innlogget', code: 'notLoggedIn' }, 401);
+  if (!token) return json({ error: 'Not signed in', code: 'notLoggedIn' }, 401);
 
   try {
     const ref = await gh(token, `/repos/${config.repo}/git/ref/heads/${config.branch}`);
@@ -28,7 +28,7 @@ export async function onRequestGet({ request, env }) {
     const base = new URL(request.url).searchParams.get('base');
     if (!base || base === head) return json({ head, changedFiles: [] });
     // base går inn i GitHub-API-stien og må være en ekte commit-sha, ikke vilkårlig tekst.
-    if (!/^[0-9a-f]{7,64}$/i.test(base)) return json({ error: 'Ugyldig base', code: 'badBase' }, 400);
+    if (!/^[0-9a-f]{7,64}$/i.test(base)) return json({ error: 'Invalid base', code: 'badBase' }, 400);
 
     const diff = await gh(token, `/repos/${config.repo}/compare/${base}...${head}`);
     // Rapporter stier relative til nettsiden (samme rom som editoren bruker).
@@ -45,6 +45,6 @@ export async function onRequestGet({ request, env }) {
     return json({ head, changedFiles, truncated: allFiles.length >= 300 });
   } catch (err) {
     console.error('Urd latest:', err.message);
-    return json({ error: 'Kunne ikke lese repo-status fra GitHub', code: 'statusFailed' }, 502);
+    return json({ error: 'Could not read repository status from GitHub', code: 'statusFailed' }, 502);
   }
 }

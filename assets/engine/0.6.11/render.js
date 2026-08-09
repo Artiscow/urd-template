@@ -145,7 +145,11 @@ export function renderSection(section, site, host, opts = {}) {
       const el = document.createElement('div');
       el.className = 'urd-block urd-block-flow';
       el.dataset.blockId = block.id;
-      if (block.type !== 'text') el.style.height = `${block.frames.desktop.h}px`;
+      // Autovoksende blokker (def.autoGrow: faq/galleri/samling og plugin-
+      // blokker med eget innhold) får naturlig høyde i mobilflyten: fast
+      // desktophøyde ville klippet høyere mobilinnhold over neste blokk.
+      const def = Urd.blocks.get(block.type);
+      if (block.type !== 'text' && !def?.autoGrow) el.style.height = `${block.frames.desktop.h}px`;
       if (block.frames.desktop.rot) el.style.transform = `rotate(${block.frames.desktop.rot}deg)`;
       renderBlock(Urd, el, block, ctx);
       flow.appendChild(el);
@@ -165,6 +169,9 @@ export function renderSection(section, site, host, opts = {}) {
       const el = document.createElement('div');
       el.className = 'urd-block';
       el.dataset.blockId = block.id;
+      // Dekor-merket leses av stagger-animasjonen (dekor er pynt og skal
+      // ikke forsinke innholdsbølgen); mobilflyten filtrerer på feltet selv.
+      if (block.decor) el.dataset.decor = '1';
       const frame = viewport === 'mobile'
         ? (block.frames.mobile ?? block.frames.desktop)
         : block.frames.desktop;

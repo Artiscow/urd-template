@@ -213,6 +213,7 @@ const VIEWS = { grid: renderGrid, carousel: renderCarousel, slides: renderSlides
 
 export const galleriBlock = {
   version: 1,
+  autoGrow: true,
   label: 'Galleri',
   labelKey: 'blocks.galleri',
   defaults: () => ({

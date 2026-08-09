@@ -22,6 +22,6 @@ export async function onRequestGet({ request, env }) {
     // KUN GitHubs 401 betyr utlogget (ugyldig/utløpt token). Alt annet er
     // GitHub-trøbbel og skal ikke vises som utlogging i editoren.
     if (err.status === 401) return json({ loggedIn: false });
-    return json({ error: 'GitHub er utilgjengelig akkurat nå', code: 'githubUnavailable' }, 503);
+    return json({ error: 'GitHub is unavailable right now', code: 'githubUnavailable' }, 503);
   }
 }

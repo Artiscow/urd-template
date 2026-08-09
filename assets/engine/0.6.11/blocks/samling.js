@@ -236,6 +236,7 @@ function emptyState(el, ctx, message) {
 
 export const samlingBlock = {
   version: 1,
+  autoGrow: true,
   label: 'Samling',
   labelKey: 'blocks.samling',
   defaults: () => ({ collection: null, view: 'cards', limit: 6, newestFirst: true }),

@@ -48,8 +48,9 @@ export default { lang: 'nb', strings: { '<id>.nokkel': 'Tekst', '<id>.edit.nokke
 - **nb er basen**: lasteren legger nb i bunn og valgt språk oppå, så en
   manglende nøkkel faller til bokmål. Paritetstesten (`node --test
   tests/i18n.test.mjs`) finner `locales/`-mappen automatisk og krever
-  identiske nøkkelsett, ingen tomme verdier, ingen tankestrek og samme
-  `{var}`-tokens i alle fem filene.
+  komplette nøkkelsett i kjernespråkene nb/en-GB/tr, ingen tomme verdier,
+  ingen tankestrek og samme `{var}`-tokens; nn/se kan ha etterslep (fylles
+  i oversettelsesrunder), men aldri ukjente nøkler.
 - **Oppslag**: `import { t, ta } from '/assets/urd/i18n.js'` - `t()` for
   besøkende-tekster (site-språket), `ta()` for editor-chromen (admin-
   språket). `/assets/urd/` er det STABILE plugin-API-et (ADR-0013):
@@ -126,6 +127,36 @@ Plugin-blokker og -seksjonsmaler vises automatisk i egne «Plugins»-
 seksjoner i «+ Ny blokk», «+ Ny seksjon» og Blokker-panelet. En blokk-def
 kan i tillegg ha `variants: [{ label, props }, …]`: da blir den en
 foldemeny i blokkmenyene (kalenderen bruker det til visningene sine).
+
+Blokker der innholdet selv bestemmer høyden (autovekst via `urd-grow`,
+som kalender/skjema/kart) skal sette `autoGrow: true` på blokk-defen:
+da får blokken naturlig høyde i mobilvisningens autostabling i stedet
+for den faste desktophøyden, så høyere mobilinnhold aldri klippes.
+
+**Innstillinger i Egenskaper (felt-kontrakten)**: har blokken din enkle
+innstillinger (tekst, tall, av/på, valg, sted), deklarer dem som `fields`
+på blokk-defen i stedet for å bygge et eget config-panel - admin rendrer
+dem rett i Egenskaper-panelet når blokken er markert:
+
+```js
+Urd.blocks.define('kart', {
+  // …
+  fields: [
+    { key: 'location', type: 'place', labelKey: 'kart.edit.location', placeholderKey: 'kart.edit.locationPh' },
+    { key: 'zoom', type: 'number', labelKey: 'kart.edit.zoom', min: 1, max: 19 },
+  ],
+});
+```
+
+Typene er `text`, `number` (`min`/`max`/`step`), `toggle`, `select`
+(`options: [{ value, labelKey }]`) og `place` (stedssøk: teksten skrives
+til `key`, koordinater til props `lat`/`lon`; se kart-referansen).
+Etikettnøklene løses av motoren før de sendes til admin, så bruk
+`labelKey` fra pluginens egen ordbok. Uten `fields` viser Egenskaper en
+«Innstillinger …»-knapp som åpner pluginens eget config-panel i
+forhåndsvisningen (kalenderen og skjemaet viser det mønsteret - riktig
+for innstillinger som er mer enn en flat felt-liste, som kildelister).
+Kontrakten er beskrevet i [docs/SKJEMA.md](../../docs/SKJEMA.md#plugins).
 
 **Temastyrt UI-regelen (ADR-0009)**: aldri native `<select>` i
 redigerings-UI - popupen følger OS-temaet og blir uleselig. Bruk

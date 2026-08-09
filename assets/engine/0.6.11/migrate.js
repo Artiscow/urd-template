@@ -25,18 +25,22 @@ export function lift(data, def) {
   if (!def) {
     return { ok: false, version: data.version, props: data.props, placeholder: 'unknown-type' };
   }
-  if (data.version > def.version) {
+  // Manglende/ugyldig version (håndredigert eller amputert data) behandles
+  // som v1, aldri som gjeldende: uten dette hopper while-løkken over alle
+  // migreringene (undefined < n er falsk) og gammelt format leses som nytt.
+  const from = Number.isInteger(data.version) ? data.version : 1;
+  if (from > def.version) {
     // Innholdet er skrevet av en nyere motor - rendres som plassholder,
     // aldri feiltolket eller nedgradert.
-    return { ok: false, version: data.version, props: data.props, placeholder: 'newer-than-engine' };
+    return { ok: false, version: from, props: data.props, placeholder: 'newer-than-engine' };
   }
 
-  let version = data.version;
+  let version = from;
   let props = data.props;
   while (version < def.version) {
     const step = def.migrations && def.migrations[version];
     if (typeof step !== 'function') {
-      return { ok: false, version: data.version, props: data.props, placeholder: 'missing-migration' };
+      return { ok: false, version: from, props: data.props, placeholder: 'missing-migration' };
     }
     props = step(structuredClone(props));
     version++;

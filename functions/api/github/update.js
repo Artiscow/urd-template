@@ -61,14 +61,14 @@ async function loadState(token, config, toParam) {
     // Et avkortet tre ville feilklassifisert filer utenfor utsnittet som
     // «mangler lokalt» og skrevet dem om uten varsel: stopp heller trygt.
     throw Object.assign(
-      new Error('Repoets git-tre er for stort til å sammenlignes trygt'),
-      { code: 'updateFailed', detail: 'git-treet er avkortet av GitHub' },
+      new Error('The repository tree is too large to compare safely'),
+      { code: 'updateFailed', detail: 'the git tree is truncated by GitHub' },
     );
   }
   const userTree = siteTree(rawTree.tree, rootDir);
 
   if (!userTree['urd.json']) {
-    throw Object.assign(new Error('Fant ikke urd.json i repoet'), { code: 'updateFailed', detail: 'urd.json mangler' });
+    throw Object.assign(new Error('Could not find urd.json in the repository'), { code: 'updateFailed', detail: 'urd.json is missing' });
   }
   const urdBlob = await gh(token, `/repos/${repo}/git/blobs/${userTree['urd.json']}`);
   const engine = JSON.parse(decodeBlob(urdBlob.content)).engine;
@@ -81,7 +81,7 @@ async function loadState(token, config, toParam) {
       target = highestVersionTag(templateTags.map((t) => t.name));
     }
     if (!target) {
-      throw Object.assign(new Error('Malrepoet har ingen versjonstagger'), { code: 'updateNoBaseline', tag: '(ingen)' });
+      throw Object.assign(new Error('The template repository has no version tags'), { code: 'updateNoBaseline', tag: '(none)' });
     }
     if (target === `v${engine}`) {
       return { head, engine, target, userTree, upToDate: true };
@@ -93,7 +93,7 @@ async function loadState(token, config, toParam) {
     } catch (err) {
       if (err.status === 404 || err.status === 422) {
         throw Object.assign(
-          new Error(`Fant ikke basislinje-taggen v${engine} i malrepoet`),
+          new Error(`Could not find the baseline tag v${engine} in the template repository`),
           { code: 'updateNoBaseline', tag: `v${engine}` },
         );
       }
@@ -106,7 +106,7 @@ async function loadState(token, config, toParam) {
       if (err.status === 404 || err.status === 422) {
         // Formgyldig, men ikke-eksisterende måltagg skal diagnostiseres som
         // nettopp det, ikke som «malrepoet utilgjengelig».
-        throw Object.assign(new Error(`Målversjonen ${target} finnes ikke i malrepoet`), { code: 'updateBadTarget', target });
+        throw Object.assign(new Error(`The target version ${target} does not exist in the template repository`), { code: 'updateBadTarget', target });
       }
       throw err;
     }
@@ -122,7 +122,7 @@ async function loadState(token, config, toParam) {
   } catch (err) {
     if (err.code) throw err;
     throw Object.assign(
-      new Error(`Fikk ikke lest malrepoet ${templateRepo}: ${err.message}`),
+      new Error(`Could not read the template repository ${templateRepo}: ${err.message}`),
       { code: 'updateTemplateUnreachable', repo: templateRepo, detail: err.message.slice(0, 200) },
     );
   }
@@ -135,7 +135,7 @@ export async function onRequestGet({ request, env }) {
 
   const to = new URL(request.url).searchParams.get('to');
   if (to !== null && !TAG_RE.test(to)) {
-    return json({ error: `Ugyldig målversjon '${to}'`, code: 'updateBadTarget', target: to }, 400);
+    return json({ error: `Invalid target version '${to}'`, code: 'updateBadTarget', target: to }, 400);
   }
 
   try {
@@ -158,11 +158,20 @@ export async function onRequestGet({ request, env }) {
       headers.upstream = decodeBlob(blob.content);
     }
 
-    return json({ current: state.engine, target: state.target, head: state.head, upToDate, changes, headers });
+    // Utgivelsesnotatene (valgfritt): release-Action-en publiserer monorepo-
+    // releasens notater videre til malrepoet. 404 er normalt for eldre
+    // versjoner; feil her skal aldri velte sjekken.
+    let notes = null;
+    try {
+      const release = await gh(token, `/repos/${config.templateRepo}/releases/tags/${state.target}`);
+      notes = typeof release.body === 'string' && release.body.trim() ? release.body.slice(0, 4000) : null;
+    } catch { /* ingen release med notater: feltet forblir null */ }
+
+    return json({ current: state.engine, target: state.target, head: state.head, upToDate, changes, headers, notes });
   } catch (err) {
     if (err.code) return json({ error: err.message, code: err.code, tag: err.tag, repo: err.repo, target: err.target, detail: err.detail }, 502);
     console.error('Urd update check:', err.message);
-    return json({ error: `Oppdaterings-sjekken feilet: ${err.message}`, code: 'updateFailed', detail: err.message.slice(0, 200) }, 502);
+    return json({ error: `The update check failed: ${err.message}`, code: 'updateFailed', detail: err.message.slice(0, 200) }, 502);
   }
 }
 
@@ -175,25 +184,25 @@ export async function onRequestPost({ request, env }) {
   try {
     body = await request.json();
   } catch {
-    return json({ error: 'Ugyldig JSON i forespørselen', code: 'badJson' }, 400);
+    return json({ error: 'Invalid JSON in the request', code: 'badJson' }, 400);
   }
   const { to, expect, skip } = body ?? {};
   if (typeof to !== 'string' || !TAG_RE.test(to)) {
-    return json({ error: `Ugyldig målversjon '${to}'`, code: 'updateBadTarget', target: String(to) }, 400);
+    return json({ error: `Invalid target version '${to}'`, code: 'updateBadTarget', target: String(to) }, 400);
   }
   if (typeof expect !== 'string' || !expect) {
-    return json({ error: 'expect må være en commit-sha', code: 'badExpect' }, 400);
+    return json({ error: 'expect must be a commit sha', code: 'badExpect' }, 400);
   }
   if (skip !== undefined && (!Array.isArray(skip) || skip.length > 500 || skip.some((p) => typeof p !== 'string'))) {
     // api.updateFailed interpolerer detail, så teksten blir riktig for
     // DENNE brukeren av koden (api.badFiles beskriver commit-endepunktet).
-    return json({ error: 'skip må være en liste stier', code: 'updateFailed', detail: 'skip må være en liste stier (maks 500)' }, 400);
+    return json({ error: 'skip must be a list of paths', code: 'updateFailed', detail: 'skip must be a list of paths (max 500)' }, 400);
   }
 
   try {
     const state = await loadState(token, config, to);
     if (state.head !== expect) {
-      return json({ error: 'Repoet endret seg etter oppdaterings-sjekken', code: 'updateRace' }, 409);
+      return json({ error: 'The repository changed after the update check', code: 'updateRace' }, 409);
     }
     if (state.upToDate) {
       return json({ current: state.engine, target: state.target, upToDate: true });
@@ -206,7 +215,7 @@ export async function onRequestPost({ request, env }) {
     for (const path of skip ?? []) {
       const change = planned.get(path);
       if (!change || change.atom) {
-        return json({ error: `Filen '${path}' kan ikke holdes tilbake fra oppdateringen`, code: 'updateBadSkip', path }, 400);
+        return json({ error: `The file '${path}' cannot be held back from the update`, code: 'updateBadSkip', path }, 400);
       }
       planned.delete(path);
     }
@@ -270,10 +279,10 @@ export async function onRequestPost({ request, env }) {
     return json({ sha, current: state.engine, target: to, written: writes.length + copyPaths.length, deleted: deletes.length });
   } catch (err) {
     if (err.status === 409 || (err.status === 422 && /fast.?forward/i.test(err.message))) {
-      return json({ error: 'Repoet endret seg mens oppdateringen pågikk', code: 'updateRace' }, 409);
+      return json({ error: 'The repository changed while the update was running', code: 'updateRace' }, 409);
     }
     if (err.code) return json({ error: err.message, code: err.code, tag: err.tag, repo: err.repo, target: err.target, detail: err.detail }, 502);
     console.error('Urd update:', err.message);
-    return json({ error: `Oppdateringen feilet: ${err.message}`, code: 'updateFailed', detail: err.message.slice(0, 200) }, 502);
+    return json({ error: `The update failed: ${err.message}`, code: 'updateFailed', detail: err.message.slice(0, 200) }, 502);
   }
 }

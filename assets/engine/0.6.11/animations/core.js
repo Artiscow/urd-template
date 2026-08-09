@@ -21,11 +21,13 @@ export const coreAnimations = {
   'hover-lift': { version: 1, label: 'Løft ved peker', labelKey: 'anim.hoverLift', entrance: false, defaults: () => ({}), migrations: {} },
   // Stagger er en GRUPPE-inngangsanimasjon (kun seksjonsnivå): den animerer
   // ikke seksjonen selv, men slipper seksjonens kort-blokker inn forskjøvet fra
-  // ÉN felles trigger. pattern: 'sequence' (ett trinn per kort) eller 'columns'
-  // (kort i samme kolonne kommer samtidig, bølgen skyves bortover kolonnene).
+  // ÉN felles trigger. pattern: 'sequence' (ett trinn per kort), 'columns'/
+  // 'rows' (kort på samme x/y kommer samtidig, bølgen skyves bortover) eller
+  // 'center' (utover fra midten av rekka). delay er felles grunnforsinkelse
+  // (additiv fra 0.6.6.4.6, eldre data mangler feltet og leses som 0).
   stagger: {
     version: 1, label: 'Stagger (kortgruppe)', labelKey: 'anim.stagger', entrance: true, group: true,
-    defaults: () => ({ duration: 600, step: 90, effect: 'slide-up', pattern: 'sequence' }),
+    defaults: () => ({ duration: 600, delay: 0, step: 90, effect: 'slide-up', pattern: 'sequence' }),
     migrations: {},
   },
 };
@@ -33,15 +35,39 @@ export const coreAnimations = {
 const STAGGER_EFFECTS = ['fade-in', 'slide-up', 'zoom-in'];
 
 /**
- * Forsinkelser (ms) for kolonnevis stagger: kort med samme x-posisjon deler
- * trinn, og bølgen skyves bortover stigende x. Ren funksjon (node-testet).
- * @param {number[]} positions x-posisjon per kort (samme rekkefølge som kortene)
+ * Forsinkelser (ms) for kolonne-/radvis stagger: posisjoner klynges med
+ * toleranse (kort som er nesten på linje regnes som samme kolonne/rad; de
+ * gamle 8px-bøttene delte dem), og bølgen skyves bortover stigende posisjon.
+ * Ren funksjon (node-testet).
+ * @param {number[]} positions x- eller y-posisjon i px per kort (samme rekkefølge som kortene)
+ * @param {number} step Trinn-tid i ms
+ * @param {number} [tolerance] Maks px-avstand som regnes som samme klynge
+ * @returns {number[]}
+ */
+export function staggerColumnDelays(positions, step, tolerance = 24) {
+  const sorted = [...new Set(positions)].sort((a, b) => a - b);
+  const clusterOf = new Map();
+  let cluster = -1;
+  let prev = null;
+  for (const p of sorted) {
+    if (prev === null || p - prev > tolerance) cluster += 1;
+    clusterOf.set(p, cluster);
+    prev = p;
+  }
+  return positions.map((p) => clusterOf.get(p) * step);
+}
+
+/**
+ * Forsinkelser (ms) for «fra midten»-stagger: midtkortet (eller midtparet ved
+ * partall) slippes først, så bølger rekka utover symmetrisk. Indeksbasert
+ * (kortenes rekkefølge i seksjonen). Ren funksjon (node-testet).
+ * @param {number} count Antall kort
  * @param {number} step Trinn-tid i ms
  * @returns {number[]}
  */
-export function staggerColumnDelays(positions, step) {
-  const cols = [...new Set(positions)].sort((a, b) => a - b);
-  return positions.map((p) => cols.indexOf(p) * step);
+export function staggerCenterDelays(count, step) {
+  const mid = (count - 1) / 2;
+  return Array.from({ length: count }, (_, i) => Math.floor(Math.abs(i - mid)) * step);
 }
 
 /** Delt observer: legger på .urd-anim-in første gang elementet er synlig. */
@@ -85,17 +111,25 @@ function entranceObserver() {
 function applyStagger(host, props, ctx) {
   const effect = STAGGER_EFFECTS.includes(props.effect) ? props.effect : 'slide-up';
   const step = Number.isFinite(props.step) ? Math.max(0, props.step) : 90;
+  const base = Number.isFinite(props.delay) ? Math.max(0, props.delay) : 0;
   host.classList.add('urd-anim-stagger');
-  // Kort-blokkene: alle .urd-block i seksjonen som ikke alt har egen animasjon.
-  const targets = [...host.querySelectorAll('.urd-block')].filter((el) => !/\burd-anim-/.test(el.className));
+  // Kort-blokkene: alle .urd-block i seksjonen som ikke alt har egen
+  // animasjon. Dekor-blokker unntas (som i mobil-stablingen): de er pynt og
+  // skal ikke forsinke innholdsbølgen.
+  const targets = [...host.querySelectorAll('.urd-block')]
+    .filter((el) => !/\burd-anim-/.test(el.className) && !el.dataset.decor);
   if (!targets.length) return;
   const delays = props.pattern === 'columns'
-    ? staggerColumnDelays(targets.map((el) => Math.round(el.offsetLeft / 8)), step)
-    : targets.map((_, i) => i * step);
+    ? staggerColumnDelays(targets.map((el) => el.offsetLeft), step)
+    : props.pattern === 'rows'
+      ? staggerColumnDelays(targets.map((el) => el.offsetTop), step)
+      : props.pattern === 'center'
+        ? staggerCenterDelays(targets.length, step)
+        : targets.map((_, i) => i * step);
   targets.forEach((el, i) => {
     el.classList.add(`urd-anim-${effect}`);
     if (props.duration != null) el.style.setProperty('--urd-anim-duration', `${props.duration}ms`);
-    el.style.setProperty('--urd-anim-delay', `${delays[i]}ms`);
+    el.style.setProperty('--urd-anim-delay', `${base + delays[i]}ms`);
   });
 
   const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;

@@ -6,7 +6,11 @@
  *
  * Brukes kun i editoren (når eieren klikker «Bruk»), ikke ved hver sidelasting:
  * koordinatene lagres i blokken, så besøkende laster kartet direkte fra OSM.
+ *
+ * Krever innlogget økt (som latest.js): uten vakten er dette en åpen proxy
+ * mot Nominatim, og misbruk kan få deployment-IP-en bannlyst.
  */
+import { readCookie } from '../_lib/cookies.js';
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -19,8 +23,9 @@ const json = (body, status = 200) =>
   });
 
 export async function onRequestGet({ request }) {
+  if (!readCookie(request, 'urd_gh')) return json({ error: 'Not signed in', code: 'notLoggedIn' }, 401);
   const q = (new URL(request.url).searchParams.get('q') ?? '').trim();
-  if (q.length < 3) return json({ error: 'Skriv en adresse eller et sted', code: 'queryTooShort' }, 400);
+  if (q.length < 3) return json({ error: 'Enter an address or a place', code: 'queryTooShort' }, 400);
 
   const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=0&q=${encodeURIComponent(q)}`;
   const controller = new AbortController();
@@ -37,22 +42,22 @@ export async function onRequestGet({ request }) {
     });
   } catch {
     clearTimeout(timer);
-    return json({ error: 'Fikk ikke kontakt med adressesøket', code: 'geocodeUnreachable' }, 502);
+    return json({ error: 'Could not reach the address lookup', code: 'geocodeUnreachable' }, 502);
   }
   clearTimeout(timer);
-  if (!upstream.ok) return json({ error: `Adressesøket svarte ${upstream.status}`, code: 'geocodeUpstreamStatus', status: upstream.status }, 502);
+  if (!upstream.ok) return json({ error: `The address lookup responded ${upstream.status}`, code: 'geocodeUpstreamStatus', status: upstream.status }, 502);
 
   let data = null;
   try {
     data = await upstream.json();
   } catch {
-    return json({ error: 'Uventet svar fra adressesøket', code: 'geocodeUnexpected' }, 502);
+    return json({ error: 'Unexpected response from the address lookup', code: 'geocodeUnexpected' }, 502);
   }
   const hit = Array.isArray(data) ? data[0] : null;
   const lat = Number(hit?.lat);
   const lon = Number(hit?.lon);
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-    return json({ error: 'Fant ikke stedet. Prøv en mer nøyaktig adresse.', code: 'placeNotFound' }, 404);
+    return json({ error: 'Could not find the place. Try a more precise address.', code: 'placeNotFound' }, 404);
   }
   return json({ lat, lon, label: hit.display_name ?? q });
 }

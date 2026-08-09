@@ -11,7 +11,7 @@
  * styles av body.urd-mobile (breakpointet settes i urd.js fra site.json).
  */
 
-import { navItems, navClasses, navSurface, navSubSurface, hostClasses, clampSideWidth, navScrollState } from './nav-model.js';
+import { navItems, navClasses, navSurface, navSubSurface, navLayerVeil, hostClasses, clampSideWidth, navScrollState } from './nav-model.js';
 import { themeMode, toggleThemeMode, resolveColor } from './theme.js';
 import { renderBackgroundLayers } from './render.js';
 import { t } from './i18n.js';
@@ -160,6 +160,10 @@ export function renderNav(site, host) {
     // Lagene definerer flaten: nav-elementets egen bakgrunn gjøres gjennomsiktig
     // (blur/frosted-glass virker fortsatt gjennom den).
     nav.style.setProperty('--urd-nav-bg', 'transparent');
+    // Undermenyen og mobilpanelet arver fargelagene som ett flatet slør,
+    // så nedtrekket følger barens tone i stedet for standard-sløret.
+    const layerVeil = navLayerVeil(navBg.layers);
+    if (layerVeil) nav.style.setProperty('--urd-nav-sub-bg', layerVeil);
   } else if (surface.bg) {
     nav.style.setProperty('--urd-nav-bg', surface.bg);
   }

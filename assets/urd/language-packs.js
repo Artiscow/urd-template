@@ -3,4 +3,4 @@
  * i admin) laster språkpakke-modulen dynamisk via denne, så samme absolutte
  * sti virker fra både motoren og editor-bundelen uavhengig av motorversjon.
  */
-export * from '../engine/0.6.10/language-packs.js';
+export * from '../engine/0.6.11/language-packs.js';

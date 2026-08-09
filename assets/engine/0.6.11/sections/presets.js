@@ -95,6 +95,46 @@ const galleri = (fr, props = {}) => ({
   frames: fr,
 });
 
+/* FAQ-blokk: spørsmålslisten redigeres i Egenskaper og rett i previewen. */
+const faq = (fr, items) => ({
+  id: makeId('blk'),
+  type: 'faq',
+  version: 1,
+  props: { items, multi: false },
+  animation: null,
+  frames: fr,
+});
+
+/* Sitat-blokk (0.6.7.11): semantisk figure/blockquote med attribusjon. */
+const sitat = (fr, props = {}) => ({
+  id: makeId('blk'),
+  type: 'sitat',
+  version: 1,
+  props: { text: '', attribution: '', role: '', variant: 'stor', image: '', accent: null, ...props },
+  animation: null,
+  frames: fr,
+});
+
+/* Tidslinje-blokk (0.6.7.11): hendelser langs en tegnet linje. */
+const tidslinje = (fr, items) => ({
+  id: makeId('blk'),
+  type: 'tidslinje',
+  version: 1,
+  props: { items, variant: 'venstre', marker: 'fylt', accent: null },
+  animation: null,
+  frames: fr,
+});
+
+/* Statistikk-blokk (0.6.7.11): ett nøkkeltall med etikett og tell-opp. */
+const statistikk = (fr, props = {}) => ({
+  id: makeId('blk'),
+  type: 'statistikk',
+  version: 1,
+  props: { value: '4800', prefix: '', suffix: '', label: '', countUp: true, ...props },
+  animation: null,
+  frames: fr,
+});
+
 const bg = (...layers) => ({ version: 1, layers });
 const colorLayer = (value) => ({ type: 'color', version: 1, props: { value } });
 const glowLayer = (x, y, opacity, radius = 0.5) => ({
@@ -469,37 +509,37 @@ export function registerSectionPresets(Urd) {
     groupKey: 'presetGroup.cards',
     hint: 'Spørsmål og svar i kort',
     hintKey: 'preset.faq.hint',
-    create: () => {
-      const qa = (y, q) => text(frame(20, y, 60, 96),
-        `<h3>${q}</h3>${ta('seed.faq.answer')}`, { box: true });
-      return section('faq', '520px', bg(colorLayer('bg')), [
-        text(frame(25, 24, 50, 36), ta('seed.faq.title'), { align: 'center' }),
-        qa(80, ta('seed.faq.q1')),
-        qa(192, ta('seed.faq.q2')),
-        qa(304, ta('seed.faq.q3')),
-        text(frame(20, 416, 60, 32),
-          ta('seed.faq.more'),
-          { align: 'center' }),
-      ]);
-    },
-    itemLabel: 'spørsmål',
-    itemLabelKey: 'item.question',
-    item: (sec) => {
-      // Nye spørsmål skal inn FØR «flere spørsmål?»-linjen: plasser etter nederste spørsmålsboks, og skyv alt under (avslutningslinjen) ned ett radhopp via moves.
-      const boxes = sec.blocks.filter((b) => b.type === 'text' && b.props?.box);
-      const y = boxes.length
-        ? Math.max(...boxes.map((b) => b.frames.desktop.y + b.frames.desktop.h)) + 16
-        : maxBottom(sec) + 16;
-      const dy = 112;
-      const moves = sec.blocks
-        .filter((b) => b.frames.desktop.y >= y - 4)
-        .map((b) => ({ blockId: b.id, dy }));
-      return {
-        blocks: [text(frame(20, y, 60, 96), `<h3>${ta('seed.faq.newQ')}</h3>${ta('seed.faq.answer')}`, { box: true })],
-        bottom: maxBottom(sec) + dy + 28,
-        moves,
-      };
-    },
+    // Modernisert i 0.6.7.11: bruker faq-blokken (levert 0.6.6.4) i stedet
+    // for tekstboks-etterligningen. Nye spørsmål legges til i Egenskaper
+    // eller rett i previewen, så preset-item-knappen trengs ikke lenger.
+    create: () => section('faq', '520px', bg(colorLayer('bg')), [
+      text(frame(25, 24, 50, 36), ta('seed.faq.title'), { align: 'center' }),
+      faq(frame(20, 80, 60, 320), [
+        { q: ta('seed.faq.q1'), a: ta('seed.faq.answer') },
+        { q: ta('seed.faq.q2'), a: ta('seed.faq.answer') },
+        { q: ta('seed.faq.q3'), a: ta('seed.faq.answer') },
+      ]),
+      text(frame(20, 416, 60, 32),
+        ta('seed.faq.more'),
+        { align: 'center' }),
+    ]),
+  });
+
+  Urd.sections.define('tidslinje', {
+    label: 'Tidslinje',
+    labelKey: 'preset.tidslinje.label',
+    group: 'Kort og lister',
+    groupKey: 'presetGroup.cards',
+    hint: 'Historien som hendelser langs en linje',
+    hintKey: 'preset.tidslinje.hint',
+    create: () => section('tidslinje', '480px', bg(colorLayer('bg')), [
+      text(frame(25, 24, 50, 36), ta('seed.tidslinje.title'), { align: 'center' }),
+      tidslinje(frame(25, 88, 50, 330), [
+        { year: '2019', title: ta('seed.tidslinje.t1'), text: ta('seed.tidslinje.text') },
+        { year: '2022', title: ta('seed.tidslinje.t2'), text: ta('seed.tidslinje.text') },
+        { year: '2026', title: ta('seed.tidslinje.t3'), text: ta('seed.tidslinje.text') },
+      ]),
+    ]),
   });
 
   Urd.sections.define('steg', {
@@ -624,9 +664,14 @@ export function registerSectionPresets(Urd) {
     groupKey: 'presetGroup.highlight',
     hint: 'Stort sitat med attribusjon',
     hintKey: 'preset.sitat.hint',
+    // Modernisert i 0.6.7.11: bruker sitat-blokken (semantisk blockquote)
+    // i stedet for to løse tekstblokker.
     create: () => section('sitat', '300px', bg(colorLayer('bg')), [
-      text(frame(15, 64, 70, 116), ta('seed.quote.text'), { align: 'center', size: 22 }),
-      text(frame(15, 188, 70, 30), ta('seed.quote.attribution'), { align: 'center' }),
+      sitat(frame(20, 56, 60, 190), {
+        text: ta('seed.sitat.text'),
+        attribution: ta('seed.sitat.name'),
+        role: ta('seed.sitat.role'),
+      }),
     ]),
   });
 
@@ -637,30 +682,27 @@ export function registerSectionPresets(Urd) {
     groupKey: 'presetGroup.highlight',
     hint: 'Tre store tall med etikett',
     hintKey: 'preset.statistikk.hint',
+    // Modernisert i 0.6.7.12: bruker statistikk-blokken (tell-opp ved entré)
+    // i stedet for to tekstblokker per tall.
     create: () => {
-      const stat = (x, col, value, label) => {
-        // Tallrammen har litt slark over fontens linjeboks (h2 med size 44 blir ~76px hoy).
-        const num = text(frame(x, 72, 25, 84), `<h2>${value}</h2>`, { align: 'center', size: 44 });
-        const lbl = text(frame(x, 160, 25, 36), `<p>${label}</p>`, { align: 'center' });
-        num.mobileOrder = cardOrder(72, col, 0);
-        lbl.mobileOrder = cardOrder(72, col, 1);
-        return [num, lbl];
+      const stat = (x, col, value, suffix, label) => {
+        const s = statistikk(frame(x, 76, 25, 120), { value, suffix, label });
+        s.mobileOrder = cardOrder(76, col, 0);
+        return s;
       };
       return section('statistikk', '260px', bg(colorLayer('surface')), [
-        ...stat(6, 0, '120+', ta('seed.stats.l1')),
-        ...stat(37.5, 1, '25', ta('seed.stats.l2')),
-        ...stat(69, 2, '1981', ta('seed.stats.l3')),
+        stat(6, 0, '120', '+', ta('seed.stats.l1')),
+        stat(37.5, 1, '25', '', ta('seed.stats.l2')),
+        stat(69, 2, '1981', '', ta('seed.stats.l3')),
       ]);
     },
     itemLabel: 'tall',
     itemLabelKey: 'item.number',
     item: (sec) => {
-      const { x, y, n } = freeSlot(sec, 3, 6, 31.5, 72, 140, 25, 124);
-      const num = text(frame(x, y, 25, 84), '<h2>42</h2>', { align: 'center', size: 44 });
-      const lbl = text(frame(x, y + 88, 25, 36), `<p>${ta('seed.stats.newLabel')}</p>`, { align: 'center' });
-      num.mobileOrder = cardOrder(72, n, 0);
-      lbl.mobileOrder = cardOrder(72, n, 1);
-      return { blocks: [num, lbl], bottom: y + 152 };
+      const { x, y, n } = freeSlot(sec, 3, 6, 31.5, 76, 140, 25, 120);
+      const s = statistikk(frame(x, y, 25, 120), { value: '42', label: ta('seed.stats.newLabel') });
+      s.mobileOrder = cardOrder(76, n, 0);
+      return { blocks: [s], bottom: y + 148 };
     },
   });
 

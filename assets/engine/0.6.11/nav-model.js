@@ -236,6 +236,28 @@ export function navSubSurface(style = {}) {
 }
 
 /**
+ * Flater lagstakkens FARGELAG til ett slør for undermenyen og mobilpanelet,
+ * så nedtrekket følger barens tone når nav-en har lag-bakgrunn. Bilde- og
+ * gradientlag holdes ute, samme prinsipp som subImage: undermenyen får
+ * aldri bildet. Lagene tegnes i listerekkefølge (første bakerst), så hvert
+ * fargelag mikses over de forrige. Null = ingen fargelag, CSS-standarden
+ * gjelder.
+ * @param {Array<{type?: string, props?: {value?: string, opacity?: number}}>} [layers]
+ * @returns {string|null}
+ */
+export function navLayerVeil(layers) {
+  let mix = null;
+  for (const layer of Array.isArray(layers) ? layers : []) {
+    if (layer?.type !== 'color') continue;
+    const pct = Math.round(Math.min(1, Math.max(0, layer.props?.opacity ?? 1)) * 100);
+    if (pct === 0) continue;
+    const color = resolveColor(layer.props?.value ?? 'bg');
+    mix = `color-mix(in srgb, ${color} ${pct}%, ${mix ?? 'transparent'})`;
+  }
+  return mix;
+}
+
+/**
  * Den sidestilte kolonnens bredde i px (nav.style.width), klemt til
  * fornuftige grenser; alt ugyldig gir standardbredden 250.
  * @param {number|string|undefined} width

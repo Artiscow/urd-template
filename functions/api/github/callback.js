@@ -19,7 +19,7 @@ export async function onRequestGet({ request, env }) {
   const code = url.searchParams.get('code');
   const state = url.searchParams.get('state');
   if (!code || !state || state !== readCookie(request, 'urd_state')) {
-    return new Response('Ugyldig OAuth-state (prøv å logge inn på nytt)', { status: 400 });
+    return new Response('Invalid OAuth state (try signing in again)', { status: 400 });
   }
 
   const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
@@ -33,7 +33,7 @@ export async function onRequestGet({ request, env }) {
   });
   const token = (await tokenRes.json()).access_token;
   if (!token) {
-    return new Response('GitHub godtok ikke innloggingen (utløpt kode?)', { status: 401 });
+    return new Response('GitHub rejected the sign-in (expired code?)', { status: 401 });
   }
 
   const headers = new Headers({ location: '/admin/' });

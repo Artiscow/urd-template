@@ -2,8 +2,8 @@
  * Kart-referansepluginen (v0.6 M4): personvennlig OpenStreetMap-innbygging.
  * Eieren limer inn koordinater eller en OSM-lenke; blokken bygger inn OSMs
  * offisielle iframe (ingen sporing, ingen tredjeparts-tiles). Følger kalender-
- * referansen: egen CSS via én style-tag, hover-konfigpanel, hjelpechip
- * (ADR-0008), temastyrte nedtrekk (ADR-0009).
+ * referansen: egen CSS via én style-tag og hjelpechip (ADR-0008). Innstillingene
+ * rendres i Egenskaper-panelet via felt-kontrakten (`fields` på blokk-defen).
  *
  * CSP (ADR-0006): iframe mot openstreetmap.org krever frame-src-unntak.
  * Manifestet deklarerer det, Plugins-panelet viser eieren linjen, og blir
@@ -13,7 +13,7 @@ import { parseLocation, buildEmbedUrl, buildLargerMapUrl, OSM_HOST } from './osm
 // Flerspråk (ADR-0012): t() for besøkende-tekster (site-språket), ta() for
 // editor-chromen og seed (admin-språket). Ordboka (locales/) lastes av
 // plugin-lasteren FØR register() - t/ta kalles aldri på modulnivå.
-import { t, ta, taApiError } from '/assets/urd/i18n.js';
+import { t, ta } from '/assets/urd/i18n.js';
 
 const el2 = (tag, className, textContent) => {
   const node = document.createElement(tag);
@@ -23,114 +23,6 @@ const el2 = (tag, className, textContent) => {
 };
 
 const post = (msg) => window.parent?.postMessage(msg, location.origin);
-
-/* ---------- Konfigpanel ---------- */
-
-function configPanel(el, props, ctx) {
-  const gear = el2('button', 'urd-kart-gear urd-cfg-toggle', `⚙ ${ta('kart.edit.location')}`);
-  gear.type = 'button';
-  gear.title = ta('kart.edit.gearTitle');
-  const panel = el2('div', 'urd-kart-config');
-
-  const label = (text) => el2('div', 'urd-kart-config-label', text);
-  const location = el2('input', 'urd-kart-config-input');
-  location.value = props.location ?? '';
-  location.placeholder = ta('kart.edit.locationPh');
-
-  const zoom = el2('input', 'urd-kart-config-input');
-  zoom.type = 'number';
-  zoom.min = '1';
-  zoom.max = '19';
-  zoom.value = String(props.zoom ?? 15);
-
-  const height = el2('input', 'urd-kart-config-input');
-  height.type = 'number';
-  height.min = '120';
-  height.max = '900';
-  height.value = String(props.height ?? 320);
-
-  const status = el2('p', 'urd-kart-config-note urd-kart-status');
-
-  const apply = el2('button', 'urd-kart-apply', ta('common.apply'));
-  apply.type = 'button';
-  apply.addEventListener('click', async () => {
-    const raw = location.value.trim();
-    const z = Math.max(1, Math.min(19, Number(zoom.value) || 15));
-    const h = Math.max(120, Math.min(900, Number(height.value) || 320));
-    status.textContent = '';
-    status.classList.remove('feil');
-
-    // Koordinater/OSM-lenke tolkes lokalt; en vanlig adresse geokodes.
-    const parsed = parseLocation(raw);
-    let lat = null;
-    let lon = null;
-    let resolvedZoom = z;
-    if (parsed) {
-      lat = parsed.lat;
-      lon = parsed.lon;
-      if (parsed.zoom) resolvedZoom = parsed.zoom;
-    } else if (raw) {
-      apply.disabled = true;
-      status.textContent = ta('kart.edit.searching');
-      try {
-        const res = await fetch(`/api/geocode?q=${encodeURIComponent(raw)}`);
-        const data = await res.json().catch(() => null);
-        if (res.ok && Number.isFinite(data?.lat)) {
-          lat = data.lat;
-          lon = data.lon;
-        } else {
-          status.textContent = taApiError(data) ?? ta('kart.edit.notFound');
-          status.classList.add('feil');
-          apply.disabled = false;
-          return;
-        }
-      } catch {
-        status.textContent = ta('kart.edit.searchFailed');
-        status.classList.add('feil');
-        apply.disabled = false;
-        return;
-      }
-      apply.disabled = false;
-    }
-
-    post({
-      type: 'urd-edit',
-      sectionId: ctx.section.id,
-      blockId: el.dataset.blockId,
-      props: { location: raw, lat, lon, zoom: resolvedZoom, height: h },
-      rerender: true,
-    });
-    close();
-  });
-
-  panel.append(
-    label(ta('kart.edit.location')), location,
-    el2('p', 'urd-kart-config-note', ta('kart.edit.locationNote')),
-    status,
-    label(ta('kart.edit.zoom')), zoom,
-    label(ta('kart.edit.height')), height,
-    apply,
-  );
-
-  const onOutside = (event) => {
-    if (!panel.isConnected) { close(); return; }
-    if (panel.contains(event.target) || event.target === gear) return;
-    close();
-  };
-  function close() {
-    panel.classList.remove('vis');
-    document.removeEventListener('pointerdown', onOutside, true);
-  }
-  gear.addEventListener('click', (event) => {
-    event.stopPropagation();
-    if (panel.classList.toggle('vis')) {
-      setTimeout(() => document.addEventListener('pointerdown', onOutside, true), 0);
-    } else {
-      close();
-    }
-  });
-  return [gear, panel];
-}
 
 /* ---------- Tomtilstand og CSP-degradering ---------- */
 
@@ -160,7 +52,7 @@ function watchCspBlock(host, frame, ctx, largerUrl) {
     if (ctx.preview) {
       note.append(
         el2('strong', null, ta('kart.edit.cspBlocked')),
-        el2('p', 'urd-kart-config-note', ta('kart.edit.cspFix')),
+        el2('p', 'urd-kart-note', ta('kart.edit.cspFix')),
         el2('code', 'urd-kart-code', `frame-src ${OSM_HOST}`),
       );
     } else {
@@ -190,29 +82,12 @@ const KART_CSS = `
 .urd-kart-code { font: 12px/1.4 ui-monospace, monospace; padding: 4px 8px; border-radius: 5px;
   background: color-mix(in srgb, var(--urd-color-text) 10%, transparent); }
 .urd-kart-fallback { color: var(--urd-color-accent); font-weight: 600; }
-.urd-kart-status:empty { display: none; }
-.urd-kart-status.feil { color: #e05252; opacity: 1; }
+.urd-kart-note { font-size: 11px; opacity: 0.6; margin: 0; }
 .urd-kart-tools { position: absolute; top: -32px; right: -6px; z-index: 5;
   display: flex; gap: 4px; align-items: center;
   /* Usynlig bro ned til blokk-kanten, så hover overlever veien opp */
   padding-bottom: 8px; }
 .urd-kart-tools .urd-hint-chip { position: static; }
-/* Config-bryteren er skjult: innstillingene åpnes fra blokkens Egenskaper. */
-.urd-kart-gear { display: none; }
-.urd-block:hover .urd-kart-gear, .urd-kart-gear:focus-visible,
-.urd-kart:has(.urd-kart-config.vis) .urd-kart-gear { opacity: 0.92; pointer-events: auto; }
-.urd-kart-config { position: absolute; top: -6px; right: 0; z-index: 6; width: min(340px, 92vw);
-  display: none; gap: 6px; padding: 12px; border-radius: 10px;
-  background: #151a23; color: #e8eaf0; border: 1px solid rgb(255 255 255 / 18%);
-  box-shadow: 0 12px 36px rgb(0 0 0 / 55%); font: 12px/1.4 system-ui, sans-serif; }
-.urd-kart-config.vis { display: grid; }
-.urd-kart-config-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.55; }
-.urd-kart-config-note { font-size: 11px; opacity: 0.6; margin: 0; }
-.urd-kart-config-input { font: 12px/1.4 system-ui, sans-serif; color: inherit; background: rgb(255 255 255 / 6%);
-  border: 1px solid rgb(255 255 255 / 20%); border-radius: 6px; padding: 5px 7px; width: 100%; }
-.urd-kart-apply { font: 600 12px/1 system-ui, sans-serif; cursor: pointer; border-radius: 6px;
-  padding: 7px 10px; border: 0; background: #7c5cff; color: #fff; }
-body.urd-chrome-off .urd-kart-gear, body.urd-chrome-off .urd-kart-config { display: none !important; }
 `;
 
 function injectCss() {
@@ -283,11 +158,10 @@ function renderKart(el, props, ctx) {
   }
 
   if (ctx.preview && ctx.viewport !== 'mobile') {
-    const [gear, panel] = configPanel(el, props, ctx);
-    // «?» og «⚙ Sted» i samme rad øverst til høyre, med hover-bro (klar av rotasjonshåndtaket).
+    // Innstillingene (sted, zoom, høyde) bor i Egenskaper-panelet via
+    // felt-kontrakten (`fields` på blokk-defen); her gjenstår kun «?»-chipen.
     const tools = el2('div', 'urd-kart-tools');
-    tools.appendChild(gear);
-    host.append(tools, panel);
+    host.append(tools);
     import('/assets/urd/hint.js').then(({ attachHint }) => {
       if (!host.isConnected || host.querySelector('.urd-hint-chip')) return;
       const chip = attachHint(tools, {
@@ -350,9 +224,18 @@ function finnOssSection() {
 export function register(Urd) {
   Urd.blocks.define('kart', {
     version: 1,
+    autoGrow: true,
     label: 'Kart',
     labelKey: 'kart.edit.blockLabel',
     defaults: () => ({ location: '', zoom: 15, height: 320 }),
+    // Felt-kontrakten: innstillingene rendres i adminens Egenskaper-panel.
+    // `place` skriver {location, lat, lon} (adressesøk via /api/geocode i
+    // admin; koordinater og OSM-lenker tolkes av parseLocation ved rendring).
+    fields: [
+      { key: 'location', type: 'place', labelKey: 'kart.edit.location', placeholderKey: 'kart.edit.locationPh' },
+      { key: 'zoom', type: 'number', labelKey: 'kart.edit.zoom', min: 1, max: 19 },
+      { key: 'height', type: 'number', labelKey: 'kart.edit.height', min: 120, max: 900, step: 10 },
+    ],
     migrations: {},
     render: renderKart,
   });

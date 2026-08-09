@@ -246,12 +246,42 @@ export const SECTION_THEMES = {
     '--urd-color-surface': 'color-mix(in srgb, var(--urd-base-text) 78%, var(--urd-base-bg))',
     '--urd-color-text': 'var(--urd-base-bg)',
   },
+  // De fire under kom i 0.6.6.4.6 (eiervalg 9. august 2026, alle fire skissene).
+  // Dus: aksenten som svakt pastell-skjær over hele seksjonen.
+  dus: {
+    '--urd-color-bg': 'color-mix(in srgb, var(--urd-base-accent) 12%, var(--urd-base-bg))',
+    '--urd-color-surface': 'color-mix(in srgb, var(--urd-base-accent) 8%, var(--urd-base-surface))',
+  },
+  // Dempet: lavmælt gråtonet sone med mykere tekst for sekundært innhold.
+  dempet: {
+    '--urd-color-bg': 'color-mix(in srgb, var(--urd-base-text) 5%, var(--urd-base-bg))',
+    '--urd-color-surface': 'color-mix(in srgb, var(--urd-base-text) 10%, var(--urd-base-bg))',
+    '--urd-color-text': 'color-mix(in srgb, var(--urd-base-text) 82%, var(--urd-base-bg))',
+  },
+  // Dyp: invers med aksentskjær - kontrastsonen tar merkevarefargen i seg.
+  dyp: {
+    '--urd-color-bg': 'color-mix(in srgb, var(--urd-base-accent) 30%, var(--urd-base-text))',
+    '--urd-color-surface': 'color-mix(in srgb, var(--urd-base-accent) 40%, var(--urd-base-text))',
+    '--urd-color-text': 'var(--urd-base-bg)',
+  },
+  // Uthevede kort: seksjonen står som Standard, kun flaten (kortene) tones.
+  uthevet: {
+    '--urd-color-surface': 'color-mix(in srgb, var(--urd-base-accent) 14%, var(--urd-base-surface))',
+  },
 };
 
-/** Etiketter til seksjonstema-nedtrekket (Standard er «ingen rolle»). */
+/** Etiketter til seksjonstema-velgeren (Standard er «ingen rolle»). */
 /** Visningsnavn-NØKLER (ta-oppslag hos konsumenten; modulen ligger i
  *  besøkende-lukningen og kan aldri kalle ta() på modulnivå). */
-export const SECTION_THEME_LABELS = { flate: 'sectionTheme.flate', aksent: 'sectionTheme.aksent', invers: 'sectionTheme.invers' };
+export const SECTION_THEME_LABELS = {
+  flate: 'sectionTheme.flate',
+  aksent: 'sectionTheme.aksent',
+  invers: 'sectionTheme.invers',
+  dus: 'sectionTheme.dus',
+  dempet: 'sectionTheme.dempet',
+  dyp: 'sectionTheme.dyp',
+  uthevet: 'sectionTheme.uthevet',
+};
 
 /** Alle token-nøkler noen rolle kan sette - brukes til å nullstille før ny rolle. */
 const SECTION_THEME_KEYS = [...new Set(Object.values(SECTION_THEMES).flatMap(Object.keys))];

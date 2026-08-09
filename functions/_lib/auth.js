@@ -30,21 +30,21 @@ export async function requirePublisher(request, env) {
   // muterende kall skal komme fra vår egen side, aldri fra et fremmed nettsted.
   const origin = request.headers.get('origin');
   if (origin && origin !== new URL(request.url).origin) {
-    return { response: json({ error: 'Forespørselen kommer fra feil nettsted', code: 'wrongOrigin' }, 403) };
+    return { response: json({ error: 'The request comes from the wrong site', code: 'wrongOrigin' }, 403) };
   }
 
   const token = readCookie(request, 'urd_gh');
-  if (!token) return { response: json({ error: 'Ikke innlogget', code: 'notLoggedIn' }, 401) };
+  if (!token) return { response: json({ error: 'Not signed in', code: 'notLoggedIn' }, 401) };
 
   let user;
   try {
     user = await currentUser(token);
   } catch (err) {
-    if (err.status === 401) return { response: json({ error: 'Ugyldig eller utløpt innlogging', code: 'loginExpired' }, 401) };
-    return { response: json({ error: 'GitHub er utilgjengelig akkurat nå - prøv igjen om litt', code: 'githubUnavailable' }, 503) };
+    if (err.status === 401) return { response: json({ error: 'Invalid or expired sign-in', code: 'loginExpired' }, 401) };
+    return { response: json({ error: 'GitHub is unavailable right now - try again shortly', code: 'githubUnavailable' }, 503) };
   }
   if (!isAllowedLogin(user.login, env)) {
-    return { response: json({ error: `GitHub-brukeren '${user.login}' har ikke publiseringstilgang`, code: 'notAllowed', login: user.login }, 403) };
+    return { response: json({ error: `The GitHub user '${user.login}' does not have publishing access`, code: 'notAllowed', login: user.login }, 403) };
   }
 
   return { config, token, user };

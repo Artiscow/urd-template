@@ -24,6 +24,9 @@ import { iconBlock } from './blocks/icon.js';
 import { samlingBlock } from './blocks/samling.js';
 import { galleriBlock } from './blocks/galleri.js';
 import { faqBlock } from './blocks/faq.js';
+import { tidslinjeBlock } from './blocks/tidslinje.js';
+import { sitatBlock } from './blocks/sitat.js';
+import { statistikkBlock } from './blocks/statistikk.js';
 import { colorLayer } from './backgrounds/color.js';
 import { gradientLayer } from './backgrounds/gradient.js';
 import { glowLayer } from './backgrounds/glow.js';
@@ -42,6 +45,10 @@ export const Urd = {
   sections: createRegistry('sections'),
   backgrounds: createRegistry('backgrounds'),
   animations: createRegistry('animations'),
+  // Plugin-leverte maler (0.6.7, samme def-form som malfilene: {name, kind,
+  // section|blocks}); seksjonsgalleriet fletter kind section inn i
+  // plugin-gruppen. Pakking/deling av maler hører til 0.6.9.
+  maler: createRegistry('maler'),
 };
 
 // Globalt tilgjengelig for plugins (register(Urd)) og editorens preview-bro.
@@ -57,6 +64,9 @@ function registerCore() {
   Urd.blocks.define('samling', samlingBlock);
   Urd.blocks.define('galleri', galleriBlock);
   Urd.blocks.define('faq', faqBlock);
+  Urd.blocks.define('tidslinje', tidslinjeBlock);
+  Urd.blocks.define('sitat', sitatBlock);
+  Urd.blocks.define('statistikk', statistikkBlock);
   Urd.backgrounds.define('color', colorLayer);
   Urd.backgrounds.define('gradient', gradientLayer);
   Urd.backgrounds.define('glow', glowLayer);
@@ -96,6 +106,36 @@ function mountToTop() {
   const toggle = () => btn.classList.toggle('vis', window.scrollY > 400);
   window.addEventListener('scroll', toggle, { passive: true });
   toggle();
+}
+
+/**
+ * Cross-document View Transitions (ADR-0011): nav og footer får
+ * view-transition-name KUN i selve overgangsvinduet (pageswap ved utreise,
+ * pagereveal ved innreise), så side-chromen står i ro mens innholdet toner.
+ * Et statisk navn i CSS gjorde elementene til backdrop-roots, som slo av
+ * menyens backdrop-filter (uskarpheten bak nav) i all vanlig visning.
+ * Uten cross-document-støtte fyrer hendelsene aldri: navnene settes ikke,
+ * og siden navigerer som før (sluttilstand).
+ */
+function wireViewTransitionNames() {
+  const setNames = (on) => {
+    for (const id of ['urd-nav', 'urd-footer']) {
+      const el = document.getElementById(id);
+      if (on) el?.style.setProperty('view-transition-name', id);
+      else el?.style.removeProperty('view-transition-name');
+    }
+  };
+  window.addEventListener('pageswap', (event) => {
+    if (event.viewTransition) setNames(true);
+  });
+  window.addEventListener('pagereveal', (event) => {
+    // Uten overgang (også bfcache-gjenoppliving etter en avbrutt utreise)
+    // skal navnene være borte, ellers står backdrop-rooten på og uskarpheten
+    // forblir av.
+    if (!event.viewTransition) { setNames(false); return; }
+    setNames(true);
+    event.viewTransition.finished.finally(() => setNames(false));
+  });
 }
 
 /**
@@ -220,6 +260,12 @@ function enablePreview(state, opts) {
       // Samlingsutkast fra editoren: brukes i stedet for serverfilene, og alt som viser samlinger rendres på nytt.
       setCollectionsDraft(msg.collections);
       renderPage(state.page, state.site, root, vp());
+    } else if (msg?.type === 'urd-maler') {
+      // Mal-utkastene fra editoren: vises i Mine maler-fanen i «+ Ny seksjon».
+      window.UrdPreviewEdit?.setMaler?.(msg.maler);
+    } else if (msg?.type === 'urd-insert-template') {
+      // Blokker-panelets Mine maler: sett inn blokkgruppe-malen i aktiv seksjon.
+      window.UrdPreviewEdit?.insertTemplate?.(msg.id);
     } else if (msg?.type === 'urd-close-menus') {
       // Eieren klikket i admin-panelene: lukk åpne menyer (preset-galleri, blokkmeny).
       window.UrdPreviewEdit?.closeMenus();
@@ -254,6 +300,23 @@ function enablePreview(state, opts) {
             defaults: def.defaults ? def.defaults() : {},
             variants: Array.isArray(def.variants)
               ? def.variants.map((v) => ({ label: v.labelKey ? ta(v.labelKey) : v.label, props: v.props ?? {} }))
+              : [],
+            // Felt-kontrakten (additiv): en def med `fields` får innstillingene
+            // sine rendret rett i Egenskaper-panelet i stedet for et eget
+            // config-panel. Etikettene løses her av samme grunn som over.
+            fields: Array.isArray(def.fields)
+              ? def.fields.map((f) => ({
+                  key: f.key,
+                  type: f.type,
+                  label: f.labelKey ? ta(f.labelKey) : (f.label ?? f.key),
+                  placeholder: f.placeholderKey ? ta(f.placeholderKey) : (f.placeholder ?? ''),
+                  ...(f.min !== undefined ? { min: f.min } : {}),
+                  ...(f.max !== undefined ? { max: f.max } : {}),
+                  ...(f.step !== undefined ? { step: f.step } : {}),
+                  ...(Array.isArray(f.options)
+                    ? { options: f.options.map((o) => ({ value: o.value, label: o.labelKey ? ta(o.labelKey) : (o.label ?? String(o.value)) })) }
+                    : {}),
+                }))
               : [],
           });
         }
@@ -341,6 +404,8 @@ export async function boot(opts) {
   opts.footer.id = 'urd-footer';
   opts.root.insertAdjacentElement('afterend', opts.footer);
   mountToTop();
+  // Inert i preview (sidebytter skjer via postMessage, aldri navigasjon).
+  wireViewTransitionNames();
 
   // Tomt sideregister (håndredigert site.json) gir en tom side, ikke krasj.
   const entry = resolvePage(site) ?? { id: 'tom', title: '', file: 'content/pages/finnes-ikke.json' };

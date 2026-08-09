@@ -19,6 +19,9 @@
  */
 import { frameToCss } from './render.js';
 import { makeId } from './sections/presets.js';
+import { cloneSectionForInsert, cloneBlocksForInsert } from './maler-model.js';
+import { searchItems } from './palette-search.js';
+import { applicableLayouts, layoutFrames } from './section-layouts.js';
 import { presetThumb } from './preset-thumb.js';
 import { openImageEditor, closeImageEditor } from './image-editor.js';
 import { applyImageStyle } from './blocks/image.js';
@@ -36,6 +39,169 @@ import { ta } from './i18n.js';
 
 /** Mobilvisning? Motoren setter body-klassen ut fra breakpointet. */
 const isMobile = () => document.body.classList.contains('urd-mobile');
+
+/** Mal-utkastene fra editoren (urd-maler-meldingen): {id, name, kind, section?, blocks?}.
+ *  Editoren eier listen; her vises den i Mine maler-fanen i «+ Ny seksjon». */
+let maler = [];
+export function setMaler(list) {
+  maler = Array.isArray(list) ? list : [];
+}
+
+/** Kategorivalget i preset-galleriet huskes per økt (G2 kategori-sidefelt,
+ *  eiervalg 9. august 2026; avløste segmentfanene fra variant C). */
+let presetCategory = 'alle';
+
+/** Oppsettenes visningsnavn (nøklene i kjernespråkene). */
+const LAYOUT_LABEL_KEYS = {
+  'stack-center': 'canvas.layout.stackCenter',
+  'stack-left': 'canvas.layout.stackLeft',
+  'split-media-right': 'canvas.layout.splitMediaRight',
+  'split-media-left': 'canvas.layout.splitMediaLeft',
+  'two-columns': 'canvas.layout.twoColumns',
+  'hero-top': 'canvas.layout.heroTop',
+};
+
+/** Ett oppsettskort per anvendelig variant: miniatyr fra seksjonens EGNE
+ *  blokker med variantens rammer; klikk poster urd-apply-layout (ETT
+ *  angre-steg i editoren) og kaller done(). */
+function buildLayoutCards(section, grid, done) {
+  const cards = [];
+  for (const id of applicableLayouts(section.blocks)) {
+    const result = layoutFrames(id, section.blocks, grid);
+    if (!result) continue;
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'urd-layout-card';
+    try {
+      const clone = structuredClone(section);
+      for (const { blockId, frame } of result.frames) {
+        const b = clone.blocks.find((x) => x.id === blockId);
+        if (b) b.frames.desktop = { ...b.frames.desktop, ...frame };
+      }
+      clone.size = { ...clone.size, minHeight: result.minHeight };
+      const thumb = document.createElement('span');
+      thumb.className = 'urd-layout-thumb';
+      thumb.insertAdjacentHTML('afterbegin', presetThumb(clone));
+      card.appendChild(thumb);
+    } catch { /* tekstvalg uten miniatyr */ }
+    const name = document.createElement('span');
+    name.className = 'urd-layout-name';
+    name.textContent = ta(LAYOUT_LABEL_KEYS[id] ?? id);
+    card.appendChild(name);
+    card.addEventListener('click', () => {
+      post({ type: 'urd-apply-layout', sectionId: section.id, frames: result.frames, minHeight: result.minHeight });
+      done();
+    });
+    cards.push(card);
+  }
+  return cards;
+}
+
+/**
+ * «Bytt oppsett»-velgeren (0.6.7): stripe over seksjonen (standard) eller
+ * galleri-meny, etter den personlige preferansen i Urd-innstillingene
+ * (urd-layout-picker i delt localStorage; leses ved hver åpning, så
+ * byttet virker uten omlasting). Begge klistres til skjermen i seksjonen
+ * og lukkes ved nytt knappeklikk, valg, klikk utenfor og Escape.
+ */
+function toggleLayoutPicker(host, section, grid) {
+  const existing = host.querySelector('.urd-layout-strip, .urd-layout-menu');
+  document.querySelectorAll('.urd-layout-strip, .urd-layout-menu').forEach((el) => el.remove());
+  if (existing) return;
+
+  const asMenu = localStorage.getItem('urd-layout-picker') === 'menu';
+  const picker = document.createElement('div');
+  const outside = (event) => {
+    // Knappen selv toggler; uten unntaket ville capture-lytteren fjernet
+    // velgeren før klikket, og toggelen bygget den opp igjen.
+    if (picker.contains(event.target) || event.target.closest?.('.urd-layout-btn')) return;
+    cleanup();
+  };
+  const onKey = (event) => {
+    if (event.key === 'Escape') cleanup();
+  };
+  function cleanup() {
+    document.removeEventListener('pointerdown', outside, true);
+    document.removeEventListener('keydown', onKey, true);
+    picker.remove();
+  }
+
+  const cards = buildLayoutCards(section, grid, cleanup);
+  if (asMenu) {
+    picker.className = 'urd-layout-menu';
+    const head = document.createElement('div');
+    head.className = 'urd-preset-head';
+    const title = document.createElement('span');
+    title.textContent = ta('canvas.layoutTitle');
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'urd-layout-close';
+    close.textContent = '×';
+    close.title = ta('confirm.cancel');
+    close.addEventListener('click', cleanup);
+    head.append(title, close);
+    const grid2 = document.createElement('div');
+    grid2.className = 'urd-layout-grid';
+    grid2.append(...cards);
+    picker.append(head, grid2);
+  } else {
+    picker.className = 'urd-layout-strip';
+    picker.append(...cards);
+  }
+  host.appendChild(picker);
+  setTimeout(() => {
+    document.addEventListener('pointerdown', outside, true);
+    document.addEventListener('keydown', onKey, true);
+  }, 0);
+}
+
+/** Siste pekerposisjon på lerretet: slash-kommandoen åpner blokkmenyen der. */
+let lastPointer = null;
+document.addEventListener('pointermove', (event) => {
+  lastPointer = { x: event.clientX, y: event.clientY };
+}, { passive: true });
+
+/**
+ * Åpne en seksjons + Ny blokk-meny, delt av dobbeltklikk og slash: med
+ * punkt lander blokken der (_urdAt) og menyen står ved pekeren; uten
+ * åpnes den fra chip-posisjonen. Søkefeltet nullstilles og fokuseres.
+ */
+function openBlockMenuAt(host, clientX = null, clientY = null) {
+  const wrap = host.querySelector('.urd-add-block');
+  const menu = wrap?.querySelector('.urd-add-block-menu');
+  if (!wrap || !menu) return;
+  const rect = host.getBoundingClientRect();
+  if (clientX != null) {
+    menu._urdAt = {
+      x: Math.round(((clientX - rect.left) / rect.width) * 10000) / 100,
+      y: Math.round(clientY - rect.top),
+    };
+    wrap.style.left = `${Math.round(clientX - rect.left)}px`;
+    wrap.style.top = `${Math.round(clientY - rect.top)}px`;
+    wrap.style.right = 'auto';
+    // Ved pekeren vises menyen alene: chip-knappen skjules (CSS-en på
+    // .urd-at-pointer), så det ikke står en «+ Ny blokk» over menyen.
+    wrap.classList.add('urd-at-pointer');
+  } else {
+    menu._urdAt = null;
+  }
+  menu._urdRefreshMaler?.();
+  menu._urdSearchReset?.();
+  menu.classList.add('open');
+  menu._urdSearchFocus?.();
+  if (clientX != null) {
+    // Menyen henger normalt mot venstre fra pekeren (right: 0). Nær
+    // venstre kant ville den gått ut av skjermen: da åpnes den mot
+    // høyre for pekeren i stedet.
+    menu.style.left = '';
+    menu.style.right = '';
+    const menuWidth = menu.getBoundingClientRect().width;
+    if (clientX - menuWidth < 8) {
+      menu.style.left = '0';
+      menu.style.right = 'auto';
+    }
+  }
+}
 
 /** Lukker åpne menyer (preset-galleri, blokkmeny). Kalles også via urd-close-menus når eieren klikker i admin-panelene, som iframens egne klikk-lyttere aldri ser. */
 let collapseOpenPresetMenu = null;
@@ -131,17 +297,24 @@ export function placeBlock(block, root) {
 /**
  * Spiller en inngangsanimasjon på nytt (demo når editoren endrer den):
  * snapp tilbake til starttilstanden uten transition, og gli inn igjen.
+ * Stagger-verter har effektklassene på BARNA (hvert med sin forskjøvne
+ * delay), så der spilles hele gruppen på nytt (0.6.6.4.6-fiksen; før ga
+ * stagger-endringer ingen visuell tilbakemelding).
  */
 export function demoAnimation(el) {
   if (!el) return;
-  const entrance = ['urd-anim-fade-in', 'urd-anim-slide-up', 'urd-anim-zoom-in']
-    .some((c) => el.classList.contains(c));
-  if (!entrance) return;
-  el.style.transition = 'none';
-  el.classList.remove('urd-anim-in');
+  const ENTRANCE = ['urd-anim-fade-in', 'urd-anim-slide-up', 'urd-anim-zoom-in'];
+  const targets = el.classList.contains('urd-anim-stagger')
+    ? [...el.querySelectorAll(ENTRANCE.map((c) => `.${c}`).join(', '))]
+    : ENTRANCE.some((c) => el.classList.contains(c)) ? [el] : [];
+  if (!targets.length) return;
+  for (const t of targets) {
+    t.style.transition = 'none';
+    t.classList.remove('urd-anim-in');
+  }
   void el.offsetWidth; // tving reflow så starttilstanden faktisk settes
-  el.style.transition = '';
-  requestAnimationFrame(() => el.classList.add('urd-anim-in'));
+  for (const t of targets) t.style.transition = '';
+  requestAnimationFrame(() => targets.forEach((t) => t.classList.add('urd-anim-in')));
 }
 
 /** Om vedvarende grid-visning er på (styrt av editorens grid-meny). */
@@ -273,7 +446,8 @@ function wireHeightDrag(target, host, section, grid, opts = {}) {
 const BLOCK_KINDS = [
   ['text', ta('blocks.text')], ['text-box', ta('ui.textBox')], ['button', ta('blocks.button')],
   ['image', ta('blocks.image')], ['video', ta('blocks.video')], ['icon', ta('blocks.icon')],
-  ['samling', ta('blocks.samling')], ['galleri', ta('blocks.galleri')],
+  ['samling', ta('blocks.samling')], ['galleri', ta('blocks.galleri')], ['faq', ta('blocks.faq')],
+  ['tidslinje', ta('blocks.tidslinje')], ['sitat', ta('blocks.sitat')], ['statistikk', ta('blocks.statistikk')],
 ];
 
 /** Formene bor i sin egen utfoldbare undermeny («Former») i + Ny blokk. */
@@ -282,8 +456,10 @@ const SHAPE_KINDS = [
   ['shape-rect', ta('shape.rect')], ['shape-triangle', ta('shape.triangle')],
 ];
 
-/** Kjerneblokk-typene (paletten i editoren eier byggingen av disse). */
-const CORE_BLOCK_TYPES = new Set(['text', 'image', 'button', 'shape', 'video', 'icon', 'samling', 'galleri']);
+/** Kjerneblokk-typene (paletten i editoren eier byggingen av disse). faq
+ *  manglet her frem til 0.6.7.11 og lakk inn i Plugin-blokker-gruppen. */
+const CORE_BLOCK_TYPES = new Set(['text', 'image', 'button', 'shape', 'video', 'icon', 'samling', 'galleri',
+  'faq', 'tidslinje', 'sitat', 'statistikk']);
 
 /**
  * Lukker en «+ Ny blokk»-meny og nullstiller dobbeltklikk-tilstanden:
@@ -331,6 +507,60 @@ function addBlockAdder(host, section, grid) {
   // åpnes med DOBBELTKLIKK på seksjonsflaten; da lander blokken der.
   // Åpnet fra knappen er punktet null, og editoren sentrerer som før.
   menu._urdAt = null;
+
+  // Blokk-søket (0.6.7, variant B: flat treffliste). Alt som legges i
+  // menyen registreres i searchables med sin synlige etikett og en run
+  // som klikker den EKTE knappen, så treff og meny aldri kan divergere.
+  const searchables = [];
+  const searchWrap = document.createElement('div');
+  searchWrap.className = 'urd-block-search';
+  searchWrap.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>';
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.placeholder = ta('canvas.searchBlocks');
+  searchWrap.appendChild(searchInput);
+  const hits = document.createElement('div');
+  hits.className = 'urd-block-hits';
+  menu.append(searchWrap, hits);
+  const renderHits = () => {
+    const query = searchInput.value;
+    if (!query.trim()) {
+      menu.classList.remove('urd-searching');
+      hits.replaceChildren();
+      return;
+    }
+    menu.classList.add('urd-searching');
+    hits.replaceChildren();
+    const all = searchables.concat(menu._urdMalerSearchables ?? []);
+    const found = searchItems(all, query, (item) => item.label);
+    if (!found.length) {
+      const empty = document.createElement('div');
+      empty.className = 'urd-search-empty';
+      empty.textContent = ta('canvas.searchEmpty');
+      hits.appendChild(empty);
+      return;
+    }
+    for (const item of found) {
+      const b = document.createElement('button');
+      b.textContent = item.label;
+      b.addEventListener('click', item.run);
+      hits.appendChild(b);
+    }
+  };
+  searchInput.addEventListener('input', renderHits);
+  searchInput.addEventListener('keydown', (event) => {
+    // Enter setter inn første treff (slash-flyten: «/», skriv, Enter);
+    // Escape lukker menyen. Stoppes så lerret-snarveiene aldri ser dem.
+    if (event.key === 'Enter') hits.querySelector('button')?.click();
+    else if (event.key === 'Escape') resetBlockAdder(wrap);
+    event.stopPropagation();
+  });
+  menu._urdSearchReset = () => {
+    searchInput.value = '';
+    renderHits();
+  };
+  menu._urdSearchFocus = () => searchInput.focus();
+
   const kindButton = (parent, kind, label) => {
     const b = document.createElement('button');
     b.textContent = label;
@@ -339,6 +569,7 @@ function addBlockAdder(host, section, grid) {
       resetBlockAdder(wrap);
     });
     parent.appendChild(b);
+    searchables.push({ label, run: () => b.click() });
   };
   for (const [kind, label] of BLOCK_KINDS) kindButton(menu, kind, label);
 
@@ -389,38 +620,76 @@ function addBlockAdder(host, section, grid) {
       resetBlockAdder(wrap);
     };
     // Blokker med variants (f.eks. kalenderens visninger) får en foldemeny som Former.
+    const defLabel = def.labelKey ? ta(def.labelKey) : (def.label ?? type);
     if (Array.isArray(def.variants) && def.variants.length) {
       const toggle = document.createElement('button');
       toggle.className = 'urd-add-block-shapes-toggle';
-      toggle.textContent = `${def.labelKey ? ta(def.labelKey) : (def.label ?? type)} ▾`;
+      toggle.textContent = `${defLabel} ▾`;
       toggle.title = title;
       const sub = document.createElement('div');
       sub.className = 'urd-add-block-shapes';
       for (const variant of def.variants) {
         const b = document.createElement('button');
-        b.textContent = variant.labelKey ? ta(variant.labelKey) : variant.label;
+        const variantLabel = variant.labelKey ? ta(variant.labelKey) : variant.label;
+        b.textContent = variantLabel;
         b.addEventListener('click', () => buildAndPost(variant.props ?? {}));
         sub.appendChild(b);
+        // I trefflisten flates folden ut: «Kalender: Måned» som egen rad.
+        searchables.push({ label: `${defLabel}: ${variantLabel}`, run: () => b.click() });
       }
       toggle.addEventListener('click', () => {
         const open = sub.classList.toggle('open');
-        toggle.textContent = `${def.labelKey ? ta(def.labelKey) : (def.label ?? type)} ${open ? '▴' : '▾'}`;
+        toggle.textContent = `${defLabel} ${open ? '▴' : '▾'}`;
       });
       menu.append(toggle, sub);
       continue;
     }
     const b = document.createElement('button');
-    b.textContent = def.labelKey ? ta(def.labelKey) : (def.label ?? type);
+    b.textContent = defLabel;
     b.title = title;
     b.addEventListener('click', () => buildAndPost());
     menu.appendChild(b);
+    searchables.push({ label: defLabel, run: () => b.click() });
   }
+  // Mine maler (blokkgrupper, 0.6.7, snippets-modellen): lagrede grupper i
+  // SAMME meny som blokkene. Innholdet bygges ved hver åpning, så listen
+  // alltid er fersk (lagring/sletting skjer uten at seksjonen rerendres).
+  const malerWrap = document.createElement('div');
+  menu.appendChild(malerWrap);
+  menu._urdRefreshMaler = () => {
+    malerWrap.replaceChildren();
+    menu._urdMalerSearchables = [];
+    const groupMaler = maler.filter((m) => m.kind === 'blocks' && Array.isArray(m.blocks));
+    if (!groupMaler.length) return;
+    const divider = document.createElement('div');
+    divider.className = 'urd-add-block-plugins';
+    divider.textContent = ta('canvas.tabMyTemplates');
+    malerWrap.appendChild(divider);
+    for (const mal of groupMaler) {
+      const b = document.createElement('button');
+      b.textContent = mal.name;
+      b.title = ta('canvas.insertGroup');
+      b.addEventListener('click', () => {
+        // Dobbeltklikk-åpnet: gruppen lander med øvre venstre hjørne på
+        // klikkpunktet; ellers beholdes lagrede posisjoner (kun klem).
+        insertBlocksMal(mal, section.id, menu._urdAt);
+        resetBlockAdder(wrap);
+      });
+      malerWrap.appendChild(b);
+      menu._urdMalerSearchables.push({ label: mal.name, run: () => b.click() });
+    }
+  };
   openBtn.addEventListener('click', () => {
     // Fra knappen: nullstill ev. dobbeltklikk-plassering av menyen.
     const wasOpen = menu.classList.contains('open');
     menu._urdAt = null;
     resetBlockAdder(wrap);
-    if (!wasOpen) menu.classList.add('open');
+    if (!wasOpen) {
+      menu._urdRefreshMaler?.();
+      menu._urdSearchReset?.();
+      menu.classList.add('open');
+      menu._urdSearchFocus?.();
+    }
   });
   // enhanceSection kjører etter HVER rerender på samme host-element: lytterne legges kun én gang og slår opp gjeldende meny ved hendelsen, ellers hoper det seg opp én lytter per rerender.
   if (!host._urdAdderLeaveWired) {
@@ -437,31 +706,7 @@ function addBlockAdder(host, section, grid) {
       const target = event.target instanceof Element ? event.target : null;
       if (!target) return;
       if (target.closest('.urd-block, .urd-add-block, .urd-add-section, .urd-section-toolbar, .urd-section-resize, .urd-section-resize-top, .urd-hint-chip, .urd-hint-card')) return;
-      const curWrap = host.querySelector('.urd-add-block');
-      const curMenu = curWrap?.querySelector('.urd-add-block-menu');
-      if (!curWrap || !curMenu) return;
-      const rect = host.getBoundingClientRect();
-      curMenu._urdAt = {
-        x: Math.round(((event.clientX - rect.left) / rect.width) * 10000) / 100,
-        y: Math.round(event.clientY - rect.top),
-      };
-      curWrap.style.left = `${Math.round(event.clientX - rect.left)}px`;
-      curWrap.style.top = `${Math.round(event.clientY - rect.top)}px`;
-      curWrap.style.right = 'auto';
-      // Ved pekeren vises menyen alene: chip-knappen skjules (CSS-en på
-      // .urd-at-pointer), så det ikke står en «+ Ny blokk» over menyen.
-      curWrap.classList.add('urd-at-pointer');
-      curMenu.classList.add('open');
-      // Menyen henger normalt mot venstre fra pekeren (right: 0). Nær
-      // venstre kant ville den gått ut av skjermen: da åpnes den mot
-      // høyre for pekeren i stedet.
-      curMenu.style.left = '';
-      curMenu.style.right = '';
-      const menuWidth = curMenu.getBoundingClientRect().width;
-      if (event.clientX - menuWidth < 8) {
-        curMenu.style.left = '0';
-        curMenu.style.right = 'auto';
-      }
+      openBlockMenuAt(host, event.clientX, event.clientY);
     });
   }
 
@@ -606,29 +851,19 @@ function makeSectionAdder(index, above = null) {
     bar.classList.add('open');
     bar.replaceChildren();
 
-    // Preset-galleriet: gruppert etter def.group med def.hint som beskrivelse.
-    // Feltene er valgfrie; presets uten group havner under «Annet».
-    // Gruppene beholder registerets rekkefølge.
+    // Preset-galleriet i kategori-sidefelt-formen (G2, eiervalg 9. august
+    // 2026): smalt kategorifelt til venstre (Alle, kjernegruppene, Plugins,
+    // Mine maler), rutenett med søk til høyre. Gruppene beholder registerets
+    // rekkefølge; presets uten group havner under «Annet».
     const menu = document.createElement('div');
     menu.className = 'urd-preset-menu';
     // Den nederste grensen ligger ved sidens slutt, der iframen ikke har plass under: åpne galleriet oppover i stedet.
     // På en tom side (kun én grense) finnes ingenting over, da åpnes det fortsatt nedover.
     if (!bar.nextElementSibling && bar.previousElementSibling) menu.classList.add('urd-preset-up');
 
-    const head = document.createElement('div');
-    head.className = 'urd-preset-head';
-    const title = document.createElement('span');
-    title.textContent = ta('canvas.newSectionTitle');
-    const cancel = document.createElement('button');
-    cancel.className = 'urd-preset-close';
-    cancel.textContent = '×';
-    cancel.title = ta('confirm.cancel');
-    cancel.addEventListener('click', collapse);
-    head.append(title, cancel);
-    menu.appendChild(head);
-
-    // Kjernens maler grupperes som før; plugin-maler samles i en egen
-    // «Plugins»-seksjon under alt det innebygde.
+    // Kildene samles ÉN gang ved åpning: kjernegruppene på group-STRENGEN
+    // (visningen via groupKey - plugin-kontrakten), plugin-presets og
+    // plugin-leverte maler (kind section, via re-id-regelen) i egen gruppe.
     const groups = new Map();
     const pluginDefs = [];
     for (const id of window.Urd.sections.ids()) {
@@ -637,53 +872,233 @@ function makeSectionAdder(index, above = null) {
         pluginDefs.push(def);
         continue;
       }
-      // Grupperingen skjer på group-STRENGEN (id); kun visningen oversettes
-      // (groupKey med group som fallback - plugin-kontrakten).
       const group = def.group ?? '';
       if (!groups.has(group)) groups.set(group, { labelKey: def.groupKey ?? null, defs: [] });
       groups.get(group).defs.push(def);
     }
+    for (const id of window.Urd.maler?.ids?.() ?? []) {
+      const mal = window.Urd.maler.get(id);
+      if (mal?.kind !== 'section' || !mal.section) continue;
+      pluginDefs.push({ label: mal.name ?? id, fromPlugin: mal.fromPlugin, create: () => cloneSectionForInsert(mal.section, makeId) });
+    }
     if (pluginDefs.length) groups.set('__plugins', { labelKey: 'panel.plugins', defs: pluginDefs });
-    for (const [name, { labelKey, defs }] of groups) {
-      const heading = document.createElement('div');
-      heading.className = 'urd-preset-group';
-      heading.textContent = labelKey ? ta(labelKey) : (name || ta('canvas.groupOther'));
-      menu.appendChild(heading);
-      for (const def of defs) {
-        const choice = document.createElement('button');
-        choice.type = 'button';
-        choice.className = 'urd-preset-choice';
-        // Auto-generert miniatyr fra presetens faktiske data (dataene
-        // forkastes). En kastende plugin-preset skal aldri velte menyen:
-        // da vises valget uten skisse, som før.
+    const groupLabel = (name, labelKey) => (labelKey ? ta(labelKey) : (name || ta('canvas.groupOther')));
+
+    // Kategorifargene (F2, eiervalg 9. august 2026): hver gruppe får et fast
+    // fargesteg avledet av admin-aksenten i base.css (--urd-kat-1..5, syklisk
+    // ved flere grupper); Mine maler har alltid steg 5. Fargen settes som
+    // --urd-kat på kort, overskrifter og kategoriknapper.
+    const MAL_KAT = 5;
+    const katFor = new Map([...groups.keys()].map((name, i) => [name, (i % 5) + 1]));
+    const setKat = (el, kat) => el.style.setProperty('--urd-kat', `var(--urd-kat-${kat})`);
+    const makeDot = () => {
+      const dot = document.createElement('span');
+      dot.className = 'urd-preset-dot';
+      return dot;
+    };
+
+    // Kategorifeltet: Alle + gruppene + Mine maler (relevans-regelen: en tom
+    // plugin-gruppe finnes ikke i groups og får dermed ingen knapp).
+    const rail = document.createElement('div');
+    rail.className = 'urd-preset-rail';
+    const railTitle = document.createElement('span');
+    railTitle.className = 'urd-preset-rail-title';
+    railTitle.textContent = ta('canvas.newSectionTitle');
+    rail.appendChild(railTitle);
+
+    const main = document.createElement('div');
+    main.className = 'urd-preset-main';
+    const top = document.createElement('div');
+    top.className = 'urd-preset-top';
+    const search = document.createElement('input');
+    search.type = 'text';
+    search.className = 'urd-preset-search';
+    search.placeholder = ta('canvas.searchSections');
+    search.title = ta('canvas.searchSections');
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'urd-preset-close';
+    cancel.textContent = '×';
+    cancel.title = ta('confirm.cancel');
+    cancel.addEventListener('click', collapse);
+    top.append(search, cancel);
+    const content = document.createElement('div');
+    content.className = 'urd-preset-content';
+    main.append(top, content);
+    menu.append(rail, main);
+
+    /** Preset-kort i rutenettet: miniatyr + navn, hintet som tooltip.
+     *  En kastende plugin-preset skal aldri velte menyen: tekstkort uten
+     *  skisse i stedet (samme vern som før). */
+    const buildCard = (def, kat) => {
+      const choice = document.createElement('button');
+      choice.type = 'button';
+      choice.className = 'urd-preset-card';
+      setKat(choice, kat);
+      if (def.hintKey || def.hint) choice.title = def.hintKey ? ta(def.hintKey) : def.hint;
+      try {
+        const thumb = document.createElement('span');
+        thumb.className = 'urd-preset-thumb';
+        thumb.insertAdjacentHTML('afterbegin', presetThumb(def.create()));
+        choice.appendChild(thumb);
+      } catch { /* tekstkort uten miniatyr */ }
+      const label = document.createElement('span');
+      label.className = 'urd-preset-label';
+      label.textContent = def.labelKey ? ta(def.labelKey) : def.label;
+      choice.appendChild(label);
+      choice.addEventListener('click', () => {
+        post({ type: 'urd-add-section', index, section: def.create() });
+        // Rerenderingen fjerner menyen fra DOM: rydd document-lytteren nå i stedet for ved neste tilfeldige klikk.
+        cleanupOutside();
+      });
+      return choice;
+    };
+
+    const buildGrid = (entries) => {
+      const grid = document.createElement('div');
+      grid.className = 'urd-preset-grid';
+      for (const { def, kat } of entries) grid.appendChild(buildCard(def, kat));
+      return grid;
+    };
+
+    // Mine maler: rutenett med stor miniatyr, navn og sletteknapp.
+    // Innsetting går via cloneSectionForInsert (re-id-regelen i SKJEMA.md):
+    // nye id-er hver gang, så samme mal kan settes inn flere ganger.
+    const renderMaler = () => {
+      const list = maler.filter((m) => m.kind === 'section' && m.section);
+      if (!list.length) {
+        const empty = document.createElement('div');
+        empty.className = 'urd-mal-empty';
+        empty.textContent = ta('canvas.templatesEmpty');
+        content.appendChild(empty);
+        return;
+      }
+      const grid = document.createElement('div');
+      grid.className = 'urd-mal-grid';
+      for (const mal of list) {
+        const card = document.createElement('div');
+        card.className = 'urd-mal-card';
+        const pick = document.createElement('button');
+        pick.type = 'button';
+        pick.className = 'urd-mal-pick';
         try {
           const thumb = document.createElement('span');
-          thumb.className = 'urd-preset-thumb';
-          thumb.insertAdjacentHTML('afterbegin', presetThumb(def.create()));
-          choice.appendChild(thumb);
+          thumb.className = 'urd-mal-thumb';
+          thumb.insertAdjacentHTML('afterbegin', presetThumb(mal.section));
+          pick.appendChild(thumb);
         } catch { /* tekstvalg uten miniatyr */ }
-        const body = document.createElement('span');
-        body.className = 'urd-preset-body';
-        choice.appendChild(body);
-        const label = document.createElement('span');
-        label.className = 'urd-preset-label';
-        label.textContent = def.labelKey ? ta(def.labelKey) : def.label;
-        body.appendChild(label);
-        if (def.hintKey || def.hint) {
-          const hint = document.createElement('span');
-          hint.className = 'urd-preset-hint';
-          hint.textContent = def.hintKey ? ta(def.hintKey) : def.hint;
-          body.appendChild(hint);
-        }
-        choice.addEventListener('click', () => {
-          post({ type: 'urd-add-section', index, section: def.create() });
-          // Rerenderingen fjerner menyen fra DOM: rydd document-lytteren nå i stedet for ved neste tilfeldige klikk.
+        const nameEl = document.createElement('span');
+        nameEl.className = 'urd-mal-name';
+        nameEl.textContent = mal.name;
+        pick.appendChild(nameEl);
+        pick.addEventListener('click', () => {
+          post({ type: 'urd-add-section', index, section: cloneSectionForInsert(mal.section, makeId) });
           cleanupOutside();
         });
-        menu.appendChild(choice);
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'urd-mal-del';
+        del.textContent = '×';
+        del.title = ta('canvas.deleteTemplate');
+        del.addEventListener('click', (event) => {
+          // Editoren eier bekreftelsen og slettingen; menyen lukkes så
+          // listen er fersk neste gang den åpnes.
+          event.stopPropagation();
+          post({ type: 'urd-delete-template', id: mal.id });
+          cleanupOutside();
+          collapse();
+        });
+        setKat(card, MAL_KAT);
+        card.append(pick, del);
+        grid.appendChild(card);
       }
+      content.appendChild(grid);
+    };
+
+    // Søket går alltid på tvers av alle kategorier (flat, rangert treffliste
+    // som blokkmenyens, eiervalg 0.6.7.6) og matcher de synlige etikettene.
+    const searchables = [];
+    for (const [name, { defs }] of groups) {
+      for (const def of defs) searchables.push({ label: def.labelKey ? ta(def.labelKey) : def.label, def, kat: katFor.get(name) });
     }
+    const malDef = (mal) => ({ label: mal.name, create: () => cloneSectionForInsert(mal.section, makeId) });
+
+    const renderContent = () => {
+      content.replaceChildren();
+      const query = search.value.trim();
+      if (query) {
+        const all = [...searchables,
+          ...maler.filter((m) => m.kind === 'section' && m.section).map((m) => ({ label: m.name, def: malDef(m), kat: MAL_KAT }))];
+        const found = searchItems(all, query, (item) => item.label);
+        if (!found.length) {
+          const empty = document.createElement('div');
+          empty.className = 'urd-mal-empty';
+          empty.textContent = ta('canvas.searchEmpty');
+          content.appendChild(empty);
+          return;
+        }
+        content.appendChild(buildGrid(found));
+        return;
+      }
+      if (presetCategory === 'maler') {
+        renderMaler();
+        return;
+      }
+      for (const [name, { labelKey, defs }] of groups) {
+        if (presetCategory !== 'alle' && presetCategory !== name) continue;
+        const kat = katFor.get(name);
+        // Én valgt kategori trenger ingen overskrift over seg selv.
+        if (presetCategory === 'alle') {
+          const heading = document.createElement('div');
+          heading.className = 'urd-preset-group';
+          setKat(heading, kat);
+          heading.append(makeDot(), document.createTextNode(groupLabel(name, labelKey)));
+          content.appendChild(heading);
+        }
+        content.appendChild(buildGrid(defs.map((def) => ({ def, kat }))));
+      }
+    };
+
+    // Kategorknappene; valget huskes per økt. Aktivt søk vinner over
+    // kategorien til feltet tømmes.
+    const railButtons = new Map();
+    const addRailButton = (id, label, kat) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      if (id === 'alle') btn.classList.add('urd-preset-rail-alle');
+      if (id === 'maler') btn.classList.add('urd-preset-rail-maler');
+      if (kat) setKat(btn, kat);
+      btn.append(makeDot(), document.createTextNode(label));
+      btn.addEventListener('click', () => {
+        presetCategory = id;
+        search.value = '';
+        applyCategory();
+      });
+      railButtons.set(id, btn);
+      rail.appendChild(btn);
+    };
+    addRailButton('alle', ta('canvas.groupAll'), 1);
+    for (const [name, { labelKey }] of groups) addRailButton(name, groupLabel(name, labelKey), katFor.get(name));
+    addRailButton('maler', ta('canvas.tabMyTemplates'), MAL_KAT);
+    if (!railButtons.has(presetCategory)) presetCategory = 'alle';
+
+    const applyCategory = () => {
+      for (const [id, btn] of railButtons) btn.classList.toggle('on', id === presetCategory);
+      renderContent();
+    };
+    search.addEventListener('input', renderContent);
+    search.addEventListener('keydown', (event) => {
+      // Enter setter inn første treff; Escape lukker (som blokkmenyen).
+      if (event.key === 'Enter') content.querySelector('.urd-preset-card, .urd-mal-pick')?.click();
+      if (event.key === 'Escape') {
+        cleanupOutside();
+        collapse();
+      }
+      event.stopPropagation();
+    });
+    applyCategory();
     bar.appendChild(menu);
+    search.focus();
 
     // Klikk utenfor menyen lukker den, samme forventning som ellers i editoren.
     // Listeneren ryddes ved lukking og ved preset-valg.
@@ -1565,6 +1980,26 @@ function addSectionToolbar(host, section, grid) {
       host.style.minHeight = minHeight;
       post({ type: 'urd-section-size', sectionId: section.id, minHeight });
     });
+    // «Bytt oppsett» (0.6.7): kun når seksjonen har noe å bytte på
+    // (relevans-regelen: minst to bevegelige blokker).
+    if (applicableLayouts(section.blocks).length) {
+      const layoutBtn = document.createElement('button');
+      layoutBtn.className = 'urd-layout-btn';
+      layoutBtn.title = ta('canvas.changeLayout');
+      layoutBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="8" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>';
+      layoutBtn.addEventListener('click', () => toggleLayoutPicker(host, section, grid));
+      bar.appendChild(layoutBtn);
+    }
+    // «Lagre som mal» (0.6.7): navnløst snapshot til editoren, som navngir
+    // og lagrer utkastet. Re-id skjer først ved innsetting, aldri her.
+    const save = document.createElement('button');
+    save.className = 'urd-save-template';
+    save.title = ta('canvas.saveTemplate');
+    save.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><path d="M12 7v6M9 10h6"/></svg>';
+    save.addEventListener('click', () => {
+      post({ type: 'urd-save-template', kind: 'section', section: JSON.parse(JSON.stringify(section)) });
+    });
+    bar.appendChild(save);
     mk('×', ta('canvas.deleteSection'), () => {
       post({ type: 'urd-delete-section', sectionId: section.id });
     });
@@ -1766,6 +2201,32 @@ window.addEventListener('keydown', (event) => {
     return;
   }
 
+  // Utvalgs-sletting trenger ikke enkeltblokk-anker (marquee kan stå
+  // uten et etter gruppe-operasjoner).
+  if ((event.key === 'Delete' || event.key === 'Backspace') && multiIds.size > 1) {
+    event.preventDefault();
+    deleteSelection();
+    return;
+  }
+
+  // Slash-kommando (0.6.7): «/» åpner + Ny blokk-menyen med søkefeltet
+  // fokusert, i den aktive seksjonen (ellers seksjonen under pekeren);
+  // står pekeren i seksjonen, lander blokken på pekerpunktet.
+  if (event.key === '/' && !ctrl && !event.altKey) {
+    if (isMobile() || document.body.classList.contains('urd-chrome-off')) return;
+    const active = document.querySelector('.urd-section-active');
+    const under = lastPointer
+      ? document.elementFromPoint(lastPointer.x, lastPointer.y)?.closest?.('.urd-section') ?? null
+      : null;
+    const host = active ?? under ?? document.querySelector('.urd-section');
+    if (!host) return;
+    event.preventDefault();
+    closeMenus();
+    if (lastPointer && host === under) openBlockMenuAt(host, lastPointer.x, lastPointer.y);
+    else openBlockMenuAt(host);
+    return;
+  }
+
   if (!selectedBlockId) return;
 
   if (event.key === 'Escape') {
@@ -1794,12 +2255,7 @@ window.addEventListener('keydown', (event) => {
 
   if (event.key === 'Delete' || event.key === 'Backspace') {
     event.preventDefault();
-    if (multiIds.size > 1) {
-      // Hele utvalget slettes som ETT angre-steg (blockIds-listen).
-      post({ type: 'urd-delete', sectionId: ctx.section.id, blockIds: [...multiIds] });
-    } else {
-      post({ type: 'urd-delete', sectionId: ctx.section.id, blockId: selectedBlockId });
-    }
+    post({ type: 'urd-delete', sectionId: ctx.section.id, blockId: selectedBlockId });
     selectBlock(null);
     return;
   }
@@ -1954,6 +2410,16 @@ function clamp(value, min, max) {
 
 /* ---------- Multimarkering: verktøylinje, kopier/lim inn ---------- */
 
+/** Sletter hele utvalget som ETT angre-steg (delt av Delete-tasten og
+ *  verktøylinjens slett-knapp). */
+function deleteSelection() {
+  const ctx = selectedEls()[0]?._urdCtx;
+  const sectionId = multiSectionId ?? ctx?.section?.id;
+  if (!sectionId || multiIds.size < 2) return;
+  post({ type: 'urd-delete', sectionId, blockIds: [...multiIds] });
+  selectBlock(null);
+}
+
 /** Flytende verktøylinje over utvalget: juster/fordel + antall. */
 let multiBar = null;
 
@@ -1986,7 +2452,76 @@ function buildMultiBar() {
   const distH = btn(svg('<path d="M3 3v18M21 3v18"/><rect x="7" y="9" width="3" height="6"/><rect x="14" y="9" width="3" height="6"/>'), ta('canvas.distributeH'), () => applyDistribute('x'));
   const distV = btn(svg('<path d="M3 3h18M3 21h18"/><rect x="9" y="7" width="6" height="3"/><rect x="9" y="14" width="6" height="3"/>'), ta('canvas.distributeV'), () => applyDistribute('y'));
   multiBar._urdDist = [distH, distV];
+  // «Lagre gruppe som mal» (0.6.7, snippets-modellen): hele utvalget
+  // lagres som gjenbrukbar blokkgruppe; navngiving og lagring skjer i
+  // editoren (urd-save-template), gruppen dukker opp i blokkmenyene.
+  const saveGroup = btn(svg('<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><path d="M12 7v6M9 10h6"/>'), ta('canvas.saveGroup'), () => {
+    const blocks = selectedEls().map((el) => el._urdCtx?.block).filter(Boolean);
+    if (blocks.length < 2) return;
+    post({ type: 'urd-save-template', kind: 'blocks', blocks: JSON.parse(JSON.stringify(blocks)) });
+  });
+  saveGroup.classList.add('urd-multi-save');
+  // Dra-håndtaket: grip hele utvalget og dra det samlet (egen knapp ved
+  // siden av søppelikonet); bokføres som ETT angre-steg ved slipp.
+  const grip = document.createElement('button');
+  grip.className = 'urd-multi-drag';
+  grip.title = ta('canvas.dragSelected');
+  grip.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><g fill="currentColor"><circle cx="3" cy="3.5" r="1.4"/><circle cx="7" cy="3.5" r="1.4"/><circle cx="11" cy="3.5" r="1.4"/><circle cx="3" cy="10.5" r="1.4"/><circle cx="7" cy="10.5" r="1.4"/><circle cx="11" cy="10.5" r="1.4"/></g></svg>';
+  grip.addEventListener('pointerdown', startSelectionDrag);
+  multiBar.appendChild(grip);
+  const del = btn(svg('<path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>'), ta('canvas.deleteSelected'), deleteSelection);
+  del.classList.add('urd-multi-delete');
   document.body.appendChild(multiBar);
+}
+
+/** Dra hele utvalget samlet fra håndtaket i verktøylinjen: livevisning
+ *  under draet (klemt av groupDelta så gruppen holder seg i seksjonen),
+ *  bokført som ETT angre-steg ved slipp. Avbrudd stiller alt tilbake. */
+function startSelectionDrag(event) {
+  // isPrimary-vakten: en finger nummer to på håndtaket skal ikke starte
+  // et konkurrerende dra med egne lyttere som kjemper om delta.
+  if (event.button !== 0 || !event.isPrimary) return;
+  const items = selectionItems();
+  const host = selectedEls()[0]?.closest('.urd-section');
+  if (!host || items.length < 2) return;
+  event.preventDefault();
+  event.stopPropagation();
+  const handle = event.currentTarget;
+  handle.setPointerCapture(event.pointerId);
+
+  const width = host.getBoundingClientRect().width;
+  const startX = event.clientX;
+  const startY = event.clientY;
+  const r2 = (v) => Math.round(v * 100) / 100;
+  let delta = { dx: 0, dy: 0 };
+
+  const apply = (frameFor) => {
+    for (const it of items) {
+      const el = document.querySelector(`.urd-block[data-block-id="${CSS.escape(it.id)}"]`);
+      if (el) Object.assign(el.style, frameToCss(frameFor(it)));
+    }
+    // Verktøylinjen følger utvalget, så håndtaket ligger under pekeren hele veien.
+    updateMultiToolbar();
+  };
+  const move = (e) => {
+    delta = groupDelta(items, ((e.clientX - startX) / width) * 100, e.clientY - startY);
+    apply((it) => ({ ...it, x: it.x + delta.dx, y: it.y + delta.dy }));
+  };
+  const finish = (commit) => {
+    handle.removeEventListener('pointermove', move);
+    handle.removeEventListener('pointerup', up);
+    handle.removeEventListener('pointercancel', cancel);
+    if (commit && (delta.dx || delta.dy)) {
+      applySelectionMoves(items.map((it) => ({ id: it.id, x: r2(it.x + delta.dx), y: it.y + delta.dy })));
+    } else {
+      apply((it) => it);
+    }
+  };
+  const up = () => finish(true);
+  const cancel = () => finish(false);
+  handle.addEventListener('pointermove', move);
+  handle.addEventListener('pointerup', up);
+  handle.addEventListener('pointercancel', cancel);
 }
 
 function updateMultiToolbar() {
@@ -2098,6 +2633,30 @@ function pasteClipboard(source = clipboard) {
   multiIds = blocks.length > 1 ? new Set(blocks.map((b) => b.id)) : new Set();
   selectedBlockId = blocks[0].id;
   post({ type: 'urd-select-block', sectionId, blockId: selectedBlockId });
+}
+
+/** Sett inn en blokkgruppe-mal i en seksjon: re-id + anker/klem via
+ *  maler-model (re-id-regelen i SKJEMA.md), ETT angre-steg via
+ *  urd-add-blocks, og det innsatte blir det nye utvalget (samme hale
+ *  som pasteClipboard). anchor = {x i %, y i px} eller null. */
+function insertBlocksMal(mal, sectionId, anchor) {
+  const { blocks, minBottom } = cloneBlocksForInsert(mal.blocks, makeId, { anchor });
+  post({ type: 'urd-add-blocks', sectionId, blocks, minBottom, moves: [] });
+  document.querySelectorAll('.urd-block.urd-selected, .urd-block.urd-multi-selected')
+    .forEach((b) => b.classList.remove('urd-selected', 'urd-multi-selected'));
+  multiSectionId = sectionId;
+  multiIds = blocks.length > 1 ? new Set(blocks.map((b) => b.id)) : new Set();
+  selectedBlockId = blocks[0].id;
+  post({ type: 'urd-select-block', sectionId, blockId: selectedBlockId });
+}
+
+/** Blokker-panelets Mine maler-gruppe (urd-insert-template): sett inn i
+ *  aktiv seksjon (ellers første) med lagrede posisjoner, kun klem. */
+export function insertTemplate(id) {
+  const mal = maler.find((m) => m.id === id && m.kind === 'blocks' && Array.isArray(m.blocks));
+  const host = document.querySelector('.urd-section-active') ?? document.querySelector('.urd-section');
+  if (!mal || !host) return;
+  insertBlocksMal(mal, host.dataset.sectionId, null);
 }
 
 /** Ctrl+D med flerutvalg: dupliser utvalget (via lim inn-flyten). */

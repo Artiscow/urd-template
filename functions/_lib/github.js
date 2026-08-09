@@ -19,14 +19,14 @@ export function cfg(env) {
   for (const key of ['GITHUB_REPO', 'GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET']) {
     if (!env[key]) {
       throw Object.assign(
-        new Error(`Publisering er ikke konfigurert: miljøvariabelen ${key} mangler`),
+        new Error(`Publishing is not configured: the environment variable ${key} is missing`),
         { code: 'setupMissingEnv', key },
       );
     }
   }
   const rootDir = (env.GITHUB_ROOT_DIR || '').replace(/^\/+|\/+$/g, '');
   if (rootDir.split('/').includes('..')) {
-    throw Object.assign(new Error('GITHUB_ROOT_DIR kan ikke inneholde ..'), { code: 'setupBadRootDir' });
+    throw Object.assign(new Error('GITHUB_ROOT_DIR cannot contain ..'), { code: 'setupBadRootDir' });
   }
   return {
     repo: env.GITHUB_REPO,
@@ -66,7 +66,7 @@ export async function gh(token, path, init = {}, attempt = 1) {
     }
     const isJson = res.headers.get('content-type')?.includes('json');
     const detail = isJson ? (await res.text()).slice(0, 300) : '(HTML-feilside fra GitHub)';
-    const error = new Error(`GitHub ${init.method ?? 'GET'} ${path} svarte ${res.status}: ${detail}`);
+    const error = new Error(`GitHub ${init.method ?? 'GET'} ${path} responded ${res.status}: ${detail}`);
     error.status = res.status;
     throw error;
   }
@@ -98,7 +98,7 @@ export async function ghGraphql(token, query, attempt = 1) {
       await new Promise((resolve) => setTimeout(resolve, attempt * 500));
       return ghGraphql(token, query, attempt + 1);
     }
-    const error = new Error(`GitHub GraphQL svarte ${res.status}`);
+    const error = new Error(`GitHub GraphQL responded ${res.status}`);
     error.status = res.status;
     throw error;
   }
@@ -124,7 +124,7 @@ export async function triggerDeploy(env) {
   try {
     await fetch(env.DEPLOY_HOOK_URL, { method: 'POST' });
   } catch (err) {
-    console.warn('Urd: deploy-hook feilet', err.message);
+    console.warn('Urd: deploy hook failed', err.message);
   }
 }
 
@@ -154,7 +154,7 @@ export async function commitFiles(token, config, { message, files, expect }) {
   const ref = await gh(token, `/repos/${repo}/git/ref/heads/${branch}`);
   const baseSha = ref.object.sha;
   if (expect && expect !== baseSha) {
-    const error = new Error('HEAD har flyttet seg siden konfliktsjekken');
+    const error = new Error('HEAD has moved since the conflict check');
     error.status = 409;
     throw error;
   }
@@ -230,7 +230,7 @@ export async function commitTree(token, config, { message, entries, expect }, ch
   const ref = await gh(token, `/repos/${repo}/git/ref/heads/${branch}`);
   const baseSha = ref.object.sha;
   if (expect && expect !== baseSha) {
-    const error = new Error('HEAD har flyttet seg siden oppdaterings-sjekken');
+    const error = new Error('HEAD has moved since the update check');
     error.status = 409;
     throw error;
   }

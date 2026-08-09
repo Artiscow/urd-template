@@ -43,10 +43,10 @@ export async function onRequestPost({ request, env }) {
   try {
     body = await request.json();
   } catch {
-    return json({ error: 'Ugyldig JSON i forespørselen', code: 'badJson' }, 400);
+    return json({ error: 'Invalid JSON in the request', code: 'badJson' }, 400);
   }
   if (typeof body?.expect !== 'string' || !/^[0-9a-f]{7,64}$/i.test(body.expect)) {
-    return json({ error: 'expect (publiseringen som skal angres) mangler eller er ugyldig', code: 'badRevertTarget' }, 400);
+    return json({ error: 'expect (the publish to revert) is missing or invalid', code: 'badRevertTarget' }, 400);
   }
 
   try {
@@ -59,12 +59,12 @@ export async function onRequestPost({ request, env }) {
       `/repos/${repo}/commits?sha=${branch}&per_page=1&path=${encodeURIComponent(contentPath)}`,
     );
     if (latest[0]?.sha !== body.expect) {
-      return json({ error: 'Noen har publisert i mellomtiden - last historikken på nytt', code: 'revertRace' }, 409);
+      return json({ error: 'Someone has published in the meantime - reload the history', code: 'revertRace' }, 409);
     }
 
     const target = await gh(token, `/repos/${repo}/git/commits/${body.expect}`);
     const targetParentSha = target.parents?.[0]?.sha;
-    if (!targetParentSha) return json({ error: 'Ingenting å angre: dette er første publisering', code: 'nothingToRevert' }, 400);
+    if (!targetParentSha) return json({ error: 'Nothing to revert: this is the first publish', code: 'nothingToRevert' }, 400);
     const targetParent = await gh(token, `/repos/${repo}/git/commits/${targetParentSha}`);
 
     const ref = await gh(token, `/repos/${repo}/git/ref/heads/${branch}`);
@@ -108,9 +108,9 @@ export async function onRequestPost({ request, env }) {
   } catch (err) {
     // 422 non-fast-forward: noen committet i selve angre-vinduet.
     if (err.status === 422 && /fast.?forward/i.test(err.message)) {
-      return json({ error: 'Noen har publisert i mellomtiden - last historikken på nytt', code: 'revertRace' }, 409);
+      return json({ error: 'Someone has published in the meantime - reload the history', code: 'revertRace' }, 409);
     }
     console.error('Urd revert:', err.message);
-    return json({ error: `Kunne ikke angre: ${err.message}`, code: 'revertFailed', detail: err.message }, 502);
+    return json({ error: `Could not revert: ${err.message}`, code: 'revertFailed', detail: err.message }, 502);
   }
 }

@@ -142,15 +142,35 @@ function blockShapes(type, x, y, w, h, props) {
     parts.push(`<polygon points="${r1(cx - s / 2)},${r1(cy - s)} ${r1(cx - s / 2)},${r1(cy + s)} ${r1(cx + s)},${r1(cy)}" fill="${token('text', FALLBACK_TEXT)}" opacity="0.6"/>`);
     return parts.join('');
   }
+  if (type === 'tidslinje') {
+    const parts = [rect(x + 1, y, 1.4, h, token('accent', FALLBACK_ACCENT), ' opacity="0.7" rx="0.7"')];
+    for (let i = 0; i < 3; i += 1) {
+      const cy = y + h * (0.18 + i * 0.32);
+      parts.push(`<circle cx="${r1(x + 1.7)}" cy="${r1(cy)}" r="1.6" fill="${token('accent', FALLBACK_ACCENT)}"/>`);
+      parts.push(rect(x + 5, cy - 1, w * 0.5, 2, token('text', FALLBACK_TEXT), ' opacity="0.5" rx="1"'));
+    }
+    return parts.join('');
+  }
+  if (type === 'sitat') {
+    return [
+      `<text x="${r1(x + w / 2)}" y="${r1(y + h * 0.34)}" text-anchor="middle" font-size="${r1(Math.min(w, h) * 0.5)}" font-family="Georgia, serif" fill="${token('accent', FALLBACK_ACCENT)}">“</text>`,
+      rect(x + w * 0.15, y + h * 0.48, w * 0.7, 2, token('text', FALLBACK_TEXT), ' opacity="0.6" rx="1"'),
+      rect(x + w * 0.25, y + h * 0.62, w * 0.5, 2, token('text', FALLBACK_TEXT), ' opacity="0.6" rx="1"'),
+      rect(x + w * 0.35, y + h * 0.82, w * 0.3, 1.6, token('text', FALLBACK_TEXT), ' opacity="0.35" rx="0.8"'),
+    ].join('');
+  }
+  if (type === 'statistikk') {
+    return [
+      rect(x + w * 0.28, y + h * 0.15, w * 0.44, h * 0.42, token('accent', FALLBACK_ACCENT), ' opacity="0.85" rx="1"'),
+      rect(x + w * 0.32, y + h * 0.72, w * 0.36, 1.6, token('text', FALLBACK_TEXT), ' opacity="0.4" rx="0.8"'),
+    ].join('');
+  }
   // Ukjent type (f.eks. fra plugin): rolig kortomriss.
   return rect(x, y, w, h, token('surface', FALLBACK_SURFACE), ' rx="1.5"');
 }
 
-/**
- * @param {object} section En fersk seksjon fra en presets create() (dataene forkastes etterpå)
- * @returns {string} Skjematisk SVG-miniatyr av seksjonen
- */
-export function presetThumb(section, { w = 120, h = 68 } = {}) {
+/** Én seksjons skisse-innhold (bakgrunn + glød + blokker) i et w x h-felt. */
+function sectionShapes(section, w, h) {
   const blocks = Array.isArray(section?.blocks) ? section.blocks : [];
   const bottoms = blocks.map((b) => (b.frames?.desktop?.y ?? 0) + (b.frames?.desktop?.h ?? 0));
   const contentH = Math.max(
@@ -177,5 +197,39 @@ export function presetThumb(section, { w = 120, h = 68 } = {}) {
     parts.push(blockShapes(block.type, x, y, bw, bh, block.props));
   }
 
+  return parts.join('');
+}
+
+/**
+ * @param {object} section En fersk seksjon fra en presets create() (dataene forkastes etterpå)
+ * @returns {string} Skjematisk SVG-miniatyr av seksjonen
+ */
+export function presetThumb(section, { w = 120, h = 68 } = {}) {
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${sectionShapes(section, w, h)}</svg>`;
+}
+
+/**
+ * Side-miniatyr: seksjonene stablet som bånd, vektet etter minstehøyde, så
+ * kortet viser SIDENS oppbygning (hero stor, cta liten). Brukes av «Ny side
+ * fra mal»-rutenettet i Sider-panelet; tåler tom side (rent bakgrunnsfelt).
+ * @param {object} page Sidefil ({ sections: [...] }); dataene forkastes etterpå
+ * @returns {string} Skjematisk SVG-miniatyr av hele siden
+ */
+export function pageThumb(page, { w = 96, h = 116, max = 6 } = {}) {
+  const sections = (Array.isArray(page?.sections) ? page.sections : []).slice(0, max);
+  if (!sections.length) {
+    return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${rect(0, 0, w, h, token('bg', FALLBACK_BG))}</svg>`;
+  }
+  const gap = 1;
+  const weights = sections.map((s) => clamp(parseMinHeightPx(s?.size?.minHeight), 160, 900));
+  const sum = weights.reduce((a, b) => a + b, 0);
+  const avail = h - gap * (sections.length - 1);
+  const parts = [];
+  let y = 0;
+  for (let i = 0; i < sections.length; i += 1) {
+    const bandH = Math.max(6, (weights[i] / sum) * avail);
+    parts.push(`<g transform="translate(0 ${r1(y)})">${sectionShapes(sections[i], w, bandH)}</g>`);
+    y += bandH + gap;
+  }
   return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${parts.join('')}</svg>`;
 }

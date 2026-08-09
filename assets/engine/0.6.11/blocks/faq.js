@@ -37,6 +37,7 @@ const CHEVRON = '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" str
 
 export const faqBlock = {
   version: 1,
+  autoGrow: true,
   label: 'FAQ',
   labelKey: 'blocks.faq',
   // Seed-regelen (ADR-0012): ta() kalles kun her ved innsetting i preview.

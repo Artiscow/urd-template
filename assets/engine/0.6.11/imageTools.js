@@ -127,14 +127,14 @@ export function mediaExtension(dataUrl) {
 }
 
 /** Filnavn → trygg slug for media/-stier. */
-export function slugify(name) {
+export function slugify(name, fallback = 'bilde') {
   return name
     .replace(/\.[^.]+$/, '')
     .toLowerCase()
     .replaceAll('æ', 'ae').replaceAll('ø', 'o').replaceAll('å', 'a')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
-    .slice(0, 40) || 'bilde';
+    .slice(0, 40) || fallback;
 }
 
 /** Kort, deterministisk hash av innholdet (samme bilde → samme filnavn). */
