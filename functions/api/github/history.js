@@ -1,10 +1,10 @@
 /**
  * GET /api/github/history
- * Siste publiseringer: commits på publiseringsgrenen som rører nettsidens
- * innhold (content/ under GITHUB_ROOT_DIR). Dermed vises PUBLISERINGER,
- * ikke alle repo-commits - i et monorepo (som Urds eget) ville lista
- * ellers vært full av utviklingscommits. Lesende endepunkt: krever kun
- * innlogging (samme nivå som latest.js).
+ * The most recent publishes: commits on the publishing branch that touch the
+ * site content (content/ under GITHUB_ROOT_DIR). That way PUBLISHES are
+ * listed, not every repo commit - in a monorepo (such as Urd's own) the list
+ * would otherwise be full of development commits. Read endpoint: requires
+ * only a sign-in (same level as latest.js).
  */
 import { cfg, gh } from '../../_lib/github.js';
 import { readCookie } from '../../_lib/cookies.js';
@@ -32,15 +32,15 @@ export async function onRequestGet({ request, env }) {
     return json({
       commits: commits.map((c) => ({
         sha: c.sha,
-        // Kun første linje: resten er detaljer for git, ikke for panelet.
+        // First line only: the rest is detail for git, not for the panel.
         message: c.commit.message.split('\n')[0],
-        author: c.author?.login ?? c.commit.author?.name ?? 'ukjent',
+        author: c.author?.login ?? c.commit.author?.name ?? 'unknown',
         date: c.commit.author?.date ?? null,
       })),
     });
   } catch (err) {
     if (err.status === 401) return json({ error: 'Invalid or expired sign-in', code: 'loginExpired' }, 401);
-    // 409 = helt tomt repo: ingen historikk er en normal tilstand, ikke feil.
+    // 409 = a completely empty repo: no history is a normal state, not an error.
     if (err.status === 409) return json({ commits: [] });
     console.error('Urd history:', err.message);
     return json({ error: 'Could not read the history from GitHub', code: 'historyFailed' }, 502);

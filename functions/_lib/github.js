@@ -1,20 +1,21 @@
 /**
- * GitHub-API-hjelpere for publiseringslaget.
+ * GitHub API helpers for the publishing layer.
  *
- * Grensen her holdes bevisst leverandørformet slik at GitLab/Gitea-adaptere
- * kan skrives etter v1 uten å røre endepunktene.
+ * The boundary here is deliberately vendor-shaped so GitLab/Gitea adapters can
+ * be written after v1 without touching the endpoints.
  *
- * Konfigurasjon (miljøvariabler hos hosten):
- *   GITHUB_REPO ("eier/navn"), GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET,
- *   GITHUB_BRANCH (standard "main"), GITHUB_SCOPE (standard "public_repo"),
- *   ALLOWED_LOGINS (kommaseparert),
- *   GITHUB_ROOT_DIR (valgfri: undermappen i repoet som er nettsidens rot,
- *   f.eks. "template" i Urd-monorepoet; utelatt når nettsiden ligger i roten).
+ * Configuration (environment variables at the host):
+ *   GITHUB_REPO ("owner/name"), GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET,
+ *   GITHUB_BRANCH (default "main"), GITHUB_SCOPE (default "public_repo"),
+ *   ALLOWED_LOGINS (comma-separated),
+ *   GITHUB_ROOT_DIR (optional: the subfolder in the repo that is the site root,
+ *   e.g. "template" in the Urd monorepo; omitted when the site is at the root).
  */
 
-/** Leser og validerer konfigurasjonen fra env. Kaster ved manglende variabler.
- *  Feilene bærer en maskinlesbar `code` (og ev. parametre) som endepunktene
- *  sender videre i feilsvaret, så admin kan oversette dem (api.*-nøklene). */
+/** Reads and validates the configuration from env. Throws on missing variables.
+ *  The errors carry a machine-readable `code` (and any parameters) that the
+ *  endpoints pass on in the error response, so admin can translate them
+ *  (the api.* keys). */
 export function cfg(env) {
   for (const key of ['GITHUB_REPO', 'GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET']) {
     if (!env[key]) {
@@ -35,24 +36,24 @@ export function cfg(env) {
     branch: env.GITHUB_BRANCH || 'main',
     scope: env.GITHUB_SCOPE || 'public_repo',
     rootDir,
-    // Malrepoet oppdatereren henter nye Urd-versjoner fra (ADR-0014).
-    // Overstyres med URD_TEMPLATE_REPO for fork-baserte oppstrøms.
+    // The template repo the updater fetches new Urd versions from (ADR-0014).
+    // Override with URD_TEMPLATE_REPO for fork-based upstreams.
     templateRepo: env.URD_TEMPLATE_REPO || 'Artiscow/urd-template',
   };
 }
 
 /**
- * Autentisert kall mot api.github.com. Forbigående feil (5xx/429, som
- * GitHubs «Unicorn»-side) prøves automatisk på nytt et par ganger.
- * Kaster Error med .status, slik at endepunktene kan skille «GitHub er
- * nede» fra «ugyldig token». Feiltekst kortes ned (aldri hele HTML-sider).
+ * Authenticated call to api.github.com. Transient failures (5xx/429, such as
+ * GitHub's "Unicorn" page) are retried automatically a couple of times.
+ * Throws an Error with .status so the endpoints can tell "GitHub is down" from
+ * "invalid token". Error text is truncated (never whole HTML pages).
  */
 export async function gh(token, path, init = {}, attempt = 1) {
   const res = await fetch(`https://api.github.com${path}`, {
     ...init,
     headers: {
       accept: 'application/vnd.github+json',
-      // token null = anonym lesing (offentlige repo, lavere rategrense); brukes kun av lesende endepunkter.
+      // token null = anonymous reads (public repos, lower rate limit); used only by read-only endpoints.
       ...(token ? { authorization: `Bearer ${token}` } : {}),
       'user-agent': 'urd-publisher',
       ...(init.body ? { 'content-type': 'application/json' } : {}),
@@ -65,7 +66,7 @@ export async function gh(token, path, init = {}, attempt = 1) {
       return gh(token, path, init, attempt + 1);
     }
     const isJson = res.headers.get('content-type')?.includes('json');
-    const detail = isJson ? (await res.text()).slice(0, 300) : '(HTML-feilside fra GitHub)';
+    const detail = isJson ? (await res.text()).slice(0, 300) : '(HTML error page from GitHub)';
     const error = new Error(`GitHub ${init.method ?? 'GET'} ${path} responded ${res.status}: ${detail}`);
     error.status = res.status;
     throw error;
@@ -73,15 +74,15 @@ export async function gh(token, path, init = {}, attempt = 1) {
   return res.json();
 }
 
-/** Innlogget GitHub-bruker for tokenet. */
+/** The signed-in GitHub user for the token. */
 export function currentUser(token) {
   return gh(token, '/user');
 }
 
 /**
- * GraphQL-kall mot GitHub: brukes av oppdatereren til å hente MANGE
- * fil-innhold i ETT subrequest (Blob.text via aliaser), som REST ville
- * trengt ett kall per fil for. Samme retry-regel som gh().
+ * GraphQL call to GitHub: used by the updater to fetch MANY file contents in
+ * ONE subrequest (Blob.text via aliases), which REST would have needed one call
+ * per file for. Same retry rule as gh().
  */
 export async function ghGraphql(token, query, attempt = 1) {
   const res = await fetch('https://api.github.com/graphql', {
@@ -109,15 +110,15 @@ export async function ghGraphql(token, query, attempt = 1) {
   return payload.data;
 }
 
-/** Base64 fra blobs-API-et (kommer med innskutte linjeskift). */
+/** Base64 from the blobs API (arrives with embedded line breaks). */
 export function cleanBase64(b64) {
   return String(b64 ?? '').replace(/\s/g, '');
 }
 
 /**
- * Valgfri eksplisitt deploy-trigger (DEPLOY_HOOK_URL) i tillegg til
- * git-webhooken, som kan glippe hos hosten. Feil her velter aldri
- * kallet - commiten ligger allerede trygt i repoet.
+ * Optional explicit deploy trigger (DEPLOY_HOOK_URL) in addition to the git
+ * webhook, which the host can miss. A failure here never topples the call -
+ * the commit is already safely in the repo.
  */
 export async function triggerDeploy(env) {
   if (!env.DEPLOY_HOOK_URL) return;
@@ -129,24 +130,24 @@ export async function triggerDeploy(env) {
 }
 
 /**
- * Committer flere filer som ÉN commit via Git Data API:
- *   1. Hent branch-ref og basecommit
- *   2. Opprett en blob per fil (sletting: tre-innslag med sha: null)
- *   3. Opprett tre med base_tree = basecommitens tre
- *   4. Opprett commit med basecommit som forelder
- *   5. Oppdater ref (force: false - feiler trygt hvis HEAD har flyttet seg)
+ * Commits several files as ONE commit via the Git Data API:
+ *   1. Fetch the branch ref and the base commit
+ *   2. Create one blob per file (deletion: a tree entry with sha: null)
+ *   3. Create a tree with base_tree = the base commit's tree
+ *   4. Create a commit with the base commit as parent
+ *   5. Update the ref (force: false - fails safely if HEAD has moved)
  *
- * Filer med `delete: true` fjernes fra repoet. Stier som ikke finnes i
- * basetreet hoppes over i stillhet (GitHub avviser hele treet ellers),
- * så en sletting aldri kan velte publiseringen av resten.
+ * Files with `delete: true` are removed from the repo. Paths that do not exist
+ * in the base tree are skipped silently (GitHub rejects the whole tree
+ * otherwise), so a deletion can never topple publishing the rest.
  *
- * Med `expect` satt kreves det at HEAD står nøyaktig der (Error med
- * status 409 ellers): editorens konfliktsjekk-til-commit-vindu lukkes.
+ * With `expect` set, HEAD is required to be exactly there (Error with status
+ * 409 otherwise): it closes the editor's conflict-check-to-commit window.
  *
  * @param {string} token
- * @param {{repo: string, branch: string}} config Fra cfg(env)
+ * @param {{repo: string, branch: string}} config From cfg(env)
  * @param {{message: string, files: Array<{path: string, content?: string, encoding?: 'utf-8'|'base64', delete?: boolean}>, expect?: string}} payload
- * @returns {Promise<{sha: string}>} Den nye commit-SHA-en
+ * @returns {Promise<{sha: string}>} The new commit SHA
  */
 export async function commitFiles(token, config, { message, files, expect }) {
   const { repo, branch } = config;
@@ -160,9 +161,9 @@ export async function commitFiles(token, config, { message, files, expect }) {
   }
   const baseCommit = await gh(token, `/repos/${repo}/git/commits/${baseSha}`);
 
-  // Slettinger valideres mot basetreet: sha:null for en ukjent sti gir
-  // 422 fra GitHub. (recursive kan trunkeres i enorme repoer; da uteblir
-  // slettingen, som er den ufarlige retningen.)
+  // Deletions are validated against the base tree: sha:null for an unknown
+  // path gives 422 from GitHub. (recursive can be truncated in enormous repos;
+  // then the deletion is skipped, which is the harmless direction.)
   let existing = null;
   if (files.some((f) => f.delete)) {
     const baseTree = await gh(token, `/repos/${repo}/git/trees/${baseCommit.tree.sha}?recursive=1`);
@@ -187,7 +188,7 @@ export async function commitFiles(token, config, { message, files, expect }) {
     tree.push({ path: file.path, mode: '100644', type: 'blob', sha: blob.sha });
   }
   if (tree.length === 0) {
-    // Alt som skulle skje var slettinger av stier som alt er borte.
+    // Everything to do was deletions of paths that are already gone.
     return { sha: baseSha };
   }
 
@@ -210,18 +211,18 @@ export async function commitFiles(token, config, { message, files, expect }) {
 }
 
 /**
- * Oppdaterens commit-vei (ADR-0014): som commitFiles, men tre-innslagene
- * bygges med INLINE `content` (eller ferdig blob-`sha`) i stedet for én
- * blob-POST per fil - det er dét som holder en ~90-filers motoroppdatering
- * under Cloudflares subrequest-tak. Store innslagsmengder deles i KJEDEDE
- * trær (base_tree = forrige tre), fortsatt som ÉN commit.
+ * The updater's commit path (ADR-0014): like commitFiles, but the tree entries
+ * are built with INLINE `content` (or a ready-made blob `sha`) instead of one
+ * blob POST per file - that is what keeps a ~90-file engine update under
+ * Cloudflare's subrequest limit. Large entry counts are split into CHAINED
+ * trees (base_tree = the previous tree), still as ONE commit.
  *
  * @param {string} token
  * @param {{repo: string, branch: string}} config
  * @param {{message: string, entries: Array<{path: string, content?: string, sha?: string|null}>, expect?: string}} payload
- *   `content` for tekstfiler, `sha` for ferdiglagde blober (binær/avkortet),
- *   `sha: null` for sletting. Slettinger må gjelde stier som finnes.
- * @param {(entries: Array<object>) => Array<Array<object>>} chunk Ren chunking (fra update-plan.js)
+ *   `content` for text files, `sha` for pre-made blobs (binary/truncated),
+ *   `sha: null` for deletion. Deletions must target paths that exist.
+ * @param {(entries: Array<object>) => Array<Array<object>>} chunk Pure chunking (from update-plan.js)
  * @returns {Promise<{sha: string}>}
  */
 export async function commitTree(token, config, { message, entries, expect }, chunk) {

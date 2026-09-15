@@ -1,8 +1,8 @@
 /**
  * GET /api/github/callback
- * OAuth-retur: validerer state mot cookien, bytter code mot token
- * SERVER-SIDE (med client_secret), lagrer tokenet i httpOnly-cookien
- * 'urd_gh' og omdirigerer til /admin/. Tokenet når aldri nettleser-JS.
+ * OAuth return: validates state against the cookie, exchanges code for a
+ * token SERVER-SIDE (with client_secret), stores the token in the httpOnly
+ * cookie 'urd_gh' and redirects to /admin/. The token never reaches browser JS.
  */
 import { cfg } from '../../_lib/github.js';
 import { serializeCookie, expireCookie, readCookie } from '../../_lib/cookies.js';
@@ -31,7 +31,13 @@ export async function onRequestGet({ request, env }) {
       code,
     }),
   });
-  const token = (await tokenRes.json()).access_token;
+  // GitHub can answer with an error status or an HTML error page instead of
+  // JSON (service disruptions): the sign-in is then rejected gracefully rather
+  // than throwing a 500.
+  let token;
+  try {
+    if (tokenRes.ok) token = (await tokenRes.json()).access_token;
+  } catch { /* an unreadable response is treated as a rejected sign-in */ }
   if (!token) {
     return new Response('GitHub rejected the sign-in (expired code?)', { status: 401 });
   }

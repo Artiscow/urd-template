@@ -1,12 +1,12 @@
 /**
  * POST /api/github/commit
- * Kjernen i publiseringen. Body: { message, files: [{path, content, encoding?}] }.
- * Committer alle filene som ÉN commit via Git Data API.
+ * The core of publishing. Body: { message, files: [{path, content, encoding?}] }.
+ * Commits all the files as ONE commit through the Git Data API.
  *
- * Vern (forsvar i dybden, se ADR-0003):
- *  - krever innlogget token OG at brukeren står i ALLOWED_LOGINS
- *  - hver filsti valideres mot sti-allowlisten (kun innhold, aldri kode)
- *  - maks 200 filer per commit
+ * Protection (defence in depth, see ADR-0003):
+ *  - requires a signed-in token AND that the user is in ALLOWED_LOGINS
+ *  - every file path is validated against the path allowlist (content only, never code)
+ *  - at most 200 files per commit
  */
 import { commitFiles, triggerDeploy } from '../../_lib/github.js';
 import { requirePublisher } from '../../_lib/auth.js';
@@ -37,7 +37,7 @@ export async function onRequestPost({ request, env }) {
     return json({ error: 'files must be a list of 1 to 200 files', code: 'badFiles' }, 400);
   }
   for (const file of files) {
-    // Sletting (delete: true) trenger ikke content; vanlige filer må ha det.
+    // A deletion (delete: true) needs no content; ordinary files do.
     if (typeof file?.path !== 'string' || (file.delete !== true && typeof file?.content !== 'string')) {
       return json({ error: 'Each file needs path and content (or delete: true)', code: 'badFileEntry' }, 400);
     }
@@ -46,29 +46,29 @@ export async function onRequestPost({ request, env }) {
     }
   }
 
-  // Stiene fra editoren er relative til NETTSIDEN. Ligger nettsiden i en
-  // undermappe av repoet (GITHUB_ROOT_DIR, f.eks. "template"), prefikses
-  // stiene her - ETTER valideringen over, som gjelder nettside-stiene.
+  // The paths from the editor are relative to the SITE. When the site lives
+  // in a subfolder of the repo (GITHUB_ROOT_DIR, e.g. "template"), the paths
+  // are prefixed here - AFTER the validation above, which covers site paths.
   const repoFiles = config.rootDir
     ? files.map((f) => ({ ...f, path: `${config.rootDir}/${f.path}` }))
     : files;
 
   try {
-    // expect (valgfri): HEAD-en editorens konfliktsjekk så. Har den
-    // flyttet seg i mellomtiden, avvises commiten med 409 i stedet for
-    // å overskrive noen andres ferske publisering.
+    // expect (optional): the HEAD the editor's conflict check saw. If it has
+    // moved in the meantime, the commit is rejected with 409 instead of
+    // overwriting someone else's fresh publish.
     const { sha } = await commitFiles(token, config, { message, files: repoFiles, expect });
     await triggerDeploy(env);
     return json({ sha });
   } catch (err) {
-    // 409 fra expect-sjekken, eller 422 non-fast-forward fra ref-
-    // oppdateringen (noen rakk å publisere i selve commit-vinduet).
+    // 409 from the expect check, or 422 non-fast-forward from the ref
+    // update (someone managed to publish inside the commit window itself).
     if (err.status === 409 || (err.status === 422 && /fast.?forward/i.test(err.message))) {
       return json({ error: 'Someone just published - try publishing again', code: 'publishRace' }, 409);
     }
     console.error('Urd publish:', err.message);
-    // GitHubs faktiske svar vises til den innloggede redaktøren - uten
-    // det er feilsøking umulig. Tokenet inngår aldri i meldingen.
+    // GitHub's actual response is shown to the signed-in editor - without it
+    // debugging is impossible. The token is never part of the message.
     return json({ error: `Could not commit to GitHub: ${err.message}`, code: 'commitFailed', detail: err.message }, 502);
   }
 }

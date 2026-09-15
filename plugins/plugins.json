@@ -1,11 +1,12 @@
 {
   "version": 1,
   "enabled": [
-    "kalender",
-    "skjema",
-    "kart"
+    "calendar",
+    "form",
+    "map"
   ],
   "disabled": [
-    "sprak-svensk"
+    "lang-sv",
+    "analytics"
   ]
 }

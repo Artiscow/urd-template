@@ -1,14 +1,15 @@
 /**
- * Adressesøk for kart-pluginen: gjør en vanlig adresse om til koordinater
- * via OpenStreetMaps geokoder (Nominatim). Går gjennom sidens egen funksjon
- * (samme origin), så nettleseren trenger ingen connect-src-utvidelse, og vi
- * kan sette en identifiserende User-Agent slik Nominatims bruksvilkår krever.
+ * Address lookup for the map plugin: turns an ordinary address into coordinates
+ * via OpenStreetMap's geocoder (Nominatim). It goes through the site's own
+ * function (same origin), so the browser needs no connect-src extension, and we
+ * can set an identifying User-Agent the way Nominatim's terms of use require.
  *
- * Brukes kun i editoren (når eieren klikker «Bruk»), ikke ved hver sidelasting:
- * koordinatene lagres i blokken, så besøkende laster kartet direkte fra OSM.
+ * Used only in the editor (when the owner clicks Use), not on every page load:
+ * the coordinates are stored in the block, so visitors load the map straight
+ * from OSM.
  *
- * Krever innlogget økt (som latest.js): uten vakten er dette en åpen proxy
- * mot Nominatim, og misbruk kan få deployment-IP-en bannlyst.
+ * Requires a signed-in session (like latest.js): without that guard this is an
+ * open proxy to Nominatim, and abuse can get the deployment IP banned.
  */
 import { readCookie } from '../_lib/cookies.js';
 
@@ -17,7 +18,7 @@ const json = (body, status = 200) =>
     status,
     headers: {
       'content-type': 'application/json',
-      // Delt cache i en time: samme adresse slår ikke opp på nytt.
+      // Shared cache for an hour: the same address is not looked up again.
       'cache-control': status === 200 ? 'public, max-age=300, s-maxage=3600' : 'no-store',
     },
   });
@@ -35,8 +36,8 @@ export async function onRequestGet({ request }) {
     upstream = await fetch(url, {
       signal: controller.signal,
       headers: {
-        // Nominatim krever en identifiserende User-Agent.
-        'User-Agent': 'Urd-nettsidebygger kart-plugin (https://urd.dev)',
+        // Nominatim requires an identifying User-Agent.
+        'User-Agent': 'Urd site builder map plugin (https://urd.dev)',
         'Accept-Language': 'nb,no,en',
       },
     });

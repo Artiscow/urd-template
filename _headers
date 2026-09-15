@@ -1,18 +1,19 @@
-# Sikkerhetsheadere for Cloudflare Pages.
-# CSP-en er stram: kun egne skript og stiler; bilder også som data:/blob:
-# (upubliserte opplastinger og genererte teksturer). frame-ancestors 'self'
-# lar admin-editoren vise siden i iframe, men blokkerer fremmede sider.
-# frame-src har BEVISSTE unntak for personvernvennlige innbygginger som
-# følger med Urd: video-blokkens to verter (youtube-nocookie og Vimeo med
-# dnt=1) og kart-pluginens OpenStreetMap. Andre embeds krever at eieren
-# legger verten til her (jf. ADR-0006; plugin-manifestet deklarerer behovet
-# og admin viser den eksakte linjen).
+# Security headers for Cloudflare Pages.
+# The CSP is strict: only own scripts and styles; images also as data:/blob:
+# (unpublished uploads and generated textures). frame-ancestors 'self' lets
+# the admin editor show the page in an iframe but blocks foreign sites.
+# frame-src has DELIBERATE exceptions for the privacy-friendly embeds that
+# ship with Urd: the video block's two hosts (youtube-nocookie and Vimeo with
+# dnt=1) and the map plugin's OpenStreetMap. Other embeds require the owner
+# to add the host here (see ADR-0006; the plugin manifest declares the need
+# and admin shows the exact line).
 
-# Speculation Rules leveres som EGEN fil via header (ikke inline): et inline
-# <script type="speculationrules"> ville krevd 'inline-speculation-rules' i
-# script-src, altså det første script-src-unntaket i prosjektet, stikk i strid
-# med grunnen til at boot.js er en egen fil. Regelsettet (prerender av interne
-# lenker, admin utelatt) bor i speculation-rules.json og kan justeres der.
+# Speculation Rules are delivered as a SEPARATE file via a header (not inline):
+# an inline <script type="speculationrules"> would require
+# 'inline-speculation-rules' in script-src, the project's first script-src
+# exception, contrary to the very reason boot.js is a separate file. The rule
+# set (prefetch and prerender of internal links, admin excluded) lives in
+# speculation-rules.json and can be tuned there.
 
 /*
   X-Content-Type-Options: nosniff
@@ -21,28 +22,29 @@
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://player.vimeo.com https://www.openstreetmap.org; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'
   Speculation-Rules: "/speculation-rules.json"
 
-# Regelsettet MÅ serveres som application/speculationrules+json, ellers avviser
-# nettleseren det. Cloudflare Pages gir .json som application/json, så vi setter
-# typen eksplisitt her.
+# The rule set MUST be served as application/speculationrules+json, otherwise
+# the browser rejects it. Cloudflare Pages serves .json as application/json,
+# so the type is set explicitly here.
 /speculation-rules.json
   Content-Type: application/speculationrules+json
 
-# Media er innholdsadressert (media/<slug>-<hash>.webp): nytt innhold gir nytt
-# navn, så filene kan caches for alltid uten revalidering. De tyngste bytene på
-# en side hentes dermed kun én gang per besøker.
+# Media is content-addressed (media/<slug>-<hash>.webp): new content gets a new
+# name, so the files can be cached forever without revalidation. The heaviest
+# bytes on a page are thus fetched only once per visitor.
 /media/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Motoren er versjonsadressert (assets/engine/<versjon>/..., ADR-0013): ny
-# motor gir ny mappe, så modulene kan caches for alltid. Regelen er BEVISST
-# versjonsnøytral (/assets/engine/* dekker enhver versjonert mappe), så denne
-# håndredigerbare fila aldri trenger endring ved motor-bump. De stabile
-# plugin-API-skallene i /assets/urd/ står UTENFOR og revalideres normalt.
+# The engine is version-addressed (assets/engine/<version>/..., ADR-0013): a
+# new engine gets a new folder, so the modules can be cached forever. The rule
+# is DELIBERATELY version-neutral (/assets/engine/* covers any versioned
+# folder), so this hand-edited file never needs changing on an engine bump.
+# The stable plugin API shells in /assets/urd/ stay OUTSIDE and revalidate
+# normally.
 /assets/engine/*
   Cache-Control: public, max-age=31536000, immutable
 
-# base.css refereres alltid med innholdsstemplet ?v=<hash> fra HTML-skallene:
-# nytt innhold gir ny URL, så også den kan caches for alltid.
+# base.css is always referenced with the content stamp ?v=<hash> from the HTML
+# shells: new content gives a new URL, so it too can be cached forever.
 /assets/styles/base.css
   Cache-Control: public, max-age=31536000, immutable
 

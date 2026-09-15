@@ -1,6 +1,7 @@
 /**
- * Stabil kjøretids-sti (se ADR-0013): i18n.js og plugins.js (som buntes inn
- * i admin) laster språkpakke-modulen dynamisk via denne, så samme absolutte
- * sti virker fra både motoren og editor-bundelen uavhengig av motorversjon.
+ * Stable runtime path (see ADR-0013): i18n.js and plugins.js (which is
+ * bundled into admin) load the language pack module dynamically through this,
+ * so the same absolute path works from both the engine and the editor bundle
+ * regardless of engine version.
  */
-export * from '../engine/0.6.11/language-packs.js';
+export * from '../engine/0.7.1/language-packs.js';

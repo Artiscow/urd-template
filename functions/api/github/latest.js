@@ -1,8 +1,8 @@
 /**
  * GET /api/github/latest[?base=<sha>]
- * Returnerer HEAD-commit på publiseringsgrenen; med ?base listes i tillegg
- * filene endret i base..HEAD. Editoren bruker dette til konfliktdeteksjon:
- * har noen andre publisert siden innlasting, varsles redaktøren.
+ * Returns the HEAD commit on the publishing branch; with ?base it also lists
+ * the files changed in base..HEAD. The editor uses this for conflict
+ * detection: if someone else has published since load, the user is warned.
  */
 import { cfg, gh } from '../../_lib/github.js';
 import { readCookie } from '../../_lib/cookies.js';
@@ -27,21 +27,21 @@ export async function onRequestGet({ request, env }) {
 
     const base = new URL(request.url).searchParams.get('base');
     if (!base || base === head) return json({ head, changedFiles: [] });
-    // base går inn i GitHub-API-stien og må være en ekte commit-sha, ikke vilkårlig tekst.
+    // base goes into the GitHub API path and must be a real commit sha, not arbitrary text.
     if (!/^[0-9a-f]{7,64}$/i.test(base)) return json({ error: 'Invalid base', code: 'badBase' }, 400);
 
     const diff = await gh(token, `/repos/${config.repo}/compare/${base}...${head}`);
-    // Rapporter stier relative til nettsiden (samme rom som editoren bruker).
+    // Report paths relative to the site (the same space the editor uses).
     const prefix = config.rootDir ? `${config.rootDir}/` : '';
     const allFiles = diff.files ?? [];
     const changedFiles = allFiles
       .map((f) => f.filename)
       .filter((name) => name.startsWith(prefix))
       .map((name) => name.slice(prefix.length));
-    // GitHub avkorter fillisten ved 300: da KAN nettside-filer mangle, og
-    // konfliktsjekken må behandle diffen som «kan overlappe». Flagget
-    // settes på hele diffens lengde (avkortingen skjer før vårt filter),
-    // men først når grensen faktisk er nådd.
+    // GitHub truncates the file list at 300: site files CAN then be missing,
+    // and the conflict check must treat the diff as "may overlap". The flag
+    // is set from the length of the whole diff (truncation happens before our
+    // filter), but only once the limit is actually reached.
     return json({ head, changedFiles, truncated: allFiles.length >= 300 });
   } catch (err) {
     console.error('Urd latest:', err.message);

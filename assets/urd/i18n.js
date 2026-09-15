@@ -1,8 +1,8 @@
 /**
- * Stabil plugin-API-sti (se ADR-0013): /assets/urd/ er kontrakten plugins
- * importerer mot, og røres aldri av motorversjonering. Selve motoren bor i
- * den versjonerte (og immutable-cachede) mappa /assets/engine/<versjon>/;
- * dette skallet re-eksporterer derfra og oppdateres ved fase-slipp.
- * Hardkod aldri den versjonerte stien i en plugin.
+ * Stable plugin API path (see ADR-0013): /assets/urd/ is the contract plugins
+ * import against, and is never touched by engine versioning. The engine
+ * itself lives in the versioned (and immutably cached) folder
+ * /assets/engine/<version>/; this shell re-exports from there and is updated
+ * at each phase release. Never hardcode the versioned path in a plugin.
  */
-export * from '../engine/0.6.11/i18n.js';
+export * from '../engine/0.7.1/i18n.js';

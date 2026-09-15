@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 4,
   "meta": {
     "id": "kontakt",
     "title": "Kontakt"
@@ -8,7 +8,7 @@
     {
       "id": "sec-c1e0870f",
       "version": 1,
-      "preset": "kontakt",
+      "preset": "contact",
       "size": {
         "minHeight": "992px"
       },

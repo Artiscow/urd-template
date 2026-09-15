@@ -1,8 +1,12 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 4,
   "meta": {
     "id": "hjem",
-    "title": "Hjem"
+    "title": "Hjem",
+    "description": "Eksempelsiden til Urd: en avhengighetsfri nettsidebygger der repoet er nettsiden.",
+    "og": {
+      "title": "Urd - nettsidebyggeren"
+    }
   },
   "sections": [
     {
@@ -36,10 +40,10 @@
           },
           {
             "type": "image",
-            "version": 1,
+            "version": 2,
             "props": {
               "src": "/media/bakgrunn-a1730034.svg",
-              "fit": "vanlig",
+              "fit": "plain",
               "x": 0.5,
               "y": 0.5,
               "size": 1,
@@ -121,7 +125,7 @@
         },
         {
           "id": "blk-ef036d5f",
-          "type": "kalender",
+          "type": "calendar",
           "version": 1,
           "props": {
             "sources": [
@@ -186,7 +190,7 @@
     {
       "id": "sec-72471997",
       "version": 1,
-      "preset": "hva-skjer",
+      "preset": "whats-on",
       "size": {
         "minHeight": "1280px"
       },
@@ -271,7 +275,7 @@
         },
         {
           "id": "blk-2d9ebc4e",
-          "type": "kart",
+          "type": "map",
           "version": 1,
           "props": {
             "location": "https://www.openstreetmap.org/#map=18/63.426891/10.396446",

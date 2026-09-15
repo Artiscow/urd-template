@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 4,
   "meta": {
     "id": "om-oss",
     "title": "Om oss"
@@ -8,7 +8,7 @@
     {
       "id": "sec-82c3367e",
       "version": 1,
-      "preset": "hovedoppslag",
+      "preset": "lead-story",
       "size": {
         "minHeight": "976px"
       },
@@ -72,7 +72,12 @@
             },
             "mobile": null
           },
-          "mobileOrder": 40.01
+          "mobileOrder": 40.01,
+          "sticky": {
+            "offset": 16,
+            "until": null,
+            "group": "stk-intro"
+          }
         },
         {
           "id": "blk-77137574",
@@ -96,7 +101,12 @@
             },
             "mobile": null
           },
-          "mobileOrder": 40.02
+          "mobileOrder": 40.02,
+          "sticky": {
+            "offset": 16,
+            "until": null,
+            "group": "stk-intro"
+          }
         },
         {
           "id": "blk-44969ed3",
@@ -151,7 +161,7 @@
           "type": "image",
           "version": 1,
           "props": {
-            "src": "/media/bytt-dette-bildet-0e227b0f.svg",
+            "src": "/media/bytt-dette-bildet-2d12d623.svg",
             "alt": "Bytt dette bildet",
             "fit": "cover",
             "radius": "md",
@@ -331,6 +341,35 @@
               "rot": 0
             },
             "mobile": null
+          }
+        },
+        {
+          "id": "blk-7c1f20ab",
+          "type": "button",
+          "version": 1,
+          "props": {
+            "label": "Til toppen",
+            "page": null,
+            "href": "#",
+            "style": "secondary"
+          },
+          "animation": null,
+          "frames": {
+            "desktop": {
+              "x": 80,
+              "y": 24,
+              "w": 16,
+              "h": 38,
+              "z": 2,
+              "rot": 0
+            },
+            "mobile": null
+          },
+          "sticky": {
+            "offset": 24,
+            "until": null,
+            "mode": "screen",
+            "dock": "bottom-right"
           }
         }
       ],

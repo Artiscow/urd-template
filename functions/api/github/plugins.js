@@ -1,10 +1,10 @@
 /**
  * GET /api/github/plugins
- * Lister plugin-mappene i repoets plugins/-katalog (statisk hosting kan
- * ikke liste mapper selv). Lesende endepunkt UTEN innloggingskrav:
- * uinnlogget leses offentlige repo anonymt (lavere rategrense hos GitHub);
- * Plugins-panelet bruker det til å vise plugins som ligger i repoet men
- * ennå ikke står i plugins.json, og bufrer svaret lokalt.
+ * Lists the plugin folders in the repo's plugins/ directory (static hosting
+ * cannot list folders itself). Read endpoint WITHOUT a sign-in requirement:
+ * when signed out, public repos are read anonymously (lower rate limit at
+ * GitHub); the Plugins panel uses it to show plugins that are in the repo but
+ * not yet listed in plugins.json, and caches the response locally.
  */
 import { cfg, gh } from '../../_lib/github.js';
 import { readCookie } from '../../_lib/cookies.js';
@@ -20,7 +20,7 @@ export async function onRequestGet({ request, env }) {
     return json({ error: err.message, code: err.code, key: err.key }, 503);
   }
 
-  // Uinnlogget: anonym lesing (fungerer for offentlige repo). Rate-limit håndteres under.
+  // Signed out: anonymous read (works for public repos). Rate limits are handled below.
   const token = readCookie(request, 'urd_gh') || null;
 
   try {
@@ -36,7 +36,7 @@ export async function onRequestGet({ request, env }) {
     return json({ plugins });
   } catch (err) {
     if (err.status === 404) return json({ plugins: [] });
-    // Anonym ratebegrensning (403/429): editoren faller tilbake til sist bufrede liste.
+    // Anonymous rate limiting (403/429): the editor falls back to the last cached list.
     if (!token && (err.status === 403 || err.status === 429)) {
       return json({ error: 'GitHub rate limit for anonymous reads - sign in or try again later', code: 'rateLimited' }, 503);
     }

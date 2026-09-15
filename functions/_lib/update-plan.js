@@ -1,16 +1,17 @@
 /**
- * Ren planlegging for oppdatereren (0.6.9, ADR-0014): tre-lister inn,
- * endringssett ut. Ingen nettverk og ingen sideeffekter, så logikken kan
- * enhetstestes uttømmende i tests/update-plan.test.mjs.
+ * Pure planning for the updater (ADR-0014): tree listings in, change set out.
+ * No network and no side effects, so the logic can be unit-tested exhaustively
+ * in tests/update-plan.test.mjs.
  *
- * Sjekksum-modellen: git blob-SHA-er sammenlignes mellom brukerens tre,
- * malrepoets tre ved BASISLINJEN (taggen v<engine> for versjonen brukeren
- * har) og malrepoets tre ved MÅLVERSJONEN. Lik SHA = identisk innhold, så
- * «håndredigert» kan avgjøres uten å laste ned en eneste fil.
+ * The checksum model: git blob SHAs are compared between the user's tree, the
+ * template repo's tree at the BASELINE (the tag v<engine> for the version the
+ * user has) and the template repo's tree at the TARGET VERSION. Equal SHA means
+ * identical content, so "hand-edited" can be decided without downloading a
+ * single file.
  */
 import { isUserPath, isPageIndexCopy } from './guard.js';
 
-/** Høyeste treparts versjonstagg (vX.Y.Z) i en liste tagg-navn, eller null. */
+/** The highest three-part version tag (vX.Y.Z) in a list of tag names, or null. */
 export function highestVersionTag(names) {
   let best = null;
   let bestParts = null;
@@ -30,14 +31,14 @@ export function highestVersionTag(names) {
 }
 
 /**
- * Motor-atomgruppen (ADR-0014): filer som MÅ byttes samlet, ellers
- * foreldreløses siden. HTML-skallene peker på den versjonerte motormappa,
- * admin-bundelen bunter motormoduler, skallene i assets/urd/ peker inn i
- * versjonen, base.css refereres med innholdsstempel fra skallene, og
- * urd.json.engine ER mappenavn-invarianten. Slug-kopiene hører også til
- * (kopi-oppfriskningsplikten, ADR-0013): en tilbakeholdt kopi ville pekt
- * på slettet motormappe. Kun functions/** og løse rotfiler (f.eks.
- * speculation-rules.json) kan holdes tilbake per fil.
+ * The engine atom group (ADR-0014): files that MUST be swapped together, or the
+ * site is orphaned. The HTML shells point at the versioned engine folder, the
+ * admin bundle bundles engine modules, the shells in assets/urd/ point into the
+ * version, base.css is referenced with a content stamp from the shells, and
+ * urd.json.engine IS the folder-name invariant. The slug copies belong here too
+ * (the copy refresh duty, ADR-0013): a withheld copy would point at a deleted
+ * engine folder. Only functions/** and loose root files (e.g.
+ * speculation-rules.json) can be withheld per file.
  */
 export function isAtomPath(path) {
   return path === 'index.html'
@@ -48,24 +49,25 @@ export function isAtomPath(path) {
 }
 
 /**
- * Regner ut endringssettet for en oppdatering.
+ * Computes the change set for an update.
  *
- * @param {Record<string, string>} baselineTree Malens tre ved v<engine>: sti → blob-SHA
- * @param {Record<string, string>} targetTree Malens tre ved målversjonen: sti → blob-SHA
- * @param {Record<string, string>} userTree Brukerens tre (rootDir-strippet): sti → blob-SHA
+ * @param {Record<string, string>} baselineTree The template's tree at v<engine>: path → blob SHA
+ * @param {Record<string, string>} targetTree The template's tree at the target version: path → blob SHA
+ * @param {Record<string, string>} userTree The user's tree (rootDir stripped): path → blob SHA
  * @returns {{changes: Array<{path: string, action: 'write'|'delete', atom: boolean, conflict: 'edited'|'created'|'editedDelete'|null}>, upToDate: boolean}}
  *
- * Reglene per sti i malens trær (brukereide stier og `_headers` er utenfor,
- * jf. ADR-0006: den vises som diff-instruks og skrives aldri):
- *  - endret oppstrøms + urørt lokalt         → write
- *  - endret oppstrøms + håndredigert lokalt  → write med conflict: 'edited'
- *  - uendret oppstrøms                       → aldri rørt (lokale endringer består i stillhet)
- *  - ny oppstrøms + finnes ikke lokalt       → write
- *  - ny oppstrøms + finnes lokalt            → write med conflict: 'created'
- *  - fjernet oppstrøms + urørt lokalt        → delete
- *  - fjernet oppstrøms + håndredigert lokalt → delete med conflict: 'editedDelete'
- *  - fjernet oppstrøms + alt borte lokalt    → ingenting
- *  - mangler lokalt men uendret oppstrøms    → write (gjenopprettes)
+ * The rules per path in the template's trees (user-owned paths and `_headers`
+ * are outside them, cf. ADR-0006: it is shown as a diff instruction and never
+ * written):
+ *  - changed upstream + untouched locally    → write
+ *  - changed upstream + hand-edited locally  → write with conflict: 'edited'
+ *  - unchanged upstream                      → never touched (local changes survive silently)
+ *  - new upstream + missing locally          → write
+ *  - new upstream + present locally          → write with conflict: 'created'
+ *  - removed upstream + untouched locally    → delete
+ *  - removed upstream + hand-edited locally  → delete with conflict: 'editedDelete'
+ *  - removed upstream + already gone locally → nothing
+ *  - missing locally but unchanged upstream  → write (restored)
  */
 export function planUpdate(baselineTree, targetTree, userTree) {
   const changes = [];
@@ -78,13 +80,13 @@ export function planUpdate(baselineTree, targetTree, userTree) {
     const atom = isAtomPath(path);
 
     if (target !== undefined) {
-      if (user === target) continue; // allerede på mål-innholdet
+      if (user === target) continue; // already at the target content
       if (base === undefined) {
-        // Ny fil oppstrøms; en lokal fil på samme sti er brukerens egen.
+        // New file upstream; a local file at the same path is the user's own.
         changes.push({ path, action: 'write', atom, conflict: user !== undefined ? 'created' : null });
       } else if (base === target) {
-        // Uendret oppstrøms: røres aldri - unntatt når den mangler lokalt
-        // (slettet ved et uhell); da gjenopprettes den.
+        // Unchanged upstream: never touched, except when it is missing locally
+        // (deleted by accident); then it is restored.
         if (user === undefined) changes.push({ path, action: 'write', atom, conflict: null });
       } else {
         changes.push({
@@ -95,15 +97,15 @@ export function planUpdate(baselineTree, targetTree, userTree) {
         });
       }
     } else if (user !== undefined) {
-      // Fjernet oppstrøms (f.eks. forrige motormappe ved versjonsbytte).
+      // Removed upstream (e.g. the previous engine folder on a version swap).
       changes.push({ path, action: 'delete', atom, conflict: user !== base ? 'editedDelete' : null });
     }
   }
   return { changes, upToDate: changes.length === 0 };
 }
 
-/** Deler tre-innslag i grupper for kjedede base_tree-kall (én commit uansett).
- *  Grensen er innslag per kall, godt under GitHubs payload-tak. */
+/** Splits tree entries into groups for chained base_tree calls (one commit
+ *  either way). The limit is entries per call, well under GitHub's payload cap. */
 export function chunkEntries(entries, size = 300) {
   const chunks = [];
   for (let i = 0; i < entries.length; i += size) chunks.push(entries.slice(i, i + size));

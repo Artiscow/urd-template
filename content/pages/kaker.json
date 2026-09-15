@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 4,
   "meta": {
     "id": "kaker",
     "title": "Kaker"
@@ -8,7 +8,7 @@
     {
       "id": "sec-ec0c9b36",
       "version": 1,
-      "preset": "steg",
+      "preset": "steps",
       "size": {
         "minHeight": "1344px"
       },
@@ -18,10 +18,10 @@
         "layers": [
           {
             "type": "image",
-            "version": 1,
+            "version": 2,
             "props": {
               "src": "/media/bakgrunn-f5939d16.webp",
-              "fit": "vanlig",
+              "fit": "plain",
               "x": 0.5,
               "y": 0.5,
               "size": 1.5,
@@ -531,7 +531,7 @@
     {
       "id": "sec-4c908354",
       "version": 1,
-      "preset": "tom",
+      "preset": "blank",
       "size": {
         "minHeight": "640px"
       },

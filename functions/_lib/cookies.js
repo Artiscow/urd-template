@@ -1,23 +1,23 @@
 /**
- * Cookie-hjelpere for OAuth-tokenet.
+ * Cookie helpers for the OAuth token.
  *
- * Tokenet lagres i en httpOnly + Secure + SameSite=Lax-cookie ('urd_gh')
- * og når ALDRI nettleser-JS. En kortlevd 'urd_state'-cookie beskytter
- * OAuth-flyten mot CSRF. (Mønster validert i ApeironLF.)
+ * The token is stored in an httpOnly + Secure + SameSite=Lax cookie
+ * ('urd_gh') and NEVER reaches browser JS. A short-lived 'urd_state' cookie
+ * protects the OAuth flow against CSRF.
  */
 
 /**
  * @param {string} name
  * @param {string} value
- * @param {{maxAge?: number}} [opts] maxAge i sekunder (standard 30 dager)
- * @returns {string} Verdi for en Set-Cookie-header
+ * @param {{maxAge?: number}} [opts] maxAge in seconds (default 30 days)
+ * @returns {string} Value for a Set-Cookie header
  */
 export function serializeCookie(name, value, opts = {}) {
   const maxAge = opts.maxAge ?? 60 * 60 * 24 * 30;
   return `${name}=${value}; Max-Age=${maxAge}; Path=/; HttpOnly; Secure; SameSite=Lax`;
 }
 
-/** Set-Cookie-verdi som sletter cookien. */
+/** Set-Cookie value that deletes the cookie. */
 export function expireCookie(name) {
   return `${name}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax`;
 }

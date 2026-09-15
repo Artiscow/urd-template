@@ -1,20 +1,20 @@
 /**
  * POST /api/github/revert
- * «Angre siste publisering» som FORWARD-revert (ADR-0003): en ny commit
- * med dagens HEAD som forelder - historikk slettes aldri, og angringen
- * kan selv angres.
+ * "Undo the last publish" as a FORWARD revert (ADR-0003): a new commit with
+ * the current HEAD as its parent - history is never deleted, and the undo
+ * can itself be undone.
  *
- * Angringen gjelder NETTSIDEN, ikke repoet: den nye commiten tar HEADs
- * tre, men bytter nettsidens undertre (GITHUB_ROOT_DIR, hele repoet uten
- * rootDir) til slik det var FØR publiseringen som angres. I et monorepo
- * røres altså aldri kode utenfor nettsiden.
+ * The undo applies to the SITE, not the repo: the new commit takes HEAD's
+ * tree, but swaps the site subtree (GITHUB_ROOT_DIR, the whole repo without
+ * rootDir) back to how it was BEFORE the publish being undone. In a monorepo
+ * no code outside the site is touched.
  *
- * Body {expect: <sha>}: publiseringen som skal angres. Den må fortsatt
- * være den SISTE innholds-commiten (samme filter som history.js), ellers
- * 409 - to redaktører angrer aldri i beina på hverandre.
+ * Body {expect: <sha>}: the publish to undo. It must still be the LAST
+ * content commit (same filter as history.js), otherwise 409 - two editors
+ * never undo each other's work.
  *
- * Kjent begrensning: er publiseringen en merge-commit, gjenopprettes
- * første forelders innholdstilstand.
+ * Known limitation: if the publish is a merge commit, the first parent's
+ * content state is restored.
  */
 import { gh, triggerDeploy } from '../../_lib/github.js';
 import { requirePublisher } from '../../_lib/auth.js';
@@ -22,7 +22,7 @@ import { requirePublisher } from '../../_lib/auth.js';
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
-/** Sha for undertreet på en sti (f.eks. "template") i et gitt tre. */
+/** The sha of the subtree at a path (e.g. "template") in a given tree. */
 async function subtreeSha(token, repo, treeSha, pathSegments) {
   let sha = treeSha;
   for (const segment of pathSegments) {
@@ -52,7 +52,7 @@ export async function onRequestPost({ request, env }) {
   try {
     const { repo, branch, rootDir } = config;
 
-    // expect må fortsatt være siste publisering (samme filter som history.js).
+    // expect must still be the latest publish (same filter as history.js).
     const contentPath = rootDir ? `${rootDir}/content` : 'content';
     const latest = await gh(
       token,
@@ -70,8 +70,8 @@ export async function onRequestPost({ request, env }) {
     const ref = await gh(token, `/repos/${repo}/git/ref/heads/${branch}`);
     const headSha = ref.object.sha;
 
-    // Treet for den nye commiten: nettsidens undertre fra før publiseringen,
-    // alt annet uendret fra HEAD.
+    // The tree for the new commit: the site subtree from before the publish,
+    // everything else unchanged from HEAD.
     let treeSha;
     if (rootDir) {
       const before = await subtreeSha(token, repo, targetParent.tree.sha, rootDir.split('/'));
@@ -80,7 +80,7 @@ export async function onRequestPost({ request, env }) {
         method: 'POST',
         body: JSON.stringify({
           base_tree: headCommit.tree.sha,
-          // sha null sletter undertreet (nettsiden fantes ikke i forelderen).
+          // sha null deletes the subtree (the site did not exist in the parent).
           tree: [{ path: rootDir, mode: '040000', type: 'tree', sha: before }],
         }),
       });
@@ -93,7 +93,7 @@ export async function onRequestPost({ request, env }) {
     const commit = await gh(token, `/repos/${repo}/git/commits`, {
       method: 'POST',
       body: JSON.stringify({
-        message: `Angre «${firstLine}» via Urd-admin`,
+        message: `Revert "${firstLine}" via Urd admin`,
         tree: treeSha,
         parents: [headSha],
       }),
@@ -106,7 +106,7 @@ export async function onRequestPost({ request, env }) {
     await triggerDeploy(env);
     return json({ sha: commit.sha });
   } catch (err) {
-    // 422 non-fast-forward: noen committet i selve angre-vinduet.
+    // 422 non-fast-forward: someone committed inside the revert window itself.
     if (err.status === 422 && /fast.?forward/i.test(err.message)) {
       return json({ error: 'Someone has published in the meantime - reload the history', code: 'revertRace' }, 409);
     }

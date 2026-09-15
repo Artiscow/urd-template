@@ -43,7 +43,7 @@ i pluginmappen, samme form som motorens locale-filer:
 export default { lang: 'nb', strings: { '<id>.nokkel': 'Tekst', '<id>.edit.nokkel': 'Panel-tekst' } };
 ```
 
-- **Nøklene prefikses med plugin-id-en** (`kalender.*`); editor-/config-
+- **Nøklene prefikses med plugin-id-en** (`calendar.*`); editor-/config-
   panel-nøkler ligger under `<id>.edit.*`. Én strings-flate per fil.
 - **nb er basen**: lasteren legger nb i bunn og valgt språk oppå, så en
   manglende nøkkel faller til bokmål. Paritetstesten (`node --test
@@ -71,12 +71,12 @@ export default { lang: 'nb', strings: { '<id>.nokkel': 'Tekst', '<id>.edit.nokke
 ## Språkpakker: en plugin som KUN er et språk
 
 Trenger du et språk Urd ikke har innebygd, lages det som en plugin uten
-kode. `sprak-svensk` er referansen (svensk for besøkende-siden):
+kode. `lang-sv` er referansen (svensk for besøkende-siden):
 
 ```json
-// plugins/sprak-svensk/plugin.json - ingen entry, ingen provides
+// plugins/lang-sv/plugin.json - ingen entry, ingen provides
 {
-  "id": "sprak-svensk",
+  "id": "lang-sv",
   "name": "Svensk språkpakke",
   "version": "1.0.0",
   "requiresEngine": ">=0.6.8 <1.0.0",
@@ -85,8 +85,8 @@ kode. `sprak-svensk` er referansen (svensk for besøkende-siden):
 ```
 
 ```
-plugins/sprak-svensk/locales/site/sv.js     besøkende-tekstene (t())
-plugins/sprak-svensk/locales/admin/sv.js    admin-chromen (ta())
+plugins/lang-sv/locales/site/sv.js     besøkende-tekstene (t())
+plugins/lang-sv/locales/admin/sv.js    admin-chromen (ta())
 ```
 
 - **Filene har samme form og nøkler som motorens egne** locale-filer:
@@ -139,11 +139,11 @@ på blokk-defen i stedet for å bygge et eget config-panel - admin rendrer
 dem rett i Egenskaper-panelet når blokken er markert:
 
 ```js
-Urd.blocks.define('kart', {
+Urd.blocks.define('map', {
   // …
   fields: [
-    { key: 'location', type: 'place', labelKey: 'kart.edit.location', placeholderKey: 'kart.edit.locationPh' },
-    { key: 'zoom', type: 'number', labelKey: 'kart.edit.zoom', min: 1, max: 19 },
+    { key: 'location', type: 'place', labelKey: 'map.edit.location', placeholderKey: 'map.edit.locationPh' },
+    { key: 'zoom', type: 'number', labelKey: 'map.edit.zoom', min: 1, max: 19 },
   ],
 });
 ```
@@ -156,18 +156,18 @@ Etikettnøklene løses av motoren før de sendes til admin, så bruk
 «Innstillinger …»-knapp som åpner pluginens eget config-panel i
 forhåndsvisningen (kalenderen og skjemaet viser det mønsteret - riktig
 for innstillinger som er mer enn en flat felt-liste, som kildelister).
-Kontrakten er beskrevet i [docs/SKJEMA.md](../../docs/SKJEMA.md#plugins).
+Kontrakten er beskrevet i [docs/SCHEMA.md](../../docs/SCHEMA.md#plugins).
 
 **Temastyrt UI-regelen (ADR-0009)**: aldri native `<select>` i
 redigerings-UI - popupen følger OS-temaet og blir uleselig. Bruk
 `createDropdown` fra `/assets/urd/dropdown.js`, eller segmentknapper
 for små valgsett.
 
-Se [`kalender/`](kalender/) for referansen: den viser hele formen (manifest
+Se [`calendar/`](calendar/) for referansen: den viser hele formen (manifest
 med provides, blokk med versjon og migrering, seksjonspreset, egen CSS via én
 style-tag, redigering i preview via urd-edit, og ren logikk i egen modul med
-kontraktstester i tests/kalender.test.mjs). Kontrakten er beskrevet i
-[docs/SKJEMA.md](../../docs/SKJEMA.md#plugins).
+kontraktstester i tests/calendar.test.mjs). Kontrakten er beskrevet i
+[docs/SCHEMA.md](../../docs/SCHEMA.md#plugins).
 
 ## Kalender-pluginen (referansen)
 

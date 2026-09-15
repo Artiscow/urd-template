@@ -1,12 +1,14 @@
 /**
- * Anonym, lesende feed-proxy for kalender-pluginen: nettlesere kan ikke hente
- * iCal-feeder direkte (feed-verter sender ikke CORS, og sidens CSP tillater
- * kun connect-src 'self'), så pluginen henter alt via denne samme-origin-ruten.
+ * Anonymous read-only feed proxy for the calendar plugin: browsers cannot fetch
+ * iCal feeds directly (feed hosts send no CORS, and the site's CSP allows only
+ * connect-src 'self'), so the plugin fetches everything through this
+ * same-origin route.
  *
- * ÅPEN PROXY-VERN: kun https, ingen innlogging i URL-en, og verten må stå på
- * allowlisten (calendar.google.com er alltid med; eieren legger andre feed-
- * verter i env-variabelen ICS_HOSTS, kommaseparert). Omdirigeringer valideres
- * mot samme liste, så en godkjent vert ikke kan peke proxyen videre.
+ * OPEN PROXY GUARD: https only, no sign-in in the URL, and the host must be on
+ * the allowlist (calendar.google.com is always included; the owner puts other
+ * feed hosts in the ICS_HOSTS environment variable, comma-separated).
+ * Redirects are validated against the same list, so an approved host cannot
+ * point the proxy onwards.
  */
 
 const json = (body, status = 200) =>
@@ -48,17 +50,40 @@ export async function onRequestGet({ request, env }) {
   }
   clearTimeout(timer);
 
-  // Omdirigeringer kan ha flyttet oss til en annen vert: valider slutten av kjeden.
+  // A redirect may have moved us to another host: validate the end of the chain.
   try {
     if (upstream.url && !hostOk(new URL(upstream.url).hostname)) {
       return json({ error: 'The calendar source redirected to a host that is not allowed', code: 'calendarRedirectBlocked' }, 502);
     }
-  } catch { /* uleselig slutt-URL behandles som opprinnelig vert */ }
+  } catch { /* an unreadable final URL is treated as the original host */ }
 
   if (!upstream.ok) return json({ error: `The calendar source responded ${upstream.status}`, code: 'calendarUpstreamStatus', status: upstream.status }, 502);
 
-  const text = await upstream.text();
-  if (text.length > MAX_BYTES) return json({ error: 'The calendar file is too large', code: 'calendarTooLarge' }, 502);
+  const tooLarge = () => json({ error: 'The calendar file is too large', code: 'calendarTooLarge' }, 502);
+
+  // The size is enforced BEFORE the body is buffered: a declared length is
+  // rejected at once, and without one we count bytes while the stream is read
+  // and abort at the limit. (A plain .text() would buffer the whole response
+  // first, and the length of the finished string counts UTF-16 units, not bytes.)
+  const declared = Number(upstream.headers.get('content-length'));
+  if (Number.isFinite(declared) && declared > MAX_BYTES) return tooLarge();
+
+  const reader = upstream.body?.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let text = '';
+  let bytes = 0;
+  while (reader) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    bytes += value.byteLength;
+    if (bytes > MAX_BYTES) {
+      await reader.cancel();
+      return tooLarge();
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+  // With no body, text stays empty and the iCal check below answers calendarNotIcs.
+  text += decoder.decode();
   if (!/BEGIN:VCALENDAR/i.test(text.slice(0, 4000))) {
     return json({ error: 'The response from the source is not an iCal file', code: 'calendarNotIcs' }, 502);
   }
@@ -67,7 +92,7 @@ export async function onRequestGet({ request, env }) {
     status: 200,
     headers: {
       'content-type': 'text/calendar; charset=utf-8',
-      // Delt cache i 5 min: besøkende hamrer aldri feed-verten.
+      // Shared cache for 5 minutes: visitors never hammer the feed host.
       'cache-control': 'public, max-age=60, s-maxage=300',
     },
   });

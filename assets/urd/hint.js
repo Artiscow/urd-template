@@ -1,5 +1,5 @@
 /**
- * Stabil plugin-API-sti (se ADR-0013): re-eksporterer hjelpechipen fra den
- * versjonerte motoren. Hardkod aldri den versjonerte stien i en plugin.
+ * Stable plugin API path (see ADR-0013): re-exports the help chip from the
+ * versioned engine. Never hardcode the versioned path in a plugin.
  */
-export * from '../engine/0.6.11/hint.js';
+export * from '../engine/0.7.1/hint.js';

@@ -1,8 +1,9 @@
 {
-  "engine": "0.6.11",
+  "engine": "0.7.1",
   "schemaVersion": 1,
   "ownedPaths": [
     "index.html",
+    "404.html",
     "urd.json",
     "_headers",
     "speculation-rules.json",
@@ -17,6 +18,8 @@
   "userPaths": [
     "content/**",
     "media/**",
-    "plugins/**"
+    "plugins/**",
+    "sitemap.xml",
+    "robots.txt"
   ]
 }

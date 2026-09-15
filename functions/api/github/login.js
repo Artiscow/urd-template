@@ -1,7 +1,7 @@
 /**
  * GET /api/github/login
- * Starter GitHub OAuth: setter en tilfeldig state-cookie (CSRF-vern) og
- * omdirigerer til GitHubs autorisasjonsside.
+ * Starts GitHub OAuth: sets a random state cookie (CSRF protection) and
+ * redirects to GitHub's authorization page.
  */
 import { cfg } from '../../_lib/github.js';
 import { serializeCookie } from '../../_lib/cookies.js';
