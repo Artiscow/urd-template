@@ -245,7 +245,7 @@ export default {
     'api.geocodeUnexpected': 'Uventa svar frå adressesøket',
     'api.placeNotFound': 'Fann ikkje staden. Prøv ei meir nøyaktig adresse.',
     'api.updateBadTarget': 'Ugyldig målversjon {target}',
-    'api.updateNoBaseline': 'Fann ikkje basislinje-taggen {tag} i malrepoet, så oppdateraren veit ikkje kva versjon sida kjem frå',
+    'api.updateNoBaseline': 'Oppdateringar er ikkje tilgjengelege for denne sida enno: versjonen ho køyrer ({tag}) er ikkje publisert som oppdatering enno. Prøv igjen seinare.',
     'api.updateTemplateUnreachable': 'Fekk ikkje lese malrepoet {repo}: {detail}',
     'api.updateRace': 'Repoet endra seg medan oppdateringa gjekk føre seg. Last inn på nytt og prøv igjen.',
     'api.updateBadSkip': 'Fila {path} kan ikkje haldast tilbake frå oppdateringa',

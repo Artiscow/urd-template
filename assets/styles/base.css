@@ -64,9 +64,17 @@ img, video {
 
 /* Section container: the positioning context for block frames.
    NEVER clips content: blocks may deliberately overhang the section boundary,
-   and the editor and the published page must look identical. */
+   and the editor and the published page must look identical.
+   The content box carries the design height (the inline min-height render.js
+   writes is a plain length, part of the compatibility surface plugin copies
+   read and overwrite, see SCHEMA.md), and the padding carries the nav
+   clearance (--urd-section-clear, set only on the first section under a
+   menu outside the flow), so the surface keeps its height and the background
+   fills all the way up behind the menu. */
 .urd-section {
   position: relative;
+  box-sizing: content-box;
+  padding-top: var(--urd-section-clear, 0px);
   --urd-canvas-gutter: 0px;
 }
 
@@ -91,10 +99,8 @@ body:not(.urd-mobile) .urd-section {
      it, and shrink again when it left. Absolute placement keeps the
      invariant. Safe for pinned blocks: only transform, filter and
      containment create a containing block for fixed, not position.
-     The nav clearance (--urd-section-clear, set only on the first section under a
-     menu outside the flow) pushes the content surface down; the section grows
-     correspondingly via the min-height calculation in render.js, so the surface keeps
-     its height and the background fills all the way up behind the menu. */
+     The nav clearance is the section's padding (see .urd-section); the
+     canvas starts below it. */
   position: absolute;
   inset: 0;
   top: var(--urd-section-clear, 0px);
@@ -103,13 +109,12 @@ body:not(.urd-mobile) .urd-section {
 }
 
 /* Mobile auto layout is real document flow, and there the canvas MUST be in flow:
-   the section height is `auto` and driven by .urd-flow inside. The nav clearance becomes
-   padding in the flow. */
+   the section height is `auto` and driven by .urd-flow inside. The nav clearance
+   is the section's padding on both viewports. */
 body.urd-mobile .urd-canvas {
   position: relative;
   inset: auto;
   min-height: inherit;
-  padding-top: var(--urd-section-clear, 0px);
 }
 
 /* Nav clearance: a floating or overlay menu sits outside the flow and would

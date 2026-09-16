@@ -126,11 +126,15 @@ export async function prefetchPage(file, { fetchFn = fetch, storage, now } = {})
 }
 
 /**
- * Revalidates a page that was rendered from the parked copy. Resolves to the
- * fresh page when the server has a different version, or null when the
- * parked copy was current (304, same ETag, or identical text).
+ * Revalidates a served JSON file against the copy a page was rendered from
+ * (a parked copy, or the boot fetch of a prerendered or restored page).
+ * Resolves to the fresh page with its text and ETag when the server has a
+ * different version, or null when the copy was current (304, same ETag, or
+ * identical text). Without an ETag the request is unconditional and the
+ * text comparison decides.
+ * @returns {Promise<{page: object, text: string, etag: string|null}|null>}
  */
-export async function revalidatePage(file, etag, { fetchFn = fetch, text = null } = {}) {
+export async function revalidateFile(file, etag, { fetchFn = fetch, text = null } = {}) {
   const headers = etag ? { 'If-None-Match': etag } : {};
   const res = await fetchFn(`/${file}`, { headers });
   if (res.status === 304 || !res.ok) return null;
@@ -138,7 +142,12 @@ export async function revalidatePage(file, etag, { fetchFn = fetch, text = null 
   if (etag && freshEtag && freshEtag === etag) return null;
   const freshText = await res.text();
   if (text !== null && freshText === text) return null;
-  return JSON.parse(freshText);
+  return { page: JSON.parse(freshText), text: freshText, etag: freshEtag ?? null };
+}
+
+/** The fresh page alone, or null when the copy was current. */
+export async function revalidatePage(file, etag, opts) {
+  return (await revalidateFile(file, etag, opts))?.page ?? null;
 }
 
 /**

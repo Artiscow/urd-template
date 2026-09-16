@@ -48,7 +48,7 @@ import { loadPlugins, loadPluginList, applyPluginSiteLocales } from './plugins.j
 import { setCollectionsDraft } from './collections.js';
 import { initSticky, refreshSticky } from './sticky.js';
 import { applyHeadMeta } from './seo.js';
-import { readPrefetched, revalidatePage, wirePrefetch, sessionStore } from './prefetch.js';
+import { readPrefetched, revalidateFile, wirePrefetch, sessionStore } from './prefetch.js';
 import { t, ta, initSiteLocale, initAdminLocale, requestedLang, siteLang } from './i18n.js';
 
 export const Urd = {
@@ -457,8 +457,14 @@ export async function boot(opts) {
   const enginePromise = engineVersion();
 
   // The raw file is kept as migration context: the v1 page lift needs the
-  // ORIGINAL grid (columns/rowHeight), which the lifted site has lost.
-  const rawSite = await (await fetch('/content/site.json')).json();
+  // ORIGINAL grid (columns/rowHeight), which the lifted site has lost. The
+  // served text and ETag are kept too: a prerendered or restored page
+  // rechecks them against the server (see recheck below).
+  const served = { site: null, page: null };
+  const siteRes = await fetch('/content/site.json');
+  const siteText = await siteRes.text();
+  served.site = { text: siteText, etag: siteRes.headers.get('etag') };
+  const rawSite = JSON.parse(siteText);
   const site = liftSiteFile(rawSite);
   const preview = new URLSearchParams(location.search).get('preview') === '1';
   // The engine tolerates a truncated site.json: missing parts get empty defaults instead of a crash (the page never dies from bad data).
@@ -485,8 +491,11 @@ export async function boot(opts) {
   // with the engine cached, the serial round trips are what a page switch
   // costs.
   const pagePromise = parked
-    ? Promise.resolve(parked.page)
-    : fetch(`/${entry.file}`).then((res) => res.json());
+    ? Promise.resolve(parked)
+    : fetch(`/${entry.file}`).then(async (res) => {
+        const text = await res.text();
+        return { page: JSON.parse(text), text, etag: res.headers.get('etag') };
+      });
   // The rejection is consumed here; the failure is handled where the
   // promise is awaited.
   pagePromise.catch(() => {});
@@ -513,7 +522,9 @@ export async function boot(opts) {
   // dies from bad data.
   let page;
   try {
-    page = liftPageFile(await pagePromise, rawSite);
+    const loaded = await pagePromise;
+    page = liftPageFile(loaded.page, rawSite);
+    served.page = { text: loaded.text, etag: loaded.etag };
   } catch {
     console.warn(`Urd: could not load page file '${entry.file}' - rendering an empty page`);
     page = { schemaVersion: PAGE_SCHEMA_VERSION, meta: { id: entry.id, title: entry.title }, sections: [] };
@@ -559,26 +570,56 @@ export async function boot(opts) {
     });
     // Intent prefetch of the next page (hover, press, focus on internal links).
     wirePrefetch(site);
-    // A page rendered from the parked copy is checked against the server
-    // once; a newer file rerenders in place, the same copy leaves it be.
-    // The scroll position survives the rerender (the document collapses
-    // transiently while the data blocks measure), and the sticky blocks
-    // are re-pinned right away.
-    if (parked) {
-      revalidatePage(entry.file, parked.etag, { text: parked.text }).then((fresh) => {
-        if (!fresh) return;
-        state.page = liftPageFile(fresh, rawSite);
-        if (!Array.isArray(state.page.sections)) state.page.sections = [];
-        document.title = `${state.page.meta?.title ?? entry.title ?? ''} - ${site.site.title}`;
-        applyHeadMeta(site, state.page, location.origin, location.pathname, entry);
-        const y = window.scrollY;
-        renderPage(state.page, state.site, opts.root, { preview, viewport: state.viewport });
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          window.scrollTo(0, y);
-          refreshSticky();
-        }));
-      }).catch(() => {});
+
+    // A newer page file rerenders in place. The scroll position survives
+    // the rerender (the document collapses transiently while the data
+    // blocks measure), and the sticky blocks are re-pinned right away.
+    const applyFreshPage = (fresh) => {
+      served.page = { text: fresh.text, etag: fresh.etag };
+      state.page = liftPageFile(fresh.page, rawSite);
+      if (!Array.isArray(state.page.sections)) state.page.sections = [];
+      document.title = `${state.page.meta?.title ?? entry.title ?? ''} - ${site.site.title}`;
+      applyHeadMeta(site, state.page, location.origin, location.pathname, entry);
+      const y = window.scrollY;
+      renderPage(state.page, state.site, opts.root, { preview, viewport: state.viewport });
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        window.scrollTo(0, y);
+        refreshSticky();
+      }));
+    };
+    // The page shown may predate the site as published: a parked copy, a
+    // prerendered document, or one restored from the back-forward cache.
+    // One check at a time against the server: a changed site.json (the
+    // register, nav, theme, layout or language) reloads, a changed page
+    // file rerenders, a current copy leaves the page be. Errors are
+    // swallowed: the page never dies from a failed check.
+    let checking = null;
+    let queuedSite = false;
+    const recheck = ({ site: checkSite }) => {
+      // A site check arriving mid-flight runs after the current one, so the
+      // stronger request is never dropped.
+      if (checking) { queuedSite ||= checkSite; return checking; }
+      checking = (async () => {
+        if (checkSite) {
+          const freshSite = await revalidateFile('content/site.json', served.site.etag, { text: served.site.text });
+          if (freshSite) { location.reload(); return; }
+        }
+        const fresh = await revalidateFile(entry.file, served.page?.etag ?? null, { text: served.page?.text ?? null });
+        if (fresh) applyFreshPage(fresh);
+      })().catch(() => {}).finally(() => {
+        checking = null;
+        if (queuedSite) { queuedSite = false; recheck({ site: true }); }
+      });
+      return checking;
+    };
+    // A prerendered document checks at activation, everything else now.
+    if (parked && !document.prerendering) recheck({ site: false });
+    if (document.prerendering) {
+      document.addEventListener('prerenderingchange', () => recheck({ site: true }), { once: true });
     }
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) recheck({ site: true });
+    });
   }
 
   if (preview) enablePreview(state, opts);

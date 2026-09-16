@@ -70,14 +70,31 @@
       "id": "kontakt",
       "title": "Kontakt",
       "path": "/kontakt",
-      "file": "content/pages/kontakt.json",
-      "noindex": false
+      "file": "content/pages/kontakt.json"
     },
     {
       "id": "kaker",
       "title": "Kaker",
       "path": "/kaker",
       "file": "content/pages/kaker.json"
+    },
+    {
+      "id": "checkout",
+      "title": "Checkout",
+      "path": "/checkout",
+      "file": "content/pages/checkout.json"
+    },
+    {
+      "id": "shop-fp",
+      "title": "Shop FP",
+      "path": "/shop-fp",
+      "file": "content/pages/shop-fp.json"
+    },
+    {
+      "id": "shop",
+      "title": "Shop",
+      "path": "/shop",
+      "file": "content/pages/shop.json"
     }
   ],
   "nav": {
@@ -109,12 +126,31 @@
       {
         "label": "Kaker",
         "page": "kaker"
+      },
+      {
+        "label": "Butikk",
+        "page": "shop",
+        "children": [
+          {
+            "label": "Shop FP",
+            "page": "shop-fp"
+          },
+          {
+            "label": "Checkout",
+            "page": "checkout"
+          },
+          {
+            "label": "Butikk",
+            "page": "shop"
+          }
+        ]
       }
     ],
     "layout": "left",
-    "sticky": true,
+    "sticky": false,
     "cart": {
-      "show": false
+      "show": true,
+      "href": "/checkout"
     },
     "style": {
       "background": {
@@ -132,10 +168,11 @@
       },
       "topGap": false,
       "textColor": "#ffffff",
-      "hoverTextColor": "#00fff5"
+      "hoverTextColor": "#00fff5",
+      "blur": false
     },
     "overlay": true,
-    "variant": "floating-square"
+    "variant": "floating-tab"
   },
   "footer": {
     "version": 1,

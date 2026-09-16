@@ -71,7 +71,7 @@
               "x": 19.4,
               "y": 256,
               "w": 16.42,
-              "h": 32,
+              "h": 80,
               "z": 1,
               "rot": 0
             },
@@ -92,8 +92,8 @@
             "desktop": {
               "x": 19.4,
               "y": 320,
-              "w": 19.4,
-              "h": 64,
+              "w": 27.78,
+              "h": 80,
               "z": 1,
               "rot": 0
             },
@@ -142,7 +142,7 @@
               "x": 59.54,
               "y": 240,
               "w": 25.33,
-              "h": 299,
+              "h": 23,
               "z": 2,
               "rot": 0
             },
@@ -150,30 +150,24 @@
           }
         },
         {
-          "id": "blk-00298c94",
-          "type": "text",
+          "id": "blk-205e5f2a",
+          "type": "calendar",
           "version": 1,
-          "decor": false,
           "props": {
-            "html": "<h3><br></h3>",
-            "align": "left",
-            "box": true,
-            "boxStyle": {
-              "glass": true,
-              "border": {
-                "color": "accent",
-                "width": 1
-              }
-            }
+            "sources": [],
+            "view": "month",
+            "limit": 6,
+            "showCategories": true,
+            "showSubscribe": true
           },
           "animation": null,
           "frames": {
             "desktop": {
-              "x": 58.3,
-              "y": 208,
-              "w": 29.63,
-              "h": 400,
-              "z": 1,
+              "x": 48.89,
+              "y": 240,
+              "w": 40,
+              "h": 275,
+              "z": 3,
               "rot": 0
             },
             "mobile": null

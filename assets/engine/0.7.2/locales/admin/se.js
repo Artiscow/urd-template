@@ -248,7 +248,7 @@ export default {
     'api.geocodeUnexpected': 'Vuordekeahtes vástádus čujuhusohcamis',
     'api.placeNotFound': 'Ii gávdnan báikki. Geahččal dárkilet čujuhusa.',
     'api.updateBadTarget': 'Gustohis ulbmilveršuvdna {target}',
-    'api.updateNoBaseline': 'Ii gávdnan vuođđolinnjá-taga {tag} mállerepos, nu ahte ođasmahtti ii dieđe guđe veršuvnnas siidu boahtá',
+    'api.updateNoBaseline': 'Ođasmahttimat eai leat vel olámuttos dán siidui: veršuvdna maid dat geavaha ({tag}) ii leat vel almmuhuvvon ođasmahttimin. Geahččal fas maŋŋel.',
     'api.updateTemplateUnreachable': 'Ii sáhttán lohkat mállerepo {repo}: {detail}',
     'api.updateRace': 'Repo rievddai dan botta go ođasmahttin lei jođus. Vižžes ođđasit ja geahččal fas.',
     'api.updateBadSkip': 'Fiilla {path} ii sáhte doalahit eret ođasmahttimis',

@@ -74,9 +74,10 @@ function sectionClearance(host) {
   return Math.max(0, Math.round(canvas.getBoundingClientRect().top - host.getBoundingClientRect().top));
 }
 
-/** Inline minHeight including the nav clearance, the same calculation render.js writes. */
+/** Inline minHeight as render.js writes it: a plain length in content
+ *  height, the nav clearance being the section's padding (base.css). */
 function styleMinHeight(px) {
-  return `calc(${px}px + var(--urd-section-clear, 0px))`;
+  return `${px}px`;
 }
 
 /** Mobile view? The engine sets the body class from the breakpoint. */
@@ -3378,7 +3379,10 @@ function enhanceBlock(el, block, section, grid, host) {
         // block = native click (the drawer opens), unselected block =
         // surface drag and selection.
         if (target?.closest('.urd-cart-button') && selectedBlockId === block.id && multiIds.size <= 1) return;
-        if (target?.closest('.urd-edit-toolbar, .urd-edit-resize, .urd-edit-rotate, button:not(.urd-cart-button), input, select, textarea, dialog, .urd-collection-editable, .urd-collection-image-edit, .urd-faq-q, .urd-cal-config, .urd-form-config')) return;
+        // The plugin config panels are guarded by class name, the old
+        // reference plugin names included: plugin copies in user repos
+        // keep them forever (see the compatibility surface in SCHEMA.md).
+        if (target?.closest('.urd-edit-toolbar, .urd-edit-resize, .urd-edit-rotate, button:not(.urd-cart-button), input, select, textarea, dialog, .urd-collection-editable, .urd-collection-image-edit, .urd-faq-q, .urd-cal-config, .urd-form-config, .urd-kal-config, .urd-skjema-config, .urd-kart-config')) return;
         // Flowing mobile block: the first pinning must be a deliberate
         // choice (dragging ⠿), not a click on the block. A screen-docked
         // block is exempt: there the drag moves the docking, not the row

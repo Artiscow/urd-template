@@ -386,13 +386,10 @@ function autoGrow(el, host, ctx) {
     const sectionEl = el.closest('.urd-section');
     if (sectionEl) {
       const bottom = el.offsetTop + needed + 24;
-      // The nav clearance (--urd-section-clear) is part of the computed
-      // min-height but not of the content height: it is kept out of the
-      // comparison and written back into the calc (the shape render.js sets).
-      const cs = getComputedStyle(sectionEl);
-      const clear = Number.parseFloat(cs.getPropertyValue('--urd-section-clear')) || 0;
-      const current = (Number.parseFloat(cs.minHeight) || 0) - clear;
-      if (bottom > current) sectionEl.style.minHeight = `calc(${bottom}px + var(--urd-section-clear, 0px))`;
+      // Both sides are content heights: the nav clearance is the section's
+      // padding, and the inline min-height is a plain length.
+      const current = Number.parseFloat(getComputedStyle(sectionEl).minHeight) || 0;
+      if (bottom > current) sectionEl.style.minHeight = `${bottom}px`;
     }
     if (ctx.preview) {
       const block = ctx.section?.blocks?.find((b) => b.id === el.dataset.blockId);

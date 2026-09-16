@@ -82,18 +82,29 @@ export function applySiteLayout(site, root = document.documentElement) {
 
 /**
  * Raises the section's min-height so content down to `bottom` px (in content
- * surface coordinates) fits. Used by auto-growing blocks. The nav clearance
- * (--urd-section-clear) is kept out of the comparison and written back into
- * the calculation, the same form renderSection sets: computed min-height
- * includes the clearance, while `bottom` is pure content height.
+ * surface coordinates) fits. Used by auto-growing blocks. The section is
+ * content-box with the nav clearance as padding (base.css), so both the
+ * computed min-height and `bottom` are pure content heights, and the
+ * inline value stays a plain length (the compatibility surface plugin
+ * copies rely on, see SCHEMA.md).
  * @param {HTMLElement} sectionEl The section element
  * @param {number} bottom The content's bottom edge in px
  */
 export function growSectionTo(sectionEl, bottom) {
-  const cs = getComputedStyle(sectionEl);
-  const clear = Number.parseFloat(cs.getPropertyValue('--urd-section-clear')) || 0;
-  const current = (Number.parseFloat(cs.minHeight) || 0) - clear;
-  if (bottom > current) sectionEl.style.minHeight = `calc(${bottom}px + var(--urd-section-clear, 0px))`;
+  const current = Number.parseFloat(getComputedStyle(sectionEl).minHeight) || 0;
+  if (bottom > current) sectionEl.style.minHeight = `${bottom}px`;
+}
+
+/**
+ * The inline min-height of a desktop section: the stored size, or the
+ * blocks' extent when the section has none. Always a plain CSS length,
+ * never a calc(): plugin copies parse it with parseFloat.
+ * @param {object} section The section data
+ * @param {number} maxBottomPx The lowest block edge in px
+ * @returns {string}
+ */
+export function sectionMinHeight(section, maxBottomPx) {
+  return section.size?.minHeight ?? `${maxBottomPx}px`;
 }
 
 export function frameToCss(frame) {
@@ -346,11 +357,9 @@ export function renderSection(section, site, host, opts = {}) {
 
     // The section height belongs to the user: blocks may deliberately hang
     // past the edge (sections never clip). Without a set height, the
-    // blocks' extent is used. The nav clearance (--urd-section-clear, 0
-    // except in the first section under an out-of-flow menu, see base.css)
-    // is added on top, so the content surface keeps its height when pushed
-    // down.
-    host.style.minHeight = `calc(${section.size?.minHeight ?? `${maxBottomPx}px`} + var(--urd-section-clear, 0px))`;
+    // blocks' extent is used. The nav clearance is the section's padding
+    // (base.css), so the content surface keeps this height when pushed down.
+    host.style.minHeight = sectionMinHeight(section, maxBottomPx);
   }
 
   // Optional section animation (additive field). The entrance animation
