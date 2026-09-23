@@ -99,11 +99,11 @@
   ],
   "nav": {
     "version": 1,
-    "scroll": "shrink",
     "logo": {
       "type": "image",
       "value": "/media/logo-91963a12.svg",
-      "size": 40,
+      "size": 30,
+      "mobileSize": 26,
       "order": "image-first",
       "bold": false,
       "italic": false,
@@ -147,7 +147,7 @@
       }
     ],
     "layout": "left",
-    "sticky": false,
+    "sticky": true,
     "cart": {
       "show": true,
       "href": "/checkout"
@@ -169,7 +169,10 @@
       "topGap": false,
       "textColor": "#ffffff",
       "hoverTextColor": "#00fff5",
-      "blur": false
+      "blur": true,
+      "size": "sm",
+      "hover": "underline",
+      "hoverGlow": 1
     },
     "overlay": true,
     "variant": "floating-tab"
