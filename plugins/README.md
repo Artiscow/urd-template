@@ -11,6 +11,12 @@ ikke liste mapper, derfor en indeksfil). Admin håndterer listen for deg:
 Plugins-panelet viser mappene her automatisk (via publiseringslaget, eller
 sist kjente liste), og av/på-valget publiseres som en vanlig endring.
 
+Urd sender med én plugin: den svenske språkpakken [`lang-sv/`](lang-sv/),
+som er eksempelet på en språkpakke (se under). Kalender, skjema, kart og
+besøksmåling var referanseplugins til og med 0.7.3 og er kjerneblokker og
+en nettstedsinnstilling fra milepæl 0.7.18 (24. september 2026); mønstrene
+de viste står beskrevet under, med kjernens kode som lesestoff.
+
 ## Utvikle en plugin lokalt
 
 1. Start en lokal server fra `template/` (f.eks. `python3 -m http.server`)
@@ -71,7 +77,7 @@ export default { lang: 'nb', strings: { '<id>.nokkel': 'Tekst', '<id>.edit.nokke
 ## Språkpakker: en plugin som KUN er et språk
 
 Trenger du et språk Urd ikke har innebygd, lages det som en plugin uten
-kode. `lang-sv` er referansen (svensk for besøkende-siden):
+kode. `lang-sv` er referansen (svensk for både besøkende- og admin-siden):
 
 ```json
 // plugins/lang-sv/plugin.json - ingen entry, ingen provides
@@ -80,7 +86,7 @@ kode. `lang-sv` er referansen (svensk for besøkende-siden):
   "name": "Svensk språkpakke",
   "version": "1.0.0",
   "requiresEngine": ">=0.6.8 <1.0.0",
-  "languages": [{ "code": "sv", "name": "Svenska", "site": true, "admin": false }]
+  "languages": [{ "code": "sv", "name": "Svenska", "site": true, "admin": true }]
 }
 ```
 
@@ -126,12 +132,15 @@ if (ctx.preview) {
 Plugin-blokker og -seksjonsmaler vises automatisk i egne «Plugins»-
 seksjoner i «+ Ny blokk», «+ Ny seksjon» og Blokker-panelet. En blokk-def
 kan i tillegg ha `variants: [{ label, props }, …]`: da blir den en
-foldemeny i blokkmenyene (kalenderen bruker det til visningene sine).
+foldemeny i blokkmenyene (kjernens kalenderblokk bruker det til
+visningene sine).
 
-Blokker der innholdet selv bestemmer høyden (autovekst via `urd-grow`,
-som kalender/skjema/kart) skal sette `autoGrow: true` på blokk-defen:
-da får blokken naturlig høyde i mobilvisningens autostabling i stedet
-for den faste desktophøyden, så høyere mobilinnhold aldri klippes.
+Blokker der innholdet selv bestemmer høyden (som kalender, skjema og kart
+i kjernen) skal sette `autoGrow: true` på blokk-defen: da får blokken
+naturlig høyde i mobilvisningens autostabling i stedet for den faste
+desktophøyden, så høyere mobilinnhold aldri klippes. På desktop eier
+motorens dytt-pass boksens høyde (ADR-0024): en plugin-blokk trenger ikke
+måle seg selv, og skal aldri skrive målt høyde inn i rammen.
 
 **Innstillinger i Egenskaper (felt-kontrakten)**: har blokken din enkle
 innstillinger (tekst, tall, av/på, valg, sted), deklarer dem som `fields`
@@ -139,72 +148,60 @@ på blokk-defen i stedet for å bygge et eget config-panel - admin rendrer
 dem rett i Egenskaper-panelet når blokken er markert:
 
 ```js
-Urd.blocks.define('map', {
+Urd.blocks.define('venue', {
   // …
   fields: [
-    { key: 'location', type: 'place', labelKey: 'map.edit.location', placeholderKey: 'map.edit.locationPh' },
-    { key: 'zoom', type: 'number', labelKey: 'map.edit.zoom', min: 1, max: 19 },
+    { key: 'location', type: 'place', labelKey: 'venue.edit.location', placeholderKey: 'venue.edit.locationPh' },
+    { key: 'zoom', type: 'number', labelKey: 'venue.edit.zoom', min: 1, max: 19 },
   ],
 });
 ```
 
 Typene er `text`, `number` (`min`/`max`/`step`), `toggle`, `select`
 (`options: [{ value, labelKey }]`) og `place` (stedssøk: teksten skrives
-til `key`, koordinater til props `lat`/`lon`; se kart-referansen).
-Etikettnøklene løses av motoren før de sendes til admin, så bruk
-`labelKey` fra pluginens egen ordbok. Uten `fields` viser Egenskaper en
-«Innstillinger …»-knapp som åpner pluginens eget config-panel i
-forhåndsvisningen (kalenderen og skjemaet viser det mønsteret - riktig
-for innstillinger som er mer enn en flat felt-liste, som kildelister).
-Kontrakten er beskrevet i [docs/SCHEMA.md](../../docs/SCHEMA.md#plugins).
+til `key`, koordinater til props `lat`/`lon`; kjernens kartblokk bruker
+samme felt). Etikettnøklene løses av motoren før de sendes til admin, så
+bruk `labelKey` fra pluginens egen ordbok. Uten `fields` viser Egenskaper
+en «Innstillinger …»-knapp som åpner pluginens eget config-panel i
+forhåndsvisningen (referansepluginene kalender og skjema viste det
+mønsteret til og med v0.7.3, riktig for innstillinger som er mer enn en
+flat felt-liste, som kildelister). Kontrakten er beskrevet i
+[docs/SCHEMA.md](../../docs/SCHEMA.md#plugins).
 
 **Temastyrt UI-regelen (ADR-0009)**: aldri native `<select>` i
 redigerings-UI - popupen følger OS-temaet og blir uleselig. Bruk
 `createDropdown` fra `/assets/urd/dropdown.js`, eller segmentknapper
 for små valgsett.
 
-Se [`calendar/`](calendar/) for referansen: den viser hele formen (manifest
-med provides, blokk med versjon og migrering, seksjonspreset, egen CSS via én
-style-tag, redigering i preview via urd-edit, og ren logikk i egen modul med
-kontraktstester i tests/calendar.test.mjs). Kontrakten er beskrevet i
-[docs/SCHEMA.md](../../docs/SCHEMA.md#plugins).
+## Mønstrene, med kjernens kode som lesestoff
 
-## Kalender-pluginen (referansen)
+Kontrakten er beskrevet i [docs/SCHEMA.md](../../docs/SCHEMA.md#plugins).
+Hele formen (manifest med provides, blokk med versjon og migrering,
+seksjonspreset, egen CSS via én style-tag, redigering i forhåndsvisningen
+via urd-edit, ren logikk i egen modul med kontraktstester) sto i
+referansepluginene kalender, skjema og kart til og med Urd 0.7.3; koden
+deres ligger i git-historikken (taggen v0.7.3, `template/plugins/`). Fra
+0.7.18 er de kjerneblokker, og motorens filer viser de samme mønstrene:
 
-Kalenderblokken henter arrangementer fra abonnerbare iCal-feeder (Google
-Calendar, Nextcloud, Outlook m.fl.) med fire visninger: liste, kort,
-månedskalender og «neste arrangement». Kilder settes i forhåndsvisningen
-(«⚙ Kilder» på blokken): lim inn en iCal-URL, webcal://-adresse eller en
-Google-kalender-id (f.eks. `foreningen@gmail.com`).
+- **Kalender** (`assets/engine/<versjon>/blocks/calendar.js` og `ics.js`):
+  `variants` for visningene, henting via sidens egen proxy `/api/ics` (så
+  ingen CSP-unntak), ren parser i egen modul med tester, og eksempeldata i
+  forhåndsvisningen når kilder mangler. Innstillingene (kildeliste,
+  visning, antall) redigeres i Egenskaper-panelet; som plugin (til og med
+  v0.7.3) hadde den et eget config-panel i forhåndsvisningen, mønsteret
+  for innstillinger som er mer enn en flat felt-liste.
+- **Skjema** (`blocks/form.js` og `form-model.js`): ekte skjemarendering,
+  besøkende-input som aldri blir HTML, `mailto` som nulloppsett med et
+  valgfritt endepunkt via `fetch` (som krever `connect-src` i `_headers`),
+  honeypot mot bots, og rolig degradering når endepunktet er blokkert.
+- **Kart** (`blocks/map.js` og `osm.js`): felt-kontrakten (`fields`) for
+  enkle innstillinger rett i Egenskaper, en iframe mot OpenStreetMap, og
+  en CSP-vaktpost som forklarer hvilken `frame-src`-linje som mangler om
+  en host blokkerer kartet (Urds egen `_headers` tillater den).
 
-Konvensjoner: titler på formen «Kategori: Tittel» gir kategori-chips med
-filter, og en påmeldingslenke i beskrivelsen (en linje med «Påmelding:»)
-blir en «Meld deg på»-knapp. «Abonner»-knappen gir webcal-lenke, og for
-Google-kilder også «Legg til i Google».
-
-Henting går via sidens egen feed-proxy (`/api/ics`), så pluginen trenger
-ingen CSP-unntak. Proxyen godtar `calendar.google.com` og verter eieren
-lister i miljøvariabelen `ICS_HOSTS` (kommaseparert) i hostingoppsettet.
-Lokalt uten functions vises eksempeldata i forhåndsvisningen.
-
-## Skjema-pluginen (referanse: e-post og CSP-degradering)
-
-Skjemablokken er et kontaktskjema. Standard sendemåte er `mailto`: ved
-innsending åpnes besøkendes e-postklient med en ferdig e-post (ingen
-oppsett, ingen CSP). Valgfritt kan skjemaet sende til et eksternt
-endepunkt (eierens Apps Script eller Pages Function) via `fetch` med
-JSON, som krever at eieren åpner `connect-src` for endepunktets vert i
-`_headers`. Feltene er redigerbare (navn, type, påkrevd), e-postfelt
-valideres, og et skjult honeypot-felt stopper bots. Kontaktskjema-preset
-følger med. Viser mønsteret: ekte skjemarendering, besøkende-input som
-aldri blir HTML, og rolig degradering når endepunktet er blokkert.
-
-## Kart-pluginen (referanse: CSP-opt-in for embed)
-
-Kartblokken bygger inn OpenStreetMaps egen iframe (personvennlig: ingen
-sporing, ingen tredjeparts-tiles). Eieren limer inn koordinater eller en
-OSM-lenke. Fordi en iframe mot `openstreetmap.org` krever et
-`frame-src`-unntak, DEKLARERER manifestet behovet i `csp`-feltet
-(ADR-0006): Plugins-panelet viser eieren den nøyaktige `_headers`-linjen,
-og blir kartet blokkert forklarer blokken selv hvilken linje som mangler.
-Finn oss-preset følger med.
+Én forskjell gjelder for en plugin: kjernens blokker importerer
+`../i18n.js`, `../hint.js` og `../dropdown.js` direkte, mens en plugin
+ALLTID importerer fra `/assets/urd/` (motorkatalogen byttes ved hver
+utgivelse, ADR-0013). Besøksmåling (Cloudflare Web Analytics) var også en
+referanseplugin; den er nå nettstedsinnstillingen «Besøksmåling» bak
+tannhjulet i admin.

@@ -3,4 +3,4 @@
  * (ADR-0009) from the versioned engine. Never hardcode the versioned path in
  * a plugin.
  */
-export * from '../engine/0.7.3/dropdown.js';
+export * from '../engine/0.7.4/dropdown.js';

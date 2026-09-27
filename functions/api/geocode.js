@@ -1,5 +1,5 @@
 /**
- * Address lookup for the map plugin: turns an ordinary address into coordinates
+ * Address lookup for the map block: turns an ordinary address into coordinates
  * via OpenStreetMap's geocoder (Nominatim). It goes through the site's own
  * function (same origin), so the browser needs no connect-src extension, and we
  * can set an identifying User-Agent the way Nominatim's terms of use require.
@@ -37,7 +37,7 @@ export async function onRequestGet({ request }) {
       signal: controller.signal,
       headers: {
         // Nominatim requires an identifying User-Agent.
-        'User-Agent': 'Urd site builder map plugin (https://urd.dev)',
+        'User-Agent': 'Urd site builder map block (https://urd.dev)',
         'Accept-Language': 'nb,no,en',
       },
     });

@@ -30,6 +30,8 @@
           "id": "blk-7d311b04",
           "type": "image",
           "version": 1,
+          "fit": "shrink",
+          "fitMin": 0.6,
           "props": {
             "src": "/media/bytt-dette-bildet-84615e61.svg",
             "alt": "Bytt dette bildet",

@@ -1,7 +1,7 @@
 /**
- * Anonymous read-only feed proxy for the calendar plugin: browsers cannot fetch
+ * Anonymous read-only feed proxy for the calendar block: browsers cannot fetch
  * iCal feeds directly (feed hosts send no CORS, and the site's CSP allows only
- * connect-src 'self'), so the plugin fetches everything through this
+ * connect-src 'self'), so the block fetches everything through this
  * same-origin route.
  *
  * OPEN PROXY GUARD: https only, no sign-in in the URL, and the host must be on

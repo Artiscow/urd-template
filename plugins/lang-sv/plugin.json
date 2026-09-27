@@ -15,7 +15,7 @@
       "code": "sv",
       "name": "Svenska",
       "site": true,
-      "admin": false
+      "admin": true
     }
   ]
 }

@@ -88,6 +88,7 @@ img, video {
    backdrop-filter, contain, container-type or will-change. All seven
    create a containing block for position: fixed, and would break pinned and
    viewport-docked blocks (sticky.js). Enforced by tests/canvas.test.mjs. */
+
 body:not(.urd-mobile) .urd-section {
   --urd-canvas-gutter: var(--urd-canvas-gutter-desktop, 24px);
 }
@@ -126,9 +127,14 @@ body.urd-mobile .urd-canvas {
   --urd-section-clear: var(--urd-nav-h, 0px);
 }
 
-/* Rotated and overhanging blocks must not cause horizontal scrolling */
+/* Rotated and overhanging blocks must not cause horizontal scrolling. The
+   gutter for the vertical scrollbar is always reserved, so a page that does
+   not scroll has the same width as one that does: the menu and the centred
+   content then sit at the same place on every page (and the page transition
+   below has nothing to morph). */
 html {
   overflow-x: clip;
+  scrollbar-gutter: stable;
 }
 
 /* The background layer fills the section and sits behind the blocks */
@@ -215,6 +221,7 @@ html {
 
 /* Content inside text blocks: lists, quotes and links from
    the formatting bar (the global reset otherwise zeroes list indentation) */
+
 .urd-text ul,
 .urd-text ol {
   padding-left: 1.3em;
@@ -721,6 +728,409 @@ html {
   font-weight: 600;
   font-size: 0.95em;
 }
+
+/* The map block: OpenStreetMap's own iframe with a "larger map" link; the
+   empty state and the CSP note share one dashed box. */
+.urd-map {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  width: 100%;
+}
+
+.urd-map-frame {
+  display: block;
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 15%, transparent);
+  border-radius: var(--urd-radius-md);
+}
+
+.urd-map-link {
+  font-size: 0.82em;
+  opacity: 0.75;
+}
+
+.urd-map-link a {
+  color: var(--urd-color-accent);
+}
+
+.urd-map-empty {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 24px;
+  text-align: center;
+  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 30%, transparent);
+  border-radius: var(--urd-radius-md);
+  opacity: 0.85;
+}
+
+.urd-map-code {
+  padding: 4px 8px;
+  border-radius: 5px;
+  font: 12px/1.4 ui-monospace, monospace;
+  background: color-mix(in srgb, var(--urd-color-text) 10%, transparent);
+}
+
+.urd-map-fallback {
+  color: var(--urd-color-accent);
+  font-weight: 600;
+}
+
+.urd-map-note {
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+/* The form block: the visitor form. */
+.urd-form {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+.urd-form-form {
+  display: grid;
+  gap: 12px;
+}
+
+.urd-form-row {
+  display: grid;
+  gap: 4px;
+}
+
+.urd-form-label {
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.urd-form-input {
+  width: 100%;
+  padding: 8px 10px;
+  font: inherit;
+  color: inherit;
+  background: var(--urd-color-surface);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 22%, transparent);
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-form-input:focus {
+  outline: 2px solid var(--urd-color-accent);
+  outline-offset: 1px;
+}
+
+textarea.urd-form-input {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* Native select and date input for visitors (ADR-0009 covers editing UI only):
+   color-scheme lets the popup and the date picker follow the user's OS theme. */
+.urd-form-select,
+.urd-form-input[type="date"] {
+  color-scheme: light dark;
+}
+
+.urd-form-fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.urd-form-fieldset legend {
+  margin-bottom: 4px;
+  padding: 0;
+}
+
+.urd-form-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.urd-form-check input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--urd-color-accent);
+}
+
+.urd-form-checkrow .urd-form-label {
+  font-weight: 400;
+}
+
+.urd-form-error {
+  min-height: 0;
+  font-size: 0.8em;
+  color: #e05252;
+}
+
+.urd-form-error:empty {
+  display: none;
+}
+
+.urd-form-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.urd-form-submit {
+  justify-self: start;
+  padding: 10px 20px;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: var(--urd-color-accent);
+  border: 0;
+  border-radius: var(--urd-radius-sm);
+  cursor: pointer;
+}
+
+.urd-form-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.urd-form-status {
+  margin: 0;
+  font-size: 0.9em;
+}
+
+.urd-form-status.ok {
+  color: color-mix(in srgb, #4ac26b 85%, var(--urd-color-text));
+}
+
+.urd-form-status.error {
+  color: #e05252;
+}
+
+/* The calendar block: the four views share the collection block's rows and
+   cards; the chips, the next panel and the month grid are its own. */
+.urd-cal {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+
+.urd-cal-titlerow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.urd-cal-meta {
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.urd-cal-chip {
+  padding: 2px 8px;
+  font-size: 0.72em;
+  background: color-mix(in srgb, var(--urd-color-accent) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--urd-color-accent) 45%, transparent);
+  border-radius: 999px;
+}
+
+.urd-cal-signup {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--urd-color-accent);
+  text-decoration: none;
+}
+
+.urd-cal-signup:hover {
+  text-decoration: underline;
+}
+
+.urd-cal-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.urd-cal-chipbtn {
+  padding: 3px 10px;
+  font: inherit;
+  font-size: 0.78em;
+  color: inherit;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 25%, transparent);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.urd-cal-chipbtn.selected {
+  color: #fff;
+  background: var(--urd-color-accent);
+  border-color: var(--urd-color-accent);
+}
+
+.urd-cal-subscribe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.urd-cal-sub-btn {
+  padding: 5px 12px;
+  font-size: 0.82em;
+  color: inherit;
+  text-decoration: none;
+  background: var(--urd-color-surface);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 25%, transparent);
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-sub-btn:hover {
+  border-color: var(--urd-color-accent);
+}
+
+.urd-cal-next {
+  padding: 16px;
+  background: var(--urd-color-surface);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 12%, transparent);
+  border-radius: var(--urd-radius-md);
+}
+
+.urd-cal-next-label {
+  margin-bottom: 10px;
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.urd-cal-next-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.urd-cal-next-title {
+  font-family: var(--urd-font-heading);
+  font-size: 1.15em;
+}
+
+.urd-cal-next-count {
+  margin-top: 4px;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--urd-color-accent);
+}
+
+.urd-cal-month {
+  display: grid;
+  gap: 8px;
+}
+
+.urd-cal-month-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.urd-cal-nav {
+  width: 30px;
+  height: 30px;
+  font: inherit;
+  color: inherit;
+  background: var(--urd-color-surface);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 20%, transparent);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.urd-cal-nav:hover {
+  border-color: var(--urd-color-accent);
+}
+
+.urd-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.urd-cal-dow {
+  padding: 2px 0;
+  font-size: 0.7em;
+  text-align: center;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.urd-cal-day {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  min-height: 64px;
+  padding: 4px;
+  background: color-mix(in srgb, var(--urd-color-surface) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 8%, transparent);
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-day-empty {
+  background: transparent;
+  border-color: transparent;
+}
+
+.urd-cal-today {
+  border-color: var(--urd-color-accent);
+}
+
+.urd-cal-daynum {
+  font-size: 0.72em;
+  opacity: 0.6;
+}
+
+.urd-cal-pill {
+  padding: 2px 5px;
+  font-size: 0.68em;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: color-mix(in srgb, var(--urd-color-accent) 22%, transparent);
+  border-radius: 4px;
+}
+
+.urd-cal-more {
+  font-size: 0.66em;
+  opacity: 0.6;
+}
+
+.urd-cal-empty {
+  font-size: 0.9em;
+  opacity: 0.65;
+}
+
+/* The preview's notes under the calendar (demo data, a failed feed) hang
+   below the block instead of inside it: a note that took height would make
+   the block push its neighbours in the preview and not on the published
+   page, where no note exists. */
+.urd-cal-note {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 0.25rem 0 0;
+  font-size: 0.75em;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
 
 .urd-preview .urd-audio-empty {
   display: grid;
@@ -2137,6 +2547,13 @@ body.urd-chrome-off .urd-imged {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* A section that holds a pinned block does not lift: a transformed section
+   is the containing block of its fixed children, so the pin would follow the
+   section instead of the window (sticky.js stands still under a transform). */
+.urd-section.urd-anim-hover-lift:has(.urd-sticky-able):hover {
+  transform: none;
+}
+
 /* Combination: a block with BOTH an entrance animation AND "Lift on hover".
    Without this the hover-lift rule (later in the CSS) overrides the entrance
    transition, so opacity and shape jump instead of fading or sliding in.
@@ -2602,6 +3019,7 @@ a.urd-gallery-tile {
    showModal surface automatically): native :has()/:modal instead of JS bookkeeping
    of body.style.overflow. Without :has support (outside the baseline tail) only
    the lock is missing; the dialog itself still works. */
+html:has(dialog:modal),
 body:has(dialog:modal) {
   overflow: hidden;
 }
@@ -2940,6 +3358,85 @@ body:has(dialog:modal) {
   z-index: 100001;
 }
 
+/* The announcement bar (nav.announcement): a strip above the menu inside the
+   host, on the accent by default (colours set inline by nav.js from the
+   fields). With sticky false the host sticks only once the strip has scrolled
+   past: its sticky top is raised by the measured strip height. */
+.urd-nav-announce {
+  position: relative;
+  /* Above the bar in every context (the preview lifts the bar to 100001):
+     the bar's top pixel and a logo that grows out of the bar never paint
+     over the strip. */
+  z-index: 100002;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  /* One pixel under the bar's top edge: a fractional zoom in the editor's
+     preview otherwise leaves a hairline seam between the two surfaces. */
+  padding: 0.4rem var(--urd-nav-px, clamp(1rem, 4vw, 2.5rem)) calc(0.4rem + 1px);
+  margin-bottom: -1px;
+  background: var(--urd-announce-bg, var(--urd-color-accent));
+  color: var(--urd-announce-text, var(--urd-color-accent-text, var(--urd-color-bg)));
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-align: center;
+  pointer-events: auto;
+}
+
+.urd-nav-announce a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* The visitor's cross (announcement.dismiss): at the right edge, the text keeps
+   its centre. */
+.urd-nav-announce-close {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  translate: 0 -50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.25rem;
+  opacity: 0.85;
+}
+
+.urd-nav-announce-close:hover,
+.urd-nav-announce-close:focus-visible {
+  opacity: 1;
+}
+
+/* Room for the cross on both sides, so the text stays centred and never runs
+   under it on a narrow screen. */
+.urd-nav-announce:has(.urd-nav-announce-close) {
+  padding-left: 2.25rem;
+  padding-right: 2.25rem;
+}
+
+.urd-nav-announce-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Only a host in the flow: a fixed host (floating, overlay, the side column)
+   never scrolls, so it keeps the strip. */
+.urd-nav-sticky.urd-nav-announce-scroll:not(.urd-nav-float, .urd-nav-overlay, .urd-nav-side-host) {
+  top: calc(-1 * var(--urd-announce-h, 0px));
+}
+
+/* The strip spans the full width above the floating pill, which is centred inside
+   the same host. */
+.urd-nav-float .urd-nav-announce {
+  width: 100%;
+}
+
 /* Scroll behavior (nav.scroll, the state classes are set by nav.js from pure
    navScrollState): 'hide' slides the host out past the top with translate
    (compositor, never top/margin), 'shrink' shrinks the padding via
@@ -3089,6 +3586,17 @@ body:not(.urd-mobile) .urd-nav:not(.urd-nav-mobile) .urd-nav-toggle span {
 
 .urd-nav-left .urd-nav-tools {
   margin-left: auto;
+}
+
+/* The tool cluster at the start (nav.style.tools.side): before the logo, so the
+   burger sits on the left on mobile; the auto margin then belongs on the list */
+.urd-nav-tools-start .urd-nav-tools {
+  order: -1;
+  margin-right: 0.5rem;
+}
+
+.urd-nav-left.urd-nav-tools-start .urd-nav-tools {
+  margin-left: 0;
 }
 
 /* The light/dark toggle (shown only when the theme has an alternate counterpart) */
@@ -3373,6 +3881,13 @@ body.urd-mobile .urd-nav-has-sub > a,
   flex: 1;
 }
 
+/* With collapsed submenus an item opens its submenu on mobile instead of
+   navigating, so its own page sits first in the submenu there; on desktop the
+   item is the link, and the entry is hidden. */
+body:not(.urd-mobile) .urd-nav:not(.urd-nav-mobile) .urd-nav-sub-self {
+  display: none;
+}
+
 body.urd-mobile .urd-nav-sub,
 .urd-nav-mobile .urd-nav-sub {
   position: static;
@@ -3382,6 +3897,172 @@ body.urd-mobile .urd-nav-sub,
   background: none;
   backdrop-filter: none;
   box-shadow: none;
+}
+
+/* Full-screen mobile menu (nav.style.mobileMenu sheet): a native <dialog> in the
+   top layer that the menu list moves into while it is open (nav.js). It covers
+   the whole viewport, so the panel rules above never apply; the mobile row and
+   accordion rules still do, since the dialog sits inside the nav. The UA's
+   dialog colours are replaced by the sheet's own surface (nav.style.sheet, set
+   inline by nav.js) or else the nav's veil, blur and text colour, and display
+   is gated on [open] so the closed dialog stays hidden. */
+.urd-nav-sheet {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  background: var(--urd-nav-sheet-bg, var(--urd-nav-sub-bg, color-mix(in srgb, var(--urd-color-surface) 92%, transparent)));
+  backdrop-filter: var(--urd-nav-sheet-blur, var(--urd-nav-blur, blur(12px)));
+}
+
+.urd-nav-sheet[open] {
+  display: flex;
+  flex-direction: column;
+  animation: urd-nav-sheet-top 280ms ease-out;
+}
+
+/* The sheet itself covers the page, so the backdrop adds nothing. */
+.urd-nav-sheet::backdrop {
+  background: transparent;
+}
+
+/* The entrance (nav.style.sheetMotion): a slide from one of the four edges,
+   a fade, or none. */
+.urd-nav-sheet-from-bottom[open] { animation-name: urd-nav-sheet-bottom; }
+.urd-nav-sheet-from-left[open] { animation-name: urd-nav-sheet-left; }
+.urd-nav-sheet-from-right[open] { animation-name: urd-nav-sheet-right; }
+.urd-nav-sheet-from-fade[open] { animation-name: urd-nav-sheet-fade; animation-duration: 200ms; }
+.urd-nav-sheet-from-none[open] { animation: none; }
+
+@keyframes urd-nav-sheet-top {
+  from {
+    translate: 0 -100%;
+    opacity: 0;
+  }
+}
+
+@keyframes urd-nav-sheet-bottom {
+  from {
+    translate: 0 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes urd-nav-sheet-left {
+  from {
+    translate: -100% 0;
+    opacity: 0;
+  }
+}
+
+@keyframes urd-nav-sheet-right {
+  from {
+    translate: 100% 0;
+    opacity: 0;
+  }
+}
+
+@keyframes urd-nav-sheet-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-nav-sheet[open] {
+    animation: none;
+  }
+}
+
+/* The head holds the logo (when it moves along) on the left and the cross on
+   the right; the foot holds the theme and cart buttons as labelled outlines. */
+.urd-nav-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 0.5rem var(--urd-nav-px);
+}
+
+.urd-nav-sheet-head .urd-nav-logo {
+  margin-right: auto;
+  min-width: 0;
+}
+
+.urd-nav-sheet-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.5rem var(--urd-nav-px) 1.5rem;
+}
+
+.urd-nav-sheet-foot .urd-nav-theme,
+.urd-nav-sheet-foot .urd-nav-cart {
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid currentColor;
+  border-radius: var(--urd-radius-sm);
+  opacity: 1;
+}
+
+/* The tool labels exist for the sheet's foot only, and only as an option
+   (nav.style.sheetToolLabels); the bar and the plain foot show the icons. */
+.urd-nav-tool-label {
+  display: none;
+}
+
+.urd-nav-sheet-labels .urd-nav-sheet-foot .urd-nav-tool-label {
+  display: inline;
+}
+
+.urd-nav-sheet-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.urd-nav-sheet-close svg {
+  width: 28px;
+  height: 28px;
+}
+
+.urd-nav-sheet-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  /* Touch scrolling never chains to the page behind the open sheet. */
+  overscroll-behavior: contain;
+  padding: 0.5rem var(--urd-nav-px) 2rem;
+}
+
+/* [open] lifts the specificity above the twin rules that hide the list on
+   mobile. The list centres itself in the remaining height with auto margins,
+   so a long menu still scrolls from its top. */
+.urd-nav-sheet[open] .urd-nav-list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  margin: auto 0;
+  padding: 0;
+}
+
+.urd-nav-sheet[open] .urd-nav-list a,
+.urd-nav-sheet[open] .urd-nav-toggle {
+  font-size: 1.5em;
 }
 
 /* Floating variant (nav.variant): a detached pill with
@@ -3436,23 +4117,51 @@ body.urd-mobile .urd-nav-sub,
      negative margin trick is calibrated against --urd-nav-pad and has to
      follow it. The pill scales the size preset down, so the size choice
      composes; an explicit thickness is drawn as set.
-     The width is nav.style.pillWidth (inline from nav.js) or 1100px. */
+     The width is nav.style.pillWidth (inline from nav.js) or 1100px, the
+     rounding nav.style.radius (inline from nav.js) or the variant's preset. */
   --urd-nav-base-pad: var(--urd-nav-pad-y, calc(var(--urd-nav-size-pad, 0.9rem) * 0.67));
   margin: 0.75rem auto 0;
   width: min(var(--urd-nav-pill-w, 1100px), calc(100% - 2rem));
-  border-radius: 999px;
+  border-radius: var(--urd-nav-radius, 999px);
 }
 
 /* The square variant (nav.variant floating-square): the pill without rounding */
 .urd-nav-var-floating.urd-nav-square {
-  border-radius: 0;
+  border-radius: var(--urd-nav-radius, 0);
 }
 
 /* The tab variant (nav.variant floating-tab): a square top, only the two lower
    corners rounded - it hangs down from the top. Inherits the air above and the side
    margin from the base; with topGap: false (urd-nav-flush) it becomes a hanging header. */
 .urd-nav-var-floating.urd-nav-tab {
-  border-radius: 0 0 var(--urd-radius-md) var(--urd-radius-md);
+  border-radius: 0 0 var(--urd-nav-radius, var(--urd-radius-md)) var(--urd-nav-radius, var(--urd-radius-md));
+}
+
+/* Transparent at the top (nav.style.atTop 'clear'): until the page has left
+   the top zone the menu draws no surface, blur, border or shadow, and the
+   layer backdrop is hidden; they appear with urd-nav-scrolled (nav.js). The
+   rules set the properties themselves, not the variables, since nav.js
+   writes the surface variables inline. */
+.urd-nav-clear .urd-nav {
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.urd-nav-clear .urd-nav > .urd-nav-bg {
+  transition: opacity 0.3s ease;
+}
+
+.urd-nav-clear:not(.urd-nav-scrolled) .urd-nav {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.urd-nav-clear:not(.urd-nav-scrolled) .urd-nav::before {
+  backdrop-filter: none;
+}
+
+.urd-nav-clear:not(.urd-nav-scrolled) .urd-nav > .urd-nav-bg {
+  opacity: 0;
 }
 
 /* Glow around the pill: opt-in (off by default) */
@@ -3535,9 +4244,14 @@ body:not(.urd-mobile) .urd-nav-inset {
    is irrelevant here - the column is always fixed. */
 .urd-nav-side-host {
   position: fixed;
-  top: 0;
+  /* Below an announcement fixed across the whole page (place 'page'). */
+  top: var(--urd-announce-page-h, 0px);
   bottom: 0;
   left: 0;
+  /* A column: the announcement strip takes its own height at the top and the
+     menu fills the rest, so the tools at the menu's foot stay on screen. */
+  display: flex;
+  flex-direction: column;
   /* The width is driven by nav.style.width through the variable (set by nav.js on
      body, so the content padding below reads the same value) */
   width: var(--urd-nav-side-width, 250px);
@@ -3561,10 +4275,33 @@ body.urd-side-right {
   padding-right: var(--urd-nav-side-width, 250px);
 }
 
+/* The announcement placed across the whole page (nav.announcement.place
+   'page', side variants): a fixed strip above column and content, both of
+   which start below it by its measured height. */
+.urd-announce-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin-bottom: 0;
+}
+
+body.urd-side-left,
+body.urd-side-right {
+  padding-top: var(--urd-announce-page-h, 0px);
+}
+
+/* Placed above the content beside the column ('content'): in the flow,
+   inside the body's side padding, scrolling with the page. */
+.urd-announce-content {
+  margin-bottom: 0;
+}
+
 .urd-nav-side-host .urd-nav {
   flex-direction: column;
   align-items: stretch;
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
   padding: 1.2rem 1rem;
   overflow-y: auto;
 }
@@ -3589,10 +4326,30 @@ body.urd-side-right {
   border-radius: var(--urd-radius-sm);
 }
 
-/* The tool cluster (toggle) at the bottom of the column */
+/* The tool cluster (toggle) at the bottom of the column, or at its top with
+   tools.side start; tools.align sets the row's alignment. */
 .urd-nav-side-host .urd-nav-tools {
   margin: auto 0 0;
   justify-content: center;
+}
+
+.urd-nav-side-host .urd-nav-tools-start .urd-nav-tools {
+  margin: 0 0 1rem;
+}
+
+.urd-nav-side-host.urd-nav-tools-align-start .urd-nav-tools { justify-content: flex-start; }
+.urd-nav-side-host.urd-nav-tools-align-end .urd-nav-tools { justify-content: flex-end; }
+.urd-nav-side-host.urd-nav-tools-align-spread .urd-nav-tools { justify-content: space-between; }
+
+/* Submenus open from the start (sideSubs expanded): without the arrow the
+   caret and the opener's chevron are gone and the opener reads as a heading. */
+.urd-nav-side-host.urd-nav-side-subs-open:not(.urd-nav-side-sub-arrow) .urd-nav-has-sub > .urd-nav-caret,
+.urd-nav-side-host.urd-nav-side-subs-open:not(.urd-nav-side-sub-arrow) .urd-nav-has-sub > .urd-nav-toggle svg {
+  display: none;
+}
+
+.urd-nav-side-host.urd-nav-side-subs-open:not(.urd-nav-side-sub-arrow) .urd-nav-has-sub > .urd-nav-toggle {
+  cursor: default;
 }
 
 /* Submenus become accordions in the column (as in the mobile panel) */
@@ -3776,14 +4533,15 @@ body.urd-mobile .urd-nav-var-floating.urd-nav-open,
   height: 2px;
   border-radius: 1px;
   background: var(--urd-nav-hover, var(--urd-color-accent));
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.2s ease;
+  /* Revealed with clip-path rather than a scale transform: the line is laid
+     out at its final size, so the animation's end frame equals the resting line. */
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.2s ease;
 }
 
 .urd-nav-hover-underline .urd-nav-list a:hover::after,
 .urd-nav-hover-underline .urd-nav-list a:focus-visible::after {
-  transform: scaleX(1);
+  clip-path: inset(0);
 }
 
 .urd-nav-hover-pill .urd-nav-list a {
@@ -3820,6 +4578,8 @@ body.urd-mobile .urd-nav-var-floating.urd-nav-open,
 @media (prefers-reduced-motion: reduce) {
   .urd-nav-caret svg,
   .urd-nav-toggle svg,
+  .urd-nav-clear .urd-nav,
+  .urd-nav-clear .urd-nav > .urd-nav-bg,
   .urd-nav-hover-underline .urd-nav-list a::after,
   .urd-nav-hover-pill .urd-nav-list a,
   .urd-nav-hover-lift .urd-nav-list a,
@@ -4451,13 +5211,34 @@ body.urd-marqueeing {
 /* Page transitions (ADR-0011): cross-document View Transitions give a soft
    cross-fade between the pages of the published site. The gate is
    the at-rule itself: engines without support ignore it and navigate plainly
-   (end state). The editor preview is never affected - there page switches happen via
-   postMessage, not navigation. Nav and footer get a view-transition-name only
-   inside the transition window itself (wireViewTransitionNames in urd.js): a static
-   name here would make them backdrop roots, which turns off the menu's
-   backdrop-filter (the blur behind the nav) in all ordinary viewing. */
+   (end state). The editor's preview navigates the same way when it switches
+   page, so the transition runs there too. The menu and the footer carry no
+   name of their own: a named element is a backdrop root, which turns off
+   the menu's backdrop-filter (the blur behind the nav), and the whole page
+   moving as one never lets the menu morph between two boxes. */
 @view-transition {
   navigation: auto;
+}
+
+/* The arriving page is rendered by the engine once its data has loaded, so
+   at the transition's capture it is still the empty shell. Until the page
+   stands, the old page's snapshot stays on screen and the new one is kept
+   out of sight; the engine then ends the transition as a cut (the arrival
+   hold in urd.js). A page that is ready at arrival (prerendered) gets the
+   plain cross-fade. The five seconds are a ceiling for a page whose data
+   never arrives. */
+html.urd-arriving::view-transition-old(root) {
+  animation: urd-arrival-hold 5s step-end both;
+}
+
+html.urd-arriving::view-transition-new(root) {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes urd-arrival-hold {
+  from { opacity: 1; }
+  to { opacity: 1; }
 }
 
 /* Reduced motion: the transition is kept (navigation is just as fast),
@@ -4754,11 +5535,13 @@ body.urd-mobile .urd-section-resize-top {
 /* Rotation handle: a small circle at the block's top right corner */
 .urd-preview .urd-edit-rotate {
   /* Counter-scaling: the handle should keep the same on-screen size as
-     the admin panels at any zoom level (urd-zoom). */
+     the admin panels at any zoom level (urd-zoom). Anchored above the
+     block on the toolbar's row, clear of the resize corner on a thin
+     block at every zoom. */
   transform: scale(var(--urd-chrome-scale, 1));
-  transform-origin: top right;
+  transform-origin: bottom right;
   position: absolute;
-  top: -8px;
+  bottom: 100%;
   right: -8px;
   width: 16px;
   height: 16px;
@@ -4772,6 +5555,14 @@ body.urd-mobile .urd-section-resize-top {
   cursor: grab;
   user-select: none;
   z-index: 1000;
+}
+
+/* The toolbar flipped under the block (the top of the page): the handle
+   follows it below. */
+.urd-preview .urd-edit-toolbar.urd-toolbar-under ~ .urd-edit-rotate {
+  bottom: auto;
+  top: 100%;
+  transform-origin: top right;
 }
 
 .urd-preview .urd-editable:hover .urd-edit-rotate,
@@ -4864,10 +5655,10 @@ body.urd-mobile .urd-section-resize-top {
      and the gallery sit above anything. */
   z-index: 100001;
   /* Hidden until the mouse is over an adjacent section (or the bar itself):
-     less noise, and the topmost bar does not collide with the menu */
+     less noise, and the topmost bar does not collide with the menu. Shown
+     as a cut, not a fade: a fade restarts at every change of hover owner. */
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.12s ease;
 }
 
 .urd-preview .urd-add-section:hover,
@@ -4899,6 +5690,9 @@ body.urd-mobile .urd-section-resize-top {
   right: 0;
   top: 0;
   height: 1px;
+  /* The line is drawn only; the hover stays with the section that shows
+     the bar. */
+  pointer-events: none;
   background: repeating-linear-gradient(
     90deg,
     color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 35%, transparent) 0 8px,

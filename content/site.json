@@ -10,6 +10,9 @@
   "breakpoints": {
     "mobile": 640
   },
+  "analytics": {
+    "token": ""
+  },
   "layout": {
     "contentWidth": 1440,
     "gutter": 6
@@ -99,6 +102,12 @@
   ],
   "nav": {
     "version": 1,
+    "announcement": {
+      "show": false,
+      "text": "Nyhet: bestill kaker til høstferien",
+      "page": "kaker",
+      "place": "nav"
+    },
     "logo": {
       "type": "image",
       "value": "/media/logo-91963a12.svg",
@@ -172,7 +181,25 @@
       "blur": true,
       "size": "sm",
       "hover": "underline",
-      "hoverGlow": 1
+      "hoverGlow": 1,
+      "atTop": "clear",
+      "tools": {
+        "side": "end",
+        "align": "center"
+      },
+      "sideSubs": "collapsed",
+      "sideSubArrow": false,
+      "mobileMenu": "sheet",
+      "sheetMotion": "right",
+      "mobileSubs": "expanded",
+      "sheetLogo": true,
+      "sheetTheme": true,
+      "sheetCart": true,
+      "sheet": {
+        "bg": "#0e1a27",
+        "bgOpacity": 0.95,
+        "blur": false
+      }
     },
     "overlay": true,
     "variant": "floating-tab"

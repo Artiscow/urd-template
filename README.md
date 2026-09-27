@@ -33,7 +33,7 @@ Open the **Updates** panel in the admin: it checks against the template reposito
 ## Content and structure
 
 - `content/` is your content (pages, theme, collections) - everything the admin writes lives here and in `media/`.
-- `plugins/` holds extensions: drop in a plugin folder and enable it in the Plugins panel. See [plugins/README.md](plugins/README.md); more can be found via the GitHub topic `urd-plugin`.
+- `plugins/` holds extensions: drop in a plugin folder and enable it in the Plugins panel. The one that ships is the Swedish language pack (`lang-sv`), the example for plugin authors; calendar, form and map are core blocks. See [plugins/README.md](plugins/README.md); more can be found via the GitHub topic `urd-plugin`.
 - `assets/engine/` and `admin/` are Urd itself and are maintained by the Updates panel; do not edit them by hand.
 
 ## Documentation

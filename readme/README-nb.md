@@ -33,7 +33,7 @@ Lokal titt uten host: kjør en statisk server fra denne mappen (f.eks. `python3 
 ## Innhold og struktur
 
 - `content/` er innholdet ditt (sider, tema, samlinger) - alt admin skriver, ligger her og i `media/`.
-- `plugins/` er utvidelser: legg inn en plugin-mappe og aktiver den i Plugins-panelet. Se [plugins/README.md](../plugins/README.md); flere finnes via GitHub-topicen `urd-plugin`.
+- `plugins/` er utvidelser: legg inn en plugin-mappe og aktiver den i Plugins-panelet. Den som følger med er den svenske språkpakken (`lang-sv`), eksempelet for den som vil lage egne; kalender, skjema og kart er kjerneblokker. Se [plugins/README.md](../plugins/README.md); flere finnes via GitHub-topicen `urd-plugin`.
 - `assets/engine/` og `admin/` er Urd selv og oppdateres av Oppdatering-panelet; rør dem ikke for hånd.
 
 ## Dokumentasjon

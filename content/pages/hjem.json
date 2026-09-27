@@ -82,6 +82,8 @@
           "id": "blk-9032074e",
           "type": "text",
           "version": 1,
+          "fit": "shrink",
+          "fitMin": 0.6,
           "props": {
             "html": "<p>Urd er under oppbygging og alt du ser er testing.&nbsp;</p><p>Gjerne følg prosjektet på vår Github side!</p>",
             "align": "left",
