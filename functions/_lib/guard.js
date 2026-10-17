@@ -80,6 +80,7 @@ export const OWNED_PATTERNS = [
   'urd.json',
   '_headers',
   'speculation-rules.json',
+  'dev-server.py',
   'README.md',
   'readme/**',
   'admin/**',

@@ -24,7 +24,7 @@ This repository IS your website: a dependency-free, static site where `/admin` i
 2. **Connect the repository to a host** (Cloudflare Pages recommended) and set up publishing: follow the [setup guide](https://github.com/Artiscow/Urd/blob/main/docs/languages/setup-publication/SETUP-en-GB.md).
 3. **Open `/admin`** on the deployed site and sign in with GitHub: the setup wizard helps you with name and colours, and everything you publish is committed to your own repository.
 
-Local preview without a host: run a static server from this folder (for example `python3 -m http.server`) and open `http://localhost:8000/`. Publishing needs the host functions, but the editor and the preview work locally.
+Local preview without a host: run `python3 dev-server.py` from this folder and open `http://localhost:8000/`. It serves the site with caching off, so a plain reload always shows the newest files; a plain static server (`python3 -m http.server`) lets the browser keep old engine and plugin files until its cache is emptied. Publishing needs the host functions, but the editor and the preview work locally.
 
 ## Updating Urd
 

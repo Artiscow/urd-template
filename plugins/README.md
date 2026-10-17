@@ -19,8 +19,11 @@ de viste står beskrevet under, med kjernens kode som lesestoff.
 
 ## Utvikle en plugin lokalt
 
-1. Start en lokal server fra `template/` (f.eks. `python3 -m http.server`)
-   og åpne `http://localhost:8000/admin/`.
+1. Start den lokale serveren fra nettstedets mappe (`python3 dev-server.py`;
+   i Urd-repoet fra repo-roten) og åpne `http://localhost:8000/admin/`. Den
+   sender ingenting som kan caches, så en vanlig oppdatering laster alltid den
+   nyeste koden i pluginen din; en vanlig statisk server lar nettleseren beholde
+   gamle filer til cachen tømmes.
 2. Legg mappen din her (`plugins/<din-id>/` med `plugin.json` + `index.js`).
 3. Aktiver den i Plugins-panelet (skriv mappenavnet hvis panelet ikke kan
    liste mapper lokalt). Forhåndsvisningen laster pluginen fra UTKASTET,
@@ -138,7 +141,10 @@ visningene sine).
 Blokker der innholdet selv bestemmer høyden (som kalender, skjema og kart
 i kjernen) skal sette `autoGrow: true` på blokk-defen: da får blokken
 naturlig høyde i mobilvisningens autostabling i stedet for den faste
-desktophøyden, så høyere mobilinnhold aldri klippes. På desktop eier
+desktophøyden, så høyere mobilinnhold aldri klippes. `autoGrow` kan også
+være en funksjon av blokkens props, for en blokk som vokser i noen
+visninger og fyller rammen i andre (kjernens galleri vokser som rutenett
+og holder rammens høyde som bånd). På desktop eier
 motorens dytt-pass boksens høyde (ADR-0024): en plugin-blokk trenger ikke
 måle seg selv, og skal aldri skrive målt høyde inn i rammen.
 

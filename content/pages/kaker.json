@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 7,
   "meta": {
     "id": "kaker",
     "title": "Kaker"
@@ -526,7 +526,14 @@
           "pattern": "sequence"
         }
       },
-      "hover": null
+      "hover": null,
+      "divider": {
+        "bottom": {
+          "shape": "wave",
+          "height": 64,
+          "color": "bg"
+        }
+      }
     },
     {
       "id": "sec-4c908354",

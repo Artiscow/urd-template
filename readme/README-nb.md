@@ -24,7 +24,7 @@ Dette repoet ER nettsiden din: en avhengighetsfri, statisk side der `/admin` er 
 2. **Koble repoet til en host** (Cloudflare Pages anbefales) og sett opp publisering: følg [oppsettsguiden](https://github.com/Artiscow/Urd/blob/main/docs/languages/setup-publication/SETUP-nb.md) ([English](https://github.com/Artiscow/Urd/blob/main/docs/languages/setup-publication/SETUP-en-GB.md)).
 3. **Åpne `/admin`** på den deployerte siden og logg inn med GitHub: oppsettsveiviseren hjelper deg med navn og farger, og alt du publiserer committes i ditt eget repo.
 
-Lokal titt uten host: kjør en statisk server fra denne mappen (f.eks. `python3 -m http.server`) og åpne `http://localhost:8000/`. Publisering krever host-funksjonene, men editoren og forhåndsvisningen virker lokalt.
+Lokal titt uten host: kjør `python3 dev-server.py` fra denne mappen og åpne `http://localhost:8000/`. Den serverer siden uten caching, så en vanlig oppdatering viser alltid de nyeste filene; en vanlig statisk server (`python3 -m http.server`) lar nettleseren beholde gamle motor- og plugin-filer til cachen tømmes. Publisering krever host-funksjonene, men editoren og forhåndsvisningen virker lokalt.
 
 ## Oppdatere Urd
 

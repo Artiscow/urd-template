@@ -1,11 +1,47 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 5,
   "site": {
     "title": "Urd",
     "lang": "no",
     "description": "Urd sin testside",
+    "meetingHosts": [],
     "icon": "/media/ikon-9740643c.webp",
-    "setup": true
+    "setup": true,
+    "calendars": [
+      {
+        "id": "cal-5ed2f6ab",
+        "url": "https://calendar.google.com/calendar/ical/apeironlinjeforening%40gmail.com/public/basic.ics",
+        "name": "Apeiron",
+        "subscribable": false,
+        "inFilter": false
+      }
+    ],
+    "links": [
+      {
+        "id": "link-1",
+        "icon": "facebook",
+        "label": "Facebook",
+        "url": "https://facebook.com"
+      },
+      {
+        "id": "link-2",
+        "icon": "instagram",
+        "label": "Instagram",
+        "url": "https://instagram.com"
+      },
+      {
+        "id": "link-3",
+        "icon": "linkedin",
+        "label": "LinkedIn",
+        "url": "https://linkedin.com"
+      },
+      {
+        "id": "link-4",
+        "icon": "youtube",
+        "label": "YouTube",
+        "url": "https://youtube.com"
+      }
+    ]
   },
   "breakpoints": {
     "mobile": 640
@@ -103,10 +139,11 @@
   "nav": {
     "version": 1,
     "announcement": {
-      "show": false,
+      "show": true,
       "text": "Nyhet: bestill kaker til høstferien",
       "page": "kaker",
-      "place": "nav"
+      "place": "nav",
+      "followNav": false
     },
     "logo": {
       "type": "image",
@@ -179,7 +216,6 @@
       "textColor": "#ffffff",
       "hoverTextColor": "#00fff5",
       "blur": true,
-      "size": "sm",
       "hover": "underline",
       "hoverGlow": 1,
       "atTop": "clear",
@@ -199,10 +235,14 @@
         "bg": "#0e1a27",
         "bgOpacity": 0.95,
         "blur": false
+      },
+      "border": {
+        "side": "bottom",
+        "color": "accent",
+        "width": 2
       }
     },
-    "overlay": true,
-    "variant": "floating-tab"
+    "overlay": true
   },
   "footer": {
     "version": 1,
@@ -249,24 +289,6 @@
             "href": "#"
           }
         ]
-      }
-    ],
-    "social": [
-      {
-        "icon": "facebook",
-        "url": "https://facebook.com"
-      },
-      {
-        "icon": "instagram",
-        "url": "https://instagram.com"
-      },
-      {
-        "icon": "linkedin",
-        "url": "https://linkedin.com"
-      },
-      {
-        "icon": "youtube",
-        "url": "https://youtube.com"
       }
     ],
     "background": {

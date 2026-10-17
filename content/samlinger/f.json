@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "f",
+  "name": "F",
+  "kind": "news",
+  "entries": [
+    {
+      "id": "entry-101cf6f7",
+      "title": "Nytt innslag",
+      "date": "2026-09-27",
+      "text": "",
+      "image": "/media/nytt-innslag-df668937.webp",
+      "imageStyle": {
+        "zoom": 1
+      }
+    },
+    {
+      "id": "entry-40abf9d2",
+      "title": "Nytt innslag",
+      "date": "2026-09-27",
+      "text": "",
+      "image": "/media/nytt-innslag-11ce4c3b.webp"
+    },
+    {
+      "id": "entry-8bce8279",
+      "title": "Nytt innslag",
+      "date": "2026-09-27",
+      "text": "",
+      "image": "/media/nytt-innslag-123b6626.webp"
+    },
+    {
+      "id": "entry-c7a876ca",
+      "title": "Nytt innslag",
+      "date": "2026-09-27",
+      "text": ""
+    },
+    {
+      "id": "entry-fd41207a",
+      "title": "Nytt innslag",
+      "date": "2026-09-27",
+      "text": ""
+    }
+  ]
+}

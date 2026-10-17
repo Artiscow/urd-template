@@ -24,7 +24,7 @@ Bu depo web siteniz DEMEKTİR: bağımlılıksız, statik bir site; `/admin` ise
 2. **Depoyu bir hosta bağlayın** (Cloudflare Pages önerilir) ve yayımlamayı kurun: [kurulum kılavuzunu](https://github.com/Artiscow/Urd/blob/main/docs/languages/setup-publication/SETUP-tr.md) izleyin.
 3. **Dağıtılan sitede `/admin` adresini açın** ve GitHub ile giriş yapın: kurulum sihirbazı ad ve renkler konusunda yardımcı olur, yayımladığınız her şey kendi deponuza commit edilir.
 
-Host olmadan yerel önizleme: bu klasörden bir statik sunucu çalıştırın (örneğin `python3 -m http.server`) ve `http://localhost:8000/` adresini açın. Yayımlama host fonksiyonlarını gerektirir, ama editör ve önizleme yerelde çalışır.
+Host olmadan yerel önizleme: bu klasörden `python3 dev-server.py` çalıştırın ve `http://localhost:8000/` adresini açın. Siteyi önbelleksiz sunar, böylece sıradan bir yenileme her zaman en yeni dosyaları gösterir; sıradan bir statik sunucu (`python3 -m http.server`) tarayıcının eski motor ve eklenti dosyalarını önbellek boşaltılana kadar tutmasına izin verir. Yayımlama host fonksiyonlarını gerektirir, ama editör ve önizleme yerelde çalışır.
 
 ## Urd'u güncelleme
 

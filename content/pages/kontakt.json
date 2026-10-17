@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 7,
   "meta": {
     "id": "kontakt",
     "title": "Kontakt"
@@ -32,6 +32,18 @@
               "color": "accent",
               "radius": 0.5,
               "opacity": 0.2
+            }
+          },
+          {
+            "type": "pattern",
+            "version": 1,
+            "props": {
+              "pattern": "dots",
+              "color": "text",
+              "size": 28,
+              "opacity": 0.08,
+              "rotation": 0,
+              "invert": false
             }
           }
         ]

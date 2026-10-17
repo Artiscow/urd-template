@@ -1,6 +1,7 @@
 # Security headers for Cloudflare Pages.
 # The CSP is strict: only own scripts and styles; images also as data:/blob:
-# (unpublished uploads and generated textures). frame-ancestors 'self' lets
+# (unpublished uploads and generated textures), and video and audio also as
+# data: (an unpublished film or sound file in the draft). frame-ancestors 'self' lets
 # the admin editor show the page in an iframe but blocks foreign sites.
 # frame-src has DELIBERATE exceptions for the privacy-friendly embeds that
 # ship with Urd: the video block's two hosts (youtube-nocookie and Vimeo with
@@ -21,7 +22,7 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; frame-src 'self' https://www.youtube-nocookie.com https://player.vimeo.com https://www.openstreetmap.org; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; frame-src 'self' https://www.youtube-nocookie.com https://player.vimeo.com https://www.openstreetmap.org; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'
   Speculation-Rules: "/speculation-rules.json"
 
 # The rule set MUST be served as application/speculationrules+json, otherwise

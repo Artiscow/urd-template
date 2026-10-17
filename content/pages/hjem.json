@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 7,
   "meta": {
     "id": "hjem",
     "title": "Hjem",
@@ -14,7 +14,7 @@
       "version": 1,
       "preset": "hero",
       "size": {
-        "minHeight": "1360px"
+        "minHeight": "1264px"
       },
       "grid": null,
       "background": {
@@ -103,6 +103,42 @@
           }
         },
         {
+          "id": "blk-205e5f2a",
+          "type": "calendar",
+          "version": 1,
+          "props": {
+            "sources": [
+              {
+                "calendar": "apeiron"
+              },
+              {
+                "calendar": "cal-5ed2f6ab"
+              }
+            ],
+            "view": "next",
+            "limit": 6,
+            "showCategories": false,
+            "showSubscribe": false,
+            "design": "darkGlass",
+            "nextCount": 3,
+            "laterCount": 3
+          },
+          "animation": null,
+          "frames": {
+            "desktop": {
+              "x": 54.44,
+              "y": 208,
+              "w": 41.11,
+              "h": 336,
+              "z": 3,
+              "rot": 0
+            },
+            "mobile": null
+          },
+          "mobileHeight": 385,
+          "size": 0.95
+        },
+        {
           "id": "blk-1f8cc2e3",
           "type": "button",
           "version": 1,
@@ -115,8 +151,8 @@
           "animation": null,
           "frames": {
             "desktop": {
-              "x": 19.38,
-              "y": 400,
+              "x": 21.11,
+              "y": 445,
               "w": 20,
               "h": 32,
               "z": 1,
@@ -126,50 +162,37 @@
           }
         },
         {
-          "id": "blk-ef036d5f",
-          "type": "calendar",
+          "id": "blk-1ad5b2a1",
+          "type": "ribbon",
           "version": 1,
+          "decor": false,
+          "hideMobile": false,
           "props": {
-            "sources": [
-              "https://calendar.google.com/calendar/ical/74a6de6d28a7a0ec383148bb2f67025d09712386e8b6add3d425fc0d9b5320f7%40group.calendar.google.com/public/basic.ics"
+            "items": [
+              "Ferskt hver morgen",
+              "Bakt for hånd",
+              "Kaker til fest"
             ],
-            "view": "list",
-            "limit": 4,
-            "showCategories": true,
-            "showSubscribe": false
+            "sep": "dot",
+            "speed": 60,
+            "direction": "left",
+            "pauseOnHover": true,
+            "variant": "band",
+            "size": "md",
+            "caps": false,
+            "tilt": 0,
+            "fade": true,
+            "gap": 40,
+            "width": "page"
           },
           "animation": null,
           "frames": {
             "desktop": {
-              "x": 59.54,
-              "y": 240,
-              "w": 25.33,
-              "h": 23,
-              "z": 2,
-              "rot": 0
-            },
-            "mobile": null
-          }
-        },
-        {
-          "id": "blk-205e5f2a",
-          "type": "calendar",
-          "version": 1,
-          "props": {
-            "sources": [],
-            "view": "month",
-            "limit": 6,
-            "showCategories": true,
-            "showSubscribe": true
-          },
-          "animation": null,
-          "frames": {
-            "desktop": {
-              "x": 48.89,
-              "y": 240,
-              "w": 40,
-              "h": 485,
-              "z": 3,
+              "x": 0,
+              "y": 1200,
+              "w": 88.89,
+              "h": 70,
+              "z": 4,
               "rot": 0
             },
             "mobile": null
@@ -188,7 +211,7 @@
       "version": 1,
       "preset": "whats-on",
       "size": {
-        "minHeight": "1280px"
+        "minHeight": "1264px"
       },
       "grid": null,
       "background": {
@@ -259,8 +282,8 @@
           "animation": null,
           "frames": {
             "desktop": {
-              "x": 13.19,
-              "y": 288,
+              "x": 10.87,
+              "y": 272,
               "w": 28.26,
               "h": 272,
               "z": 1,
@@ -272,21 +295,20 @@
         {
           "id": "blk-2d9ebc4e",
           "type": "map",
-          "version": 1,
+          "version": 2,
           "props": {
             "location": "https://www.openstreetmap.org/#map=18/63.426891/10.396446",
             "lat": 63.426891,
             "lon": 10.396446,
-            "zoom": 18,
-            "height": 600
+            "zoom": 18
           },
           "animation": null,
           "frames": {
             "desktop": {
-              "x": 55.09,
-              "y": 160,
+              "x": 56.72,
+              "y": 144,
               "w": 36.57,
-              "h": 608,
+              "h": 626,
               "z": 3,
               "rot": 0
             },
