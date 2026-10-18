@@ -10,7 +10,7 @@
  */
 import { commitFiles, triggerDeploy } from '../../_lib/github.js';
 import { requirePublisher } from '../../_lib/auth.js';
-import { isAllowedPath } from '../../_lib/guard.js';
+import { isAllowedPath, isDeletablePath } from '../../_lib/guard.js';
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -41,7 +41,8 @@ export async function onRequestPost({ request, env }) {
     if (typeof file?.path !== 'string' || (file.delete !== true && typeof file?.content !== 'string')) {
       return json({ error: 'Each file needs path and content (or delete: true)', code: 'badFileEntry' }, 400);
     }
-    if (!isAllowedPath(file.path)) {
+    // A deletion may also take a plugin's whole folder; a write never goes there.
+    if (!(file.delete === true ? isDeletablePath(file.path) : isAllowedPath(file.path))) {
       return json({ error: `The path '${file.path}' cannot be published from here`, code: 'pathNotAllowed', path: file.path }, 400);
     }
   }

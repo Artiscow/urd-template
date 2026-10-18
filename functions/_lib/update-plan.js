@@ -11,18 +11,34 @@
  */
 import { isUserPath, isPageIndexCopy } from './guard.js';
 
-/** The highest three-part version tag (vX.Y.Z) in a list of tag names, or null. */
+/**
+ * A version tag: v and three numbers or more (v0.7.7, v0.7.7.1, v0.7.7.0.2), none with a leading zero, and a last number after the third that is not 0.
+ * Two different tags thus never rank equal.
+ */
+export const VERSION_TAG_RE = /^v(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*)){2}(?:(?:\.(?:0|[1-9]\d*))*\.[1-9]\d*)?$/;
+
+/** The numbers of a version tag, or null for any other name. */
+export function versionTagParts(name) {
+  return typeof name === 'string' && VERSION_TAG_RE.test(name) ? name.slice(1).split('.').map(Number) : null;
+}
+
+/** Compares two lists of version numbers number by number, a missing number counting as 0. */
+function compareParts(a, b) {
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    const d = (a[i] ?? 0) - (b[i] ?? 0);
+    if (d) return d;
+  }
+  return 0;
+}
+
+/** The highest version tag in a list of tag names, or null. */
 export function highestVersionTag(names) {
   let best = null;
   let bestParts = null;
   for (const name of names ?? []) {
-    const m = /^v(\d+)\.(\d+)\.(\d+)$/.exec(name);
-    if (!m) continue;
-    const parts = [Number(m[1]), Number(m[2]), Number(m[3])];
-    const cmp = bestParts
-      ? parts[0] - bestParts[0] || parts[1] - bestParts[1] || parts[2] - bestParts[2]
-      : 1;
-    if (cmp > 0) {
+    const parts = versionTagParts(name);
+    if (!parts) continue;
+    if (!bestParts || compareParts(parts, bestParts) > 0) {
       best = name;
       bestParts = parts;
     }

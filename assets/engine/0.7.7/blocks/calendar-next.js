@@ -4,6 +4,7 @@
  * Loaded by the block on the first render of a block that uses one of them, never in the visitor closure.
  */
 import { t, dates } from '../i18n.js';
+import { bandReach } from '../ribbon-model.js';
 
 const DAY = 24 * 3600 * 1000;
 const two = (n) => String(n).padStart(2, '0');
@@ -316,6 +317,25 @@ function bandPause(wrap, track, key, touch) {
   wrap.appendChild(button);
 }
 
+/**
+ * Lays the band over the content surface or the whole page (`reach`, as the ribbon block does with its width, bandReach), measured from the section and the canvas.
+ * The calendar's size zooms its content, so the width and the offset are written in the calendar's own pixels.
+ * @param {HTMLElement} wrap The band
+ * @param {string} reach `canvas` or `page`
+ * @returns {HTMLElement|null} The section, whose width the band follows; null when there is none
+ */
+function fitReach(wrap, reach) {
+  const el = wrap.closest('[data-block-id]');
+  const sectionEl = el?.closest('.urd-section');
+  const canvasEl = el?.closest('.urd-canvas');
+  if (!sectionEl || !canvasEl) return null;
+  const zoom = wrap.currentCSSZoom ?? (parseFloat(wrap.closest('.urd-cal')?.style.zoom) || 1);
+  const box = bandReach(reach, { sectionW: sectionEl.offsetWidth, canvasW: canvasEl.clientWidth, canvasLeft: canvasEl.offsetLeft, blockLeft: el.offsetLeft });
+  wrap.style.width = `${box.width / zoom}px`;
+  wrap.style.marginLeft = `${box.offset / zoom}px`;
+  return sectionEl;
+}
+
 /** N5 Band: one band with the tag at the left and the next events rolling past, a dot between them. */
 export function band(host, occs, props, ics, ui) {
   const shown = occs.slice(0, ics.nextCount(props.nextCount) + ics.laterCount(props.laterCount));
@@ -323,29 +343,46 @@ export function band(host, occs, props, ics, ui) {
   const tag = ui.el('div', 'urd-cal-band-tag');
   tag.append(ui.el('i', 'urd-cal-band-dot'), ui.tx('now'));
   const track = ui.el('div', 'urd-cal-band-track');
-  const run = ui.el('div', 'urd-cal-band-run');
-  shown.forEach((occ, i) => {
-    if (i) run.appendChild(ui.el('i', 'urd-cal-band-sep'));
-    const d = dayOf(occ);
-    const item = ui.tint(ui.el('span', 'urd-cal-band-item'), occ);
-    item.append(ui.field('span', 'date', ui.dayMonth(d), null, d), document.createTextNode(' · '), ui.field('strong', 'title', occ.title), document.createTextNode(' · '), ui.field('span', 'time', ui.timeText(occ), null, occ));
-    if (occ.location) {
-      item.appendChild(document.createTextNode(' · '));
-      item.appendChild(ui.field('span', 'place', occ.location));
-    }
-    run.appendChild(item);
-  });
+  /** A run of the events, each opening its card at a press. */
+  const fill = (run) => {
+    shown.forEach((occ, i) => {
+      if (i) run.appendChild(ui.el('i', 'urd-cal-band-sep'));
+      const d = dayOf(occ);
+      const item = ui.tint(ui.el('span', 'urd-cal-band-item'), occ);
+      item.append(ui.field('span', 'date', ui.dayMonth(d), null, d), document.createTextNode(' · '), ui.field('strong', 'title', occ.title), document.createTextNode(' · '), ui.field('span', 'time', ui.timeText(occ), null, occ));
+      if (occ.location) {
+        item.appendChild(document.createTextNode(' · '));
+        item.appendChild(ui.field('span', 'place', occ.location));
+      }
+      run.appendChild(item);
+    });
+    return run;
+  };
+  const run = fill(ui.el('div', 'urd-cal-band-run'));
   track.appendChild(run);
-  // The run rolls when it is wider than the band: a copy follows it so the loop has no seam, and the band gets its pause.
+  // The run rolls when it is wider than the band: a second run follows it so the loop has no seam, and the band gets its pause.
+  // The second run opens the cards as the first does, so a press anywhere on the band reaches an event; it is hidden from assistive technology and left out of the tab order, where the first run stands.
   // With rolling switched off, or with reduced motion, the band stands still and scrolls sideways by hand.
+  // A band that reaches past its block (the content width or the whole page) is laid out before it measures whether it rolls, and again when its section changes width.
+  const reach = ui.opt.reach === 'canvas' || ui.opt.reach === 'page' ? ui.opt.reach : null;
+  if (reach) requestAnimationFrame(() => {
+    if (!wrap.isConnected) return;
+    const sectionEl = fitReach(wrap, reach);
+    if (!sectionEl) return;
+    const observer = new ResizeObserver(() => {
+      if (wrap.isConnected) fitReach(wrap, reach);
+      else observer.disconnect();
+    });
+    observer.observe(sectionEl);
+  });
   const still = ui.opt.roll === false || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   if (still) track.classList.add('urd-cal-band-still');
   else requestAnimationFrame(() => {
     if (!track.isConnected) return;
     if (run.scrollWidth > track.clientWidth) {
-      const copy = run.cloneNode(true);
+      const copy = fill(ui.el('div', 'urd-cal-band-run'));
       copy.setAttribute('aria-hidden', 'true');
-      copy.inert = true;
+      for (const node of copy.querySelectorAll('[tabindex], a, button')) node.tabIndex = -1;
       track.appendChild(copy);
       track.classList.add('urd-cal-band-rolling');
       track.style.setProperty('--urd-cal-band-s', `${Math.max(12, Math.round(run.scrollWidth / 60))}s`);
@@ -360,7 +397,7 @@ export function band(host, occs, props, ics, ui) {
 export function oneLine(host, occs, props, ics, ui) {
   const count = ics.nextCount(props.nextCount);
   const shown = occs.slice(0, count + ics.laterCount(props.laterCount));
-  const list = ui.el('div', 'urd-cal-line');
+  const list = ui.el('div', 'urd-cal-oneline');
   shown.forEach((occ, i) => {
     const d = dayOf(occ);
     const row = ui.tint(ui.el('div', i < count ? 'urd-cal-line-row urd-cal-line-now' : 'urd-cal-line-row'), occ);

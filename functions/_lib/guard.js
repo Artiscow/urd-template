@@ -67,6 +67,19 @@ export function isAllowedPath(path) {
   );
 }
 
+/** A plugin's folder (`plugins/<id>`, the id as a manifest has it): publishing may delete it whole, never write in it, since a deletion cannot plant code (ADR-0003). */
+const PLUGIN_FOLDER_RE = /^plugins\/[a-z0-9][a-z0-9-]*$/;
+
+/**
+ * @param {string} path Repo-relative path from a commit request's deletion
+ * @returns {boolean} true if publishing may delete it: a path it may write, or a plugin's whole folder
+ */
+export function isDeletablePath(path) {
+  const normalized = normalizePath(path);
+  if (!normalized) return false;
+  return isAllowedPath(normalized) || PLUGIN_FOLDER_RE.test(normalized);
+}
+
 /**
  * The ownership map for the updater: mirrors ownedPaths/userPaths in urd.json,
  * because functions cannot read the repo's urd.json at runtime. The contract

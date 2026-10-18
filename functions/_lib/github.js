@@ -140,6 +140,8 @@ export async function triggerDeploy(env) {
  * Files with `delete: true` are removed from the repo. Paths that do not exist
  * in the base tree are skipped silently (GitHub rejects the whole tree
  * otherwise), so a deletion can never topple publishing the rest.
+ * A deletion of a folder (a plugin's, the only one the guard lets through)
+ * removes every file under it.
  *
  * With `expect` set, HEAD is required to be exactly there (Error with status
  * 409 otherwise): it closes the editor's conflict-check-to-commit window.
@@ -167,14 +169,19 @@ export async function commitFiles(token, config, { message, files, expect }) {
   let existing = null;
   if (files.some((f) => f.delete)) {
     const baseTree = await gh(token, `/repos/${repo}/git/trees/${baseCommit.tree.sha}?recursive=1`);
-    existing = new Set(baseTree.tree.map((t) => t.path));
+    existing = baseTree.tree.filter((t) => t.type === 'blob').map((t) => t.path);
   }
 
   const tree = [];
+  const gone = new Set();
   for (const file of files) {
     if (file.delete) {
-      if (existing?.has(file.path)) {
-        tree.push({ path: file.path, mode: '100644', type: 'blob', sha: null });
+      const under = `${file.path}/`;
+      for (const path of existing ?? []) {
+        if ((path === file.path || path.startsWith(under)) && !gone.has(path)) {
+          gone.add(path);
+          tree.push({ path, mode: '100644', type: 'blob', sha: null });
+        }
       }
       continue;
     }

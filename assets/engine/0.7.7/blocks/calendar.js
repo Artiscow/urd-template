@@ -19,7 +19,7 @@
 import { t, ta, tp, pluralForm, themeString, taApiError, dates, adminLocaleReady } from '../i18n.js';
 import { iconSvg } from '../icons.js';
 import { resolveColor, inkOn } from '../theme.js';
-import { stripActiveContent, safeHtmlFragment } from '../sanitize.js';
+import { stripActiveContent, safeHtmlFragment, plainLines } from '../sanitize.js';
 import { WIDTH_QUERIES } from '../render.js';
 
 /** An element with its class and its content: a text, or a node such as a text the owner rewrites. */
@@ -607,9 +607,9 @@ function makeUi(cd, cf, ics, maps, links, el, host, props, ctx, sources, zone) {
   };
   /** The event in full, in a native dialog over the page (ADR-0011), in the common words. */
   const openEvent = (occ, from) => plainWords(() => showEventDialog(occ, from, ics, ui, props));
-  /** The mark on an event that repeats, with words the owner can rewrite; null on a single event. */
+  /** The mark on an event that repeats, with words the owner can rewrite, shown only with `showRecurring`; null on a single event. */
   const recurring = (occ) => {
-    if (!occ.recurring) return null;
+    if (!occ.recurring || props.showRecurring !== true) return null;
     const mark = el2('span', 'urd-cal-rec');
     mark.appendChild(tx('recurring'));
     return mark;
@@ -691,9 +691,9 @@ function placeLink(place, maps, service, geo) {
   return a;
 }
 
-/** The first line of a description, cut at a word boundary near `max` and never inside an address. */
+/** The first line of a description with words in it, as plain text when the feed writes it as rich text, cut at a word boundary near `max` and never inside an address. */
 function excerptOf(description, max) {
-  const line = String(description ?? '').split('\n')[0].trim();
+  const line = plainLines(description).split('\n').map((part) => part.trim()).find(Boolean) ?? '';
   if (line.length <= max) return line;
   let cut = line.lastIndexOf(' ', max);
   if (cut < max * 0.5) cut = max;
@@ -867,7 +867,8 @@ function showEventDialog(occ, from, ics, ui, props) {
     const file = ui.link('urd-cal-dialog-link', 'addFile', URL.createObjectURL(new Blob([ics.eventIcs(real)], { type: 'text/calendar' })), '');
     file.download = `${String(occ.title || 'event').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '').slice(0, 60) || 'event'}.ics`;
     choices.append(one, google, file);
-    const feeds = ui.sources.filter((source) => source.subscribable).map((source) => ics.subscribeLinks(source.url)).filter(Boolean);
+    // The whole calendar is offered with the block's subscribe button on, as on the calendar itself.
+    const feeds = props.showSubscribe === false ? [] : ui.sources.filter((source) => source.subscribable).map((source) => ics.subscribeLinks(source.url)).filter(Boolean);
     if (feeds.length) {
       const whole = el2('span', 'urd-cal-dialog-choice-label');
       whole.appendChild(ui.tx('addWhole'));

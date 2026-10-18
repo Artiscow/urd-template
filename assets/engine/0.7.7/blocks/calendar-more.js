@@ -5,6 +5,7 @@
  */
 import { t, dates } from '../i18n.js';
 import { iconSvg } from '../icons.js';
+import { plainLines } from '../sanitize.js';
 
 const dayOf = (occ) => new Date(occ.start);
 const monthShort = (d) => dates().monthsShort[d.getMonth()];
@@ -210,7 +211,7 @@ export function apSeries(host, occs, props, ics, ui) {
     main.appendChild(kicker);
   }
   main.appendChild(ui.field('strong', 'title', first.title, 'urd-cal-aps-title'));
-  const text = String(first.description ?? '').split('\n').find((line) => line.trim() && !/^https?:\/\//i.test(line.trim()));
+  const text = plainLines(first.description).split('\n').find((line) => line.trim() && !/^https?:\/\//i.test(line.trim()));
   if (text && ui.descriptionIn !== 'card') main.appendChild(ui.field('p', 'description', ui.excerpt(text, 400), 'urd-cal-aps-text'));
   const facts = ui.el('div', 'urd-cal-aps-facts');
   const fact = (key, value) => {

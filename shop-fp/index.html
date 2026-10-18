@@ -6,7 +6,7 @@
   <title>Urd</title>
   <!-- Default Urd icon; the site icon from site.json overrides it on load -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0e14'/%3E%3Cpath d='M19.2 49.6V14.4l25.6 10.4V49.6' fill='none' stroke='%2315b39a' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="/assets/styles/base.css?v=d3e45335">
+  <link rel="stylesheet" href="/assets/styles/base.css?v=644d2fc6">
   <!-- The site's materialized theme (light-dark()): render-blocking and loaded
        AFTER base.css so it wins. Written at publish time (buildThemeCss).
        When missing (fresh clone before the first publish) base.css's
@@ -21,79 +21,79 @@
     here. tests/modulepreload.test.mjs keeps the list in sync with the
     source (the build fails on drift).
   -->
-  <link rel="modulepreload" href="/assets/engine/0.7.6/boot.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/urd.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/i18n.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/locales/site/nb.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/registry.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/migrate.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/theme.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/render.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/push-model.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/nav.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/nav-model.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/footer.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/footer-model.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/links-model.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/footer-cta.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/sanitize.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/box-style.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/icons.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/collections.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/gallery-model.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/sticky.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/seo.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/prefetch.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/sticky-model.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/plugins.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/text.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/image.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/button.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/shape.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/video.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/icon.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/collection.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/gallery.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/faq.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/timeline.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/quote.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/stats.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/ribbon.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/ribbon-model.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/table.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/share.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/countdown.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/audio.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/product.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/cart.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/checkout.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/map.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/osm.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/form.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/form-model.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/blocks/calendar.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/shop.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/backgrounds/color.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/backgrounds/gradient.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/backgrounds/glow.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/backgrounds/grain.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/backgrounds/pattern.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/divider-model.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/backgrounds/image.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/backgrounds/slideshow.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/gallery-layout.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/photo-source.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/backgrounds/video.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/animations/core.js">
-  <link rel="modulepreload" href="/assets/engine/0.7.6/sections/presets.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/boot.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/urd.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/i18n.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/locales/site/nb.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/registry.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/migrate.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/theme.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/render.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/push-model.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/nav.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/nav-model.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/footer.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/footer-model.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/links-model.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/footer-cta.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/sanitize.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/box-style.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/icons.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/collections.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/gallery-model.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/sticky.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/seo.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/prefetch.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/sticky-model.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/plugins.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/text.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/image.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/button.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/shape.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/video.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/icon.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/collection.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/gallery.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/faq.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/timeline.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/quote.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/stats.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/ribbon.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/ribbon-model.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/table.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/share.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/countdown.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/audio.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/product.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/cart.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/checkout.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/map.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/osm.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/form.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/form-model.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/blocks/calendar.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/shop.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/backgrounds/color.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/backgrounds/gradient.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/backgrounds/glow.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/backgrounds/grain.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/backgrounds/pattern.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/divider-model.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/backgrounds/image.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/backgrounds/slideshow.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/gallery-layout.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/photo-source.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/backgrounds/video.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/animations/core.js">
+  <link rel="modulepreload" href="/assets/engine/0.7.7/sections/presets.js">
   <!-- The saved light/dark choice is set as data-urd-theme before paint (a manual
        choice must not flash). External classic script due to CSP (script-src 'self', no inline). -->
-  <script src="/assets/engine/0.7.6/theme-init.js"></script>
+  <script src="/assets/engine/0.7.7/theme-init.js"></script>
   <!-- The engine, render-blocking: its page transition listener is then in
        place before the arriving document's first rendering opportunity, so a
        page switch can hold the old page until the new one is rendered (the
        arrival hold in urd.js). Browsers without the attribute paint as they go. -->
-  <script type="module" src="/assets/engine/0.7.6/boot.js" blocking="render"></script>
+  <script type="module" src="/assets/engine/0.7.7/boot.js" blocking="render"></script>
 </head>
 <body>
   <header id="urd-nav"></header>

@@ -32,7 +32,7 @@ de viste står beskrevet under, med kjernens kode som lesestoff.
    konsollen og vises i panelet.
 
 Manifestkrav: `requiresEngine` (semver-intervall mot motorversjonen i
-urd.json), `provides` (hva pluginen definerer), og valgfritt `csp`
+urd.json; en grense med flere enn tre tall leses av motorer fra 0.7.7), `provides` (hva pluginen definerer), og valgfritt `csp`
 (eksterne opprinnelser pluginen trenger; se ADR-0006 - `_headers` endres
 aldri automatisk, admin viser eieren hva som må legges inn). `entry` og
 `provides` er valgfrie for rene språkpakker, som ikke har kode (se under).

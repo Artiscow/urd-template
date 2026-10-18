@@ -67,3 +67,16 @@ export function plainText(html) {
   const doc = new DOMParser().parseFromString(String(html ?? ''), 'text/html');
   return (doc.body.textContent ?? '').trim();
 }
+
+/**
+ * The lines of a text that may be written as rich text, such as a feed's event description: markup (a tag or an entity) is parsed in an inert document, a line break and the end of a block become new lines, and the text content is read out.
+ * Text without markup comes back as it is.
+ */
+export function plainLines(text) {
+  const source = String(text ?? '');
+  if (!/<[a-z!/][^>]*>|&#?\w+;/i.test(source)) return source;
+  const doc = new DOMParser().parseFromString(source, 'text/html');
+  for (const br of doc.body.querySelectorAll('br')) br.replaceWith('\n');
+  for (const block of doc.body.querySelectorAll('p, div, li, h1, h2, h3, h4, h5, h6, blockquote, tr')) block.append('\n');
+  return doc.body.textContent ?? '';
+}

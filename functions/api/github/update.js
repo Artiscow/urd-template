@@ -4,7 +4,7 @@
  * ONE atomic commit. All GitHub traffic goes through here (the visitor CSP
  * has connect-src 'self', and the token lives in the cookie).
  *
- * GET  /api/github/update[?to=vX.Y.Z]  check: classifies every file through
+ * GET  /api/github/update[?to=<version tag, e.g. v0.7.7.1>]  check: classifies every file through
  *      blob SHAs (unchanged/hand-edited/new/deleted) without loading content.
  * POST /api/github/update              run: { to, expect, skip? }.
  *      A run with files that must be copied as blobs of their own copies a batch of them and answers 429 `updateContinue` with { copied, total }; the run that finds few enough of them missing copies those and commits.
@@ -20,12 +20,10 @@
 import { gh, ghGraphql, cleanBase64, commitTree, triggerDeploy } from '../../_lib/github.js';
 import { requirePublisher } from '../../_lib/auth.js';
 import { isPageIndexCopy } from '../../_lib/guard.js';
-import { planUpdate, highestVersionTag, chunkEntries, blobBatch, travelsAsBlob } from '../../_lib/update-plan.js';
+import { planUpdate, highestVersionTag, VERSION_TAG_RE, chunkEntries, blobBatch, travelsAsBlob } from '../../_lib/update-plan.js';
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
-
-const TAG_RE = /^v\d+\.\d+\.\d+$/;
 
 const decodeBlob = (b64) =>
   new TextDecoder().decode(Uint8Array.from(atob(cleanBase64(b64)), (c) => c.charCodeAt(0)));
@@ -137,7 +135,7 @@ export async function onRequestGet({ request, env }) {
   const { config, token } = auth;
 
   const to = new URL(request.url).searchParams.get('to');
-  if (to !== null && !TAG_RE.test(to)) {
+  if (to !== null && !VERSION_TAG_RE.test(to)) {
     return json({ error: `Invalid target version '${to}'`, code: 'updateBadTarget', target: to }, 400);
   }
 
@@ -190,7 +188,7 @@ export async function onRequestPost({ request, env }) {
     return json({ error: 'Invalid JSON in the request', code: 'badJson' }, 400);
   }
   const { to, expect, skip } = body ?? {};
-  if (typeof to !== 'string' || !TAG_RE.test(to)) {
+  if (typeof to !== 'string' || !VERSION_TAG_RE.test(to)) {
     return json({ error: `Invalid target version '${to}'`, code: 'updateBadTarget', target: String(to) }, 400);
   }
   if (typeof expect !== 'string' || !expect) {

@@ -6113,16 +6113,16 @@ textarea.urd-form-input {
   rotate: 0.9deg;
 }
 
+/* The head grows with a category that wraps, a whole ruled line at a time, so the title stands under it; the red rule keeps its place under the first line. */
 .urd-cal-index-head {
   display: flex;
   gap: 1em;
   align-items: baseline;
   justify-content: space-between;
-  height: 44px;
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  border-bottom: 2px solid var(--urd-cal-index-rule);
+  background: linear-gradient(var(--urd-cal-index-rule), var(--urd-cal-index-rule)) 0 42px / 100% 2px no-repeat;
 }
 
 .urd-cal-index-head > * {
@@ -7474,11 +7474,6 @@ textarea.urd-form-input {
   margin-inline: auto;
 }
 
-/* The receipt's content lines are lines of text, not the One line design's grid of the same class. */
-:is(.urd-cal-rc, .urd-cal-dlg-receipt) .urd-cal-line {
-  display: block;
-}
-
 .urd-cal-rc-head {
   display: grid;
   justify-items: center;
@@ -8216,7 +8211,6 @@ textarea.urd-form-input {
   overflow-wrap: anywhere;
 }
 
-/* The line box is a plain block: the class `urd-cal-line` that marks it as a content line is also the name of the One line design's grid. */
 .urd-cal-deco .urd-cal-deco-season {
   display: block;
   margin: 0 0 1.2em;
@@ -8897,7 +8891,7 @@ textarea.urd-form-input {
 .urd-cal-stack-card .urd-cal-signup,
 .urd-cal-split .urd-cal-signup,
 .urd-cal-nb .urd-cal-signup,
-.urd-cal-line .urd-cal-signup,
+.urd-cal-oneline .urd-cal-signup,
 .urd-cal-ring .urd-cal-signup {
   align-self: flex-start;
   margin: 0;
@@ -9285,7 +9279,7 @@ textarea.urd-form-input {
 }
 
 /* N6 One line */
-.urd-cal-line {
+.urd-cal-oneline {
   display: grid;
   gap: 10px;
 }

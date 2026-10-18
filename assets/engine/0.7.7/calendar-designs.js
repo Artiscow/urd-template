@@ -352,8 +352,9 @@ const slot = (key, section = 'colors') => ({ key, labelKey: `calendar.slot.${key
  * `program` marks a design that draws a link to the whole programme when the block has an address for it (`props.programHref`), and `open` one that writes «Open to everyone» on an event without a sign-up (`props.showOpen`).
  * `theme` lists the texts a design has words of its own for (calThemeKey), and `rewrites` marks a design that rewrites calendar data unless the owner switches it off (calRewrites).
  * `phoneDefault` names the phone design the block draws on a phone until the owner picks another (CAL_PHONE_DESIGNS, calPhoneView), and `cardDefault` the card design its card wears until the owner picks another (CAL_CARD_DESIGNS, calCardDesign; the module exports a decorator per card design it lends under `cards`).
+ * `limit` is the number of events a new calendar in the design starts with, and the count it takes when it is chosen while the calendar keeps the count it started with (else six, eight in the agenda).
  * `ownCard` marks a design whose card has a look of its own from its design round (`urd-cal-dlg-<id>` in base.css, and a decorator under the module's `cards` where the look needs parts of its own); a design without shares its set's card (calCardCandidates).
- * @type {Array<{id: string, labelKey: string, view: string|null, module?: string, family: string, phone: string, stripe: boolean, theme?: string[], rewrites?: boolean, slots: Array<{key: string, labelKey: string, section: string}>, texts: string[]}>}
+ * @type {Array<{id: string, labelKey: string, view: string|null, module?: string, family: string, phone: string, stripe: boolean, theme?: string[], rewrites?: boolean, limit?: number, slots: Array<{key: string, labelKey: string, section: string}>, texts: string[]}>}
  */
 export const CAL_DESIGNS = [
   {
@@ -800,6 +801,7 @@ export const CAL_DESIGNS = [
     id: 'index',
     labelKey: 'calendar.design.index',
     ownCard: true,
+    limit: 4,
     set: 'index',
     family: 'retro',
     phone: 'flows',
@@ -936,7 +938,7 @@ export const CAL_OPTIONS = {
   // The month at the top of the wheel: one of the twelve, or `now` for the month the visitor is in.
   yearWheel: [choice('firstMonth', [...MONTHS, 'now'], '0')],
   numbered: [toggle('pad', true)],
-  band: [toggle('roll', true), choice('pause', ['button', 'touch'], 'button', { roll: true })],
+  band: [tipped(choice('reach', ['content', 'canvas', 'page'], 'content')), toggle('roll', true), choice('pause', ['button', 'touch'], 'button', { roll: true })],
   index: [choice('columns', ['auto', '2', '3', '4'], 'auto')],
 };
 

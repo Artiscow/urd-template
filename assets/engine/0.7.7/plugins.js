@@ -15,22 +15,38 @@ export function parseSemver(text) {
   return m ? [Number(m[1]), Number(m[2]), Number(m[3])] : null;
 }
 
-const cmp = (a, b) => (a[0] - b[0]) || (a[1] - b[1]) || (a[2] - b[2]);
+/**
+ * Parses an engine version into its numbers: three or more (0.7.7, 0.7.7.1, 0.7.7.0.2), none with a leading zero, and a last number after the third that is not 0.
+ * Two different versions thus never rank equal.
+ */
+export function parseEngineVersion(text) {
+  const s = String(text).trim();
+  return /^(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*)){2}(?:(?:\.(?:0|[1-9]\d*))*\.[1-9]\d*)?$/.test(s) ? s.split('.').map(Number) : null;
+}
+
+/** Compares two versions number by number, a missing number counting as 0, so 0.7.6 < 0.7.6.1 < 0.7.6.1.1 < 0.7.7. */
+function cmp(a, b) {
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    const d = (a[i] ?? 0) - (b[i] ?? 0);
+    if (d) return d;
+  }
+  return 0;
+}
 
 /**
- * Minimal, dependency-free semver range check for requiresEngine.
+ * Minimal, dependency-free semver range check for requiresEngine, where a version may carry more than three numbers.
  * Supports space-separated requirements that must ALL hold: >=x.y.z, >x.y.z, <=x.y.z, <x.y.z,
  * =x.y.z / x.y.z (exact), ^x.y.z (same major; for 0.y: same minor) and ~x.y.z (same major.minor).
  * Unknown/unparseable requirements yield false: a plugin with an unintelligible requirement must not be loaded blindly.
  */
 export function satisfiesEngine(version, range) {
-  const v = parseSemver(version);
+  const v = parseEngineVersion(version);
   if (!v || typeof range !== 'string' || !range.trim()) return false;
   for (const part of range.trim().split(/\s+/)) {
-    const m = /^(>=|<=|>|<|=|\^|~)?(\d+\.\d+\.\d+)$/.exec(part);
-    if (!m) return false;
+    const m = /^(>=|<=|>|<|=|\^|~)?([\d.]+)$/.exec(part);
+    const t = m && parseEngineVersion(m[2]);
+    if (!t) return false;
     const op = m[1] ?? '=';
-    const t = parseSemver(m[2]);
     const d = cmp(v, t);
     const ok = op === '>=' ? d >= 0
       : op === '>' ? d > 0
