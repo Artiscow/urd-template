@@ -2586,7 +2586,7 @@ function aa(e) {
 	};
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/locales/site/nb.js
+//#region ../template/assets/engine/0.7.6/locales/site/nb.js
 var oa = {
 	lang: "nb",
 	strings: {
@@ -3057,7 +3057,7 @@ var q = {
 	device_mobile: "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"/><path d=\"M11 18.5h2\"/></svg>"
 };
 //#endregion
-//#region ../template/assets/engine/0.7.5/anchored.js
+//#region ../template/assets/engine/0.7.6/anchored.js
 function Ta(e = globalThis) {
 	let t = e?.HTMLElement?.prototype, n = e?.CSS;
 	return !!(t && "popover" in t && typeof t.showPopover == "function" && typeof n?.supports == "function" && n.supports("anchor-name: --urd") && n.supports("position-try-fallbacks: flip-block"));
@@ -3189,7 +3189,7 @@ function Ia(e) {
 	return Number(e) === 2 ? 2 : 1;
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/gallery-layout.js
+//#region ../template/assets/engine/0.7.6/gallery-layout.js
 var La = [
 	"floating",
 	"fill",
@@ -3452,7 +3452,7 @@ function jo(e, t, n, r = !1) {
 	return Array.from({ length: i }, (e, n) => Ao(t, n));
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/preset-thumb.js
+//#region ../template/assets/engine/0.7.6/preset-thumb.js
 var Mo = /^#[0-9a-fA-F]{3,8}$/, No = /^[a-z][a-z0-9-]*$/, Po = "#171c26", Fo = "#232a38", Io = "#98a1b3", Lo = "#7c5cff", Ro = (e, t) => `var(--urd-color-${e}, ${t})`;
 function zo(e, t) {
 	return typeof e == "string" ? Mo.test(e) ? e : No.test(e) ? Ro(e, t) : t : t;
@@ -3659,7 +3659,7 @@ function Qo(e, { w: t = 96, h: n = 116, max: r = 6 } = {}) {
 	return `<svg viewBox="0 0 ${t} ${n}" width="${t}" height="${n}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${c.join("")}</svg>`;
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/blocks/form.js
+//#region ../template/assets/engine/0.7.6/blocks/form.js
 var $o = () => [
 	{
 		id: "navn",
@@ -3681,7 +3681,7 @@ var $o = () => [
 	}
 ];
 //#endregion
-//#region ../template/assets/engine/0.7.5/sections/presets.js
+//#region ../template/assets/engine/0.7.6/sections/presets.js
 function es(e) {
 	return typeof crypto < "u" && crypto.randomUUID ? `${e}-${crypto.randomUUID().slice(0, 8)}` : `${e}-${[...crypto.getRandomValues(/* @__PURE__ */ new Uint8Array(4))].map((e) => e.toString(16).padStart(2, "0")).join("")}`;
 }
@@ -4799,7 +4799,7 @@ function Ds(e) {
 	});
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/theme.js
+//#region ../template/assets/engine/0.7.6/theme.js
 function Os(e, t, n) {
 	return t === "light" || t === "dark" ? t : n ? "dark" : "light";
 }
@@ -4926,7 +4926,7 @@ function Rs(e, t) {
 	return n == null || r == null ? null : (Math.max(n, r) + .05) / (Math.min(n, r) + .05);
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/nav-model.js
+//#region ../template/assets/engine/0.7.6/nav-model.js
 var zs = /^(?:data:image\/[\w.+-]+;base64,[A-Za-z0-9+/=]+|\/api\/photo\?[^\s"'<>\\]{1,2048}|\/(?!\/)[\w%./-]*)$/;
 function Bs(e) {
 	return typeof e == "string" && zs.test(e);
@@ -4952,7 +4952,7 @@ function Ks(e = {}) {
 	return n;
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/icons.js
+//#region ../template/assets/engine/0.7.6/icons.js
 var qs = "fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"", Js = "fill=\"currentColor\" stroke=\"none\"", Ys = {
 	facebook: {
 		label: "Facebook",
@@ -5309,7 +5309,7 @@ function Zs(e) {
 	return t ? `<svg viewBox="0 0 24 24" width="100%" height="100%" ${t.fill ? Js : qs} aria-hidden="true" focusable="false">${t.body}</svg>` : null;
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/links-model.js
+//#region ../template/assets/engine/0.7.6/links-model.js
 function Qs(e) {
 	let t = Array.isArray(e?.footer?.social) ? e.footer.social : null;
 	if (!t) return e;
@@ -5644,7 +5644,7 @@ function jc(e, t) {
 	return n;
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/page-presets.js
+//#region ../template/assets/engine/0.7.6/page-presets.js
 var Mc = /* @__PURE__ */ new Map();
 Ds({ sections: { define: (e, t) => Mc.set(e, t) } });
 var Nc = [
@@ -6520,7 +6520,7 @@ function Wl(e, t) {
 }
 Vr(["click"]);
 //#endregion
-//#region ../template/assets/engine/0.7.5/fonts.js
+//#region ../template/assets/engine/0.7.6/fonts.js
 var Gl = [
 	["font.system", "system-ui, sans-serif"],
 	["font.arial", "Arial, Helvetica, sans-serif"],
@@ -6624,7 +6624,7 @@ function uu(e, { min: t = 2, fallback: n = 5 } = {}) {
 	return !Number.isFinite(r) || r <= 0 ? n : Math.max(t, r);
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/backgrounds/image.js
+//#region ../template/assets/engine/0.7.6/backgrounds/image.js
 var du = .4, fu = [
 	"none",
 	"kenburns",
@@ -6765,7 +6765,7 @@ function Lu(e, t, n, r) {
 	Ou() ? Fu(e, t, n, r) : Du(e, t, n, r);
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/photo-source.js
+//#region ../template/assets/engine/0.7.6/photo-source.js
 var Ru = [
 	"drive",
 	"gphotos",
@@ -6958,7 +6958,7 @@ function fd(e, t, n) {
 	}), n(e, t);
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/backgrounds/slideshow.js
+//#region ../template/assets/engine/0.7.6/backgrounds/slideshow.js
 var pd = {
 	source: "upload",
 	folder: "",
@@ -10946,7 +10946,7 @@ function up(e) {
 	return ip.find((t) => t.width === e)?.id ?? null;
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/calendar-format.js
+//#region ../template/assets/engine/0.7.6/calendar-format.js
 function dp(e) {
 	if (typeof e != "string" || !e.trim()) return !1;
 	try {
@@ -10956,7 +10956,7 @@ function dp(e) {
 	}
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/map-links.js
+//#region ../template/assets/engine/0.7.6/map-links.js
 var fp = {
 	osm: {
 		url: "https://www.openstreetmap.org/search?query=",
@@ -10996,7 +10996,7 @@ function mp(e) {
 	return Object.hasOwn(fp, t) ? t : "osm";
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/meeting-links.js
+//#region ../template/assets/engine/0.7.6/meeting-links.js
 var hp = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/;
 function gp(e) {
 	let t = Array.isArray(e) ? e : String(e ?? "").split(/[\s,;]+/), n = [];
@@ -11184,7 +11184,7 @@ function Bp(e) {
 	return t.toString(16).padStart(8, "0");
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/glyphs.js
+//#region ../template/assets/engine/0.7.6/glyphs.js
 var Vp = "urd-recent-glyphs", Hp = "urd-recent-icons", Up = [
 	["glyphCat.symbols", "★ ☆ ✦ ✧ ✩ ✪ ✫ ✭ ✮ ✯ ✵ ✳ ✴ ❖ ❋ ✿ ❀ ❁ ✾ ❃ ☘ ◆ ◇ ● ○ ◎ ■ □ ▣ ▲ △ ▼ ▽ ⬡ ⬢ ♦ ♠ ♣ ♥ ♡ ✓ ✔ ✕ ✖ ✗ ✘ ✚ ✜ ☀ ☾ ♪ ♫ ♬ ☮ ☯ ⚜ ⚓ ⚡ ☂ ✂ ✏ ✒ ✉ ☎ ⌛ ⏳ ♻ ⚠ ☑ ⚙ § © ® ™ ° ± × ÷ ∞ ≈ ≠ ≤ ≥ € £ ¥ • ‣ ⁂"],
 	["glyphCat.arrows", "→ ← ↑ ↓ ↔ ↕ ↗ ↘ ↙ ↖ ⇒ ⇐ ⇑ ⇓ ⇔ ➜ ➤ ➔ ↩ ↪ ⤴ ⤵ ↺ ↻ ⟲ ⟳ « » ‹ ›"],
@@ -12183,7 +12183,7 @@ Vr([
 	"input"
 ]);
 //#endregion
-//#region ../template/assets/engine/0.7.5/palette-search.js
+//#region ../template/assets/engine/0.7.6/palette-search.js
 function Fm(e) {
 	return String(e ?? "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
@@ -12203,7 +12203,7 @@ function Rm(e, t, n) {
 	})).filter((e) => e.rank >= 0).sort((e, t) => e.rank - t.rank || e.i - t.i).map((e) => e.item);
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/calendar-designs.js
+//#region ../template/assets/engine/0.7.6/calendar-designs.js
 var zm = [
 	"list",
 	"cards",
@@ -21195,7 +21195,7 @@ function Cx(e, t) {
 }
 Vr(["keydown"]);
 //#endregion
-//#region ../template/assets/engine/0.7.5/divider-model.js
+//#region ../template/assets/engine/0.7.6/divider-model.js
 var wx = [
 	"wave",
 	"tilt",
@@ -21499,7 +21499,7 @@ Vr([
 	"click"
 ]);
 //#endregion
-//#region ../template/assets/engine/0.7.5/backgrounds/glow.js
+//#region ../template/assets/engine/0.7.6/backgrounds/glow.js
 var Lx = {
 	version: 1,
 	label: "Glow",
@@ -21527,7 +21527,7 @@ var Lx = {
 	}
 };
 //#endregion
-//#region ../template/assets/engine/0.7.5/footer-thumb.js
+//#region ../template/assets/engine/0.7.6/footer-thumb.js
 function Bx(e = {}) {
 	let t = "#2fd6b6", n = "#5c6b64", r = e.mega ? "#16221d" : "#0e1512", i = e.cols ?? 0, a = e.social ?? 0, o = `<svg viewBox="0 0 160 80" preserveAspectRatio="none" aria-hidden="true"><rect width="160" height="80" fill="${r}"/>`;
 	if (e.mega && (o += `<circle cx="20" cy="6" r="34" fill="${t}" opacity="0.18"/>`), e.bigcta) return o += `<rect x="45" y="18" width="70" height="8" rx="3" fill="${n}" opacity="0.85"/>`, o += `<rect x="56" y="32" width="48" height="4" rx="2" fill="${n}" opacity="0.5"/>`, o += `<rect x="62" y="43" width="36" height="10" rx="3" fill="${t}"/>`, o += Vx(n, e.baselineLinks), o + "</svg>";
@@ -22514,7 +22514,7 @@ Vr([
 	"change"
 ]);
 //#endregion
-//#region ../template/assets/engine/0.7.5/collections-csv.js
+//#region ../template/assets/engine/0.7.6/collections-csv.js
 var iS = [
 	"id",
 	"title",
@@ -23103,7 +23103,8 @@ function QS(e, t) {
 		})) {
 			n.updateBusy = !0, c(K("update.running", { target: F(a).target }));
 			try {
-				let t = await fetch("/api/github/update", {
+				let t, n, r = -1;
+				for (; t = await fetch("/api/github/update", {
 					method: "POST",
 					headers: { "content-type": "application/json" },
 					body: JSON.stringify({
@@ -23111,7 +23112,10 @@ function QS(e, t) {
 						expect: F(a).head,
 						skip: e
 					})
-				}), n = await t.json().catch(() => null);
+				}), n = await t.json().catch(() => null), n?.code === "updateContinue" && n.copied > r;) r = n.copied, c(K("update.copying", {
+					copied: n.copied,
+					total: n.total
+				}));
 				t.ok ? (c(K("update.committed", { target: F(a).target }), "ok"), await d(F(a).target.replace(/^v/, ""))) : t.status === 409 ? (c(ba(n) ?? K("update.checkFailed"), "error"), await s()) : c(ba(n) ?? K("update.failed"), "error");
 			} catch {
 				c(K("status.publishLayerUnreachable"), "error");
@@ -23344,7 +23348,7 @@ function eC(e, t) {
 }
 Vr(["pointerdown", "click"]);
 //#endregion
-//#region ../template/assets/engine/0.7.5/calendar-thumb.js
+//#region ../template/assets/engine/0.7.6/calendar-thumb.js
 var tC = "#0e1512", nC = "#2fd6b6", rC = "#5c6b64", iC = "#22302a", aC = "#e8efe9", oC = "#16221d", sC = "#1c2340", cC = "#f3ecd8", lC = "#d0a74a", uC = (e) => e < 1 ? ` opacity="${e}"` : "", Z = (e, t, n, r, i, a = 1, o = 2) => `<rect x="${e}" y="${t}" width="${n}" height="${r}" rx="${o}" fill="${i}"${uC(a)}/>`, dC = (e, t, n, r, i = 1) => `<circle cx="${e}" cy="${t}" r="${n}" fill="${r}"${uC(i)}/>`, fC = (e, t, n, r, i, a = 1, o = 1) => `<line x1="${e}" y1="${t}" x2="${n}" y2="${r}" stroke="${i}" stroke-width="${a}"${uC(o)}/>`, pC = (e, t, n, r) => Array.from({ length: e }, (e, i) => r(t + i * n, i)).join(""), mC = (e, t = tC) => `<svg viewBox="0 0 160 80" preserveAspectRatio="none" aria-hidden="true"><rect width="160" height="80" fill="${t}"/>${e}</svg>`;
 function hC(e, t, n, r, i, a = rC) {
 	let o = "", s = n / 7, c = r / 4;
@@ -24615,7 +24619,7 @@ function kw({ prepare: e, onHeight: t, title: n }) {
 	};
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/animations/core.js
+//#region ../template/assets/engine/0.7.6/animations/core.js
 var Aw = () => ({
 	duration: 600,
 	delay: 0
@@ -24669,7 +24673,7 @@ var Aw = () => ({
 	}
 };
 //#endregion
-//#region ../template/assets/engine/0.7.5/plugins.js
+//#region ../template/assets/engine/0.7.6/plugins.js
 function Nw(e) {
 	let t = /^(\d+)\.(\d+)\.(\d+)$/.exec(String(e).trim());
 	return t ? [
@@ -24877,7 +24881,7 @@ function Bw(e, t = {}) {
 	};
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/place.js
+//#region ../template/assets/engine/0.7.6/place.js
 function Vw(e) {
 	let t = (e) => Math.round(e * 100) / 100, n = Math.max(0, t(100 - e.w)), r = Math.min(n, Math.max(0, t(e.x - e.w / 2))), i = Math.max(0, e.y - e.h / 2), a = e.snap === !1 || e.grid?.snap === !1, o = e.grid?.size || 8;
 	return i = a ? Math.round(i) : Math.round(i / o) * o, {
@@ -24886,7 +24890,7 @@ function Vw(e) {
 	};
 }
 //#endregion
-//#region ../template/assets/engine/0.7.5/backgrounds/color.js
+//#region ../template/assets/engine/0.7.6/backgrounds/color.js
 var Hw = {
 	version: 1,
 	label: "Colour",
@@ -28888,7 +28892,7 @@ var LM = {
 	reportUpload: IM
 };
 //#endregion
-//#region ../template/assets/engine/0.7.5/feeds.js
+//#region ../template/assets/engine/0.7.6/feeds.js
 function RM(e) {
 	return String(e ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;").replaceAll("'", "&apos;");
 }

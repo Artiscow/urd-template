@@ -253,6 +253,7 @@ export default {
     'api.updateRace': 'Repo rievddai dan botta go ođasmahttin lei jođus. Vižžes ođđasit ja geahččal fas.',
     'api.updateBadSkip': 'Fiilla {path} ii sáhte doalahit eret ođasmahttimis',
     'api.updateFailed': 'Ođasmahttin filtii: {detail}',
+    'api.updateContinue': '{total} fiillas {copied} máŋgejuvvojedje mállas. Álggat ođasmahttima ođđasit joatkit dan.',
     'api.photoFolderUnknown': 'Urd ii dovdda dan máhppačujuhusa',
     'api.photoFolderFailed': 'Ii sáhttán lohkat juogaduvvon máhpa',
     'api.photoFolderUnreachable': 'Ii ožžon oktavuođa juogaduvvon máhpain',

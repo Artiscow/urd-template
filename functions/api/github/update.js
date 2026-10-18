@@ -7,6 +7,7 @@
  * GET  /api/github/update[?to=vX.Y.Z]  check: classifies every file through
  *      blob SHAs (unchanged/hand-edited/new/deleted) without loading content.
  * POST /api/github/update              run: { to, expect, skip? }.
+ *      A run with files that must be copied as blobs of their own copies a batch of them and answers 429 `updateContinue` with { copied, total }; the run that finds few enough of them missing copies those and commits.
  *
  * The checksum model: the user's tree is compared with the template's tree
  * at the BASELINE v<engine> (engine is read from the user's urd.json in the
@@ -19,7 +20,7 @@
 import { gh, ghGraphql, cleanBase64, commitTree, triggerDeploy } from '../../_lib/github.js';
 import { requirePublisher } from '../../_lib/auth.js';
 import { isPageIndexCopy } from '../../_lib/guard.js';
-import { planUpdate, highestVersionTag, chunkEntries } from '../../_lib/update-plan.js';
+import { planUpdate, highestVersionTag, chunkEntries, blobBatch, travelsAsBlob } from '../../_lib/update-plan.js';
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -236,32 +237,56 @@ export async function onRequestPost({ request, env }) {
       .filter((p) => isPageIndexCopy(p) && state.userTree[p] !== rootIndexSha && !planned.has(p));
     const needsRootText = copyPaths.length > 0 && !writes.some((c) => c.path === 'index.html');
 
-    // ONE GraphQL call fetches all the target texts; binary/truncated blobs
-    // take the REST detour (read base64 from the template repo, write a blob
-    // in the user's repo).
+    // The target files that cannot travel inline in the tree (binary, or text GraphQL cuts short) are copied as blobs of their own, at most BLOB_BATCH per call, and the call that finds at most BLOB_ROOM of them missing copies those and commits (ADR-0014 decision 6).
+    // A blob is named by its content, so a copied file has the template's SHA in the site's repository, and the tree refers to it by that SHA.
+    // ONE GraphQL call tells which files are such blobs and which of them the site's repository already holds.
     const fetchPaths = [...writes.map((c) => c.path), ...(needsRootText ? ['index.html'] : [])];
-    const texts = {};
-    const blobEntries = {};
+    const [owner, name] = config.templateRepo.split('/');
+    const [siteOwner, siteName] = config.repo.split('/');
+    let blobPaths = [];
     if (fetchPaths.length > 0) {
-      const [owner, name] = config.templateRepo.split('/');
-      const fields = fetchPaths.map((p, i) =>
-        `f${i}: object(expression: ${JSON.stringify(`${to}:${p}`)}) { ... on Blob { text isBinary isTruncated } }`);
-      const data = await ghGraphql(token, `{ repository(owner: ${JSON.stringify(owner)}, name: ${JSON.stringify(name)}) { ${fields.join(' ')} } }`);
-      for (let i = 0; i < fetchPaths.length; i++) {
-        const path = fetchPaths[i];
-        const blob = data.repository[`f${i}`];
-        if (blob && typeof blob.text === 'string' && !blob.isTruncated && !blob.isBinary) {
-          texts[path] = blob.text;
-        } else {
-          const raw = await gh(token, `/repos/${config.templateRepo}/git/blobs/${state.targetTree[path]}`);
-          const made = await gh(token, `/repos/${config.repo}/git/blobs`, {
-            method: 'POST',
-            body: JSON.stringify({ content: cleanBase64(raw.content), encoding: 'base64' }),
-          });
-          blobEntries[path] = made.sha;
-        }
+      const kinds = fetchPaths.map((p, i) =>
+        `f${i}: object(expression: ${JSON.stringify(`${to}:${p}`)}) { ... on Blob { isBinary isTruncated } }`);
+      const held = fetchPaths.map((p, i) => `h${i}: object(oid: ${JSON.stringify(state.targetTree[p])}) { oid }`);
+      const meta = await ghGraphql(token,
+        `{ template: repository(owner: ${JSON.stringify(owner)}, name: ${JSON.stringify(name)}) { ${kinds.join(' ')} } `
+        + `site: repository(owner: ${JSON.stringify(siteOwner)}, name: ${JSON.stringify(siteName)}) { ${held.join(' ')} } }`,
+        1, { partial: true });
+      blobPaths = fetchPaths.filter((p, i) => travelsAsBlob(meta?.template?.[`f${i}`]));
+      const present = new Set(fetchPaths.filter((p, i) => meta?.site?.[`h${i}`]));
+      const { batch, copied, total, commit } = blobBatch(blobPaths, present);
+      for (const path of batch) {
+        const raw = await gh(token, `/repos/${config.templateRepo}/git/blobs/${state.targetTree[path]}`);
+        await gh(token, `/repos/${config.repo}/git/blobs`, {
+          method: 'POST',
+          body: JSON.stringify({ content: cleanBase64(raw.content), encoding: 'base64' }),
+        });
+      }
+      if (!commit) {
+        // Not a 2xx: an admin from before this step reads any 2xx as the commit, and shows this text as an error instead.
+        return json({
+          error: `Copied ${copied} of ${total} files from the template. Start the update again to continue.`,
+          code: 'updateContinue',
+          copied,
+          total,
+        }, 429);
       }
     }
+
+    // ONE GraphQL call fetches the texts that travel inline.
+    const textPaths = fetchPaths.filter((p) => !blobPaths.includes(p));
+    const texts = {};
+    if (textPaths.length > 0) {
+      const fields = textPaths.map((p, i) =>
+        `f${i}: object(expression: ${JSON.stringify(`${to}:${p}`)}) { ... on Blob { text } }`);
+      const data = await ghGraphql(token, `{ repository(owner: ${JSON.stringify(owner)}, name: ${JSON.stringify(name)}) { ${fields.join(' ')} } }`);
+      for (let i = 0; i < textPaths.length; i++) {
+        const text = data.repository[`f${i}`]?.text;
+        if (typeof text !== 'string') throw new Error(`The template has no text for ${textPaths[i]}`);
+        texts[textPaths[i]] = text;
+      }
+    }
+    const blobEntries = Object.fromEntries(blobPaths.map((p) => [p, state.targetTree[p]]));
 
     const prefix = config.rootDir ? `${config.rootDir}/` : '';
     const entries = [

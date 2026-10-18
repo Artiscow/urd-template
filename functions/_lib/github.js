@@ -80,11 +80,11 @@ export function currentUser(token) {
 }
 
 /**
- * GraphQL call to GitHub: used by the updater to fetch MANY file contents in
- * ONE subrequest (Blob.text via aliases), which REST would have needed one call
- * per file for. Same retry rule as gh().
+ * GraphQL call to GitHub: used by the updater to fetch MANY file contents in ONE subrequest (Blob.text via aliases), which REST would have needed one call per file for.
+ * Same retry rule as gh().
+ * With `partial`, the data is returned beside errors for single fields (an object the repository does not hold comes back as null), and only a reply without data throws.
  */
-export async function ghGraphql(token, query, attempt = 1) {
+export async function ghGraphql(token, query, attempt = 1, { partial = false } = {}) {
   const res = await fetch('https://api.github.com/graphql', {
     method: 'POST',
     headers: {
@@ -97,14 +97,14 @@ export async function ghGraphql(token, query, attempt = 1) {
   if (!res.ok) {
     if ((res.status >= 500 || res.status === 429) && attempt < 3) {
       await new Promise((resolve) => setTimeout(resolve, attempt * 500));
-      return ghGraphql(token, query, attempt + 1);
+      return ghGraphql(token, query, attempt + 1, { partial });
     }
     const error = new Error(`GitHub GraphQL responded ${res.status}`);
     error.status = res.status;
     throw error;
   }
   const payload = await res.json();
-  if (payload.errors?.length) {
+  if (payload.errors?.length && !(partial && payload.data)) {
     throw new Error(`GitHub GraphQL: ${payload.errors[0].message}`.slice(0, 300));
   }
   return payload.data;
