@@ -32,9 +32,13 @@ Yönetici panelindeki **Güncelleme** bölümünü açın: şablon deposuyla kar
 
 ## İçerik ve yapı
 
-- `content/` sizin içeriğinizdir (sayfalar, tema, koleksiyonlar) - yönetici panelinin yazdığı her şey burada ve `media/` içinde yaşar.
+- `content/` sizin içeriğinizdir (sayfalar, tema, koleksiyonlar) - yönetici panelinin yazdığı her şey burada ve `media/` içinde yaşar; yüklemeler `images/`, `files/`, `audio/` ve `video/` içinde durur.
 - `plugins/` eklentileri barındırır: bir eklenti klasörü ekleyin ve Eklentiler panelinden etkinleştirin. Birlikte gelen tek eklenti İsveççe dil paketidir (`lang-sv`), eklenti yazanlar için örnek; takvim, form ve harita çekirdek bloklardır. Bkz. [plugins/README.md](../plugins/README.md); daha fazlası GitHub'daki `urd-plugin` konusuyla bulunabilir.
 - `assets/engine/` ve `admin/` Urd'un kendisidir ve Güncelleme paneli tarafından bakımı yapılır; elle düzenlemeyin.
+
+## Lisans
+
+Urd'un kendi dosyaları ve Urd'un sizin dosyalarınızın arasına koyduğu başlangıç dosyaları MIT Lisansı altındadır; lisans, düzenleyicinin üzerine kurulduğu üçüncü taraf kodun bildirimiyle birlikte [URD-LICENSE.md](../URD-LICENSE.md) dosyasındadır. Kendiniz eklediğiniz veya değiştirdiğiniz şeyler size aittir ve lisans onları kapsamaz.
 
 ## Belgeler
 

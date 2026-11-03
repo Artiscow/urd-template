@@ -14,7 +14,6 @@
   --urd-font-body: Georgia, 'Times New Roman', serif;
   --urd-radius-sm: 6px;
   --urd-radius-md: 12px;
-  --urd-space-section: clamp(3rem, 8vw, 6rem);
 }
 @supports (color: light-dark(#000, #fff)) {
   :root {

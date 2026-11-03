@@ -148,7 +148,8 @@ export async function triggerDeploy(env) {
  *
  * @param {string} token
  * @param {{repo: string, branch: string}} config From cfg(env)
- * @param {{message: string, files: Array<{path: string, content?: string, encoding?: 'utf-8'|'base64', delete?: boolean}>, expect?: string}} payload
+ * @param {{message: string, files: Array<{path: string, content?: string, encoding?: 'utf-8'|'base64', delete?: boolean, from?: string}>, expect?: string}} payload
+ *   A file with `from` is a move: the blob the source holds in the base tree is written at the path and the source deleted, so the bytes never travel; a source the tree does not hold throws 404 with the code `moveMissing`.
  * @returns {Promise<{sha: string}>} The new commit SHA
  */
 export async function commitFiles(token, config, { message, files, expect }) {
@@ -165,16 +166,35 @@ export async function commitFiles(token, config, { message, files, expect }) {
 
   // Deletions are validated against the base tree: sha:null for an unknown
   // path gives 422 from GitHub. (recursive can be truncated in enormous repos;
-  // then the deletion is skipped, which is the harmless direction.)
+  // then the deletion is skipped, which is the harmless direction.) A move
+  // takes its blob's sha from the same tree.
   let existing = null;
-  if (files.some((f) => f.delete)) {
+  let blobs = null;
+  if (files.some((f) => f.delete || f.from)) {
     const baseTree = await gh(token, `/repos/${repo}/git/trees/${baseCommit.tree.sha}?recursive=1`);
-    existing = baseTree.tree.filter((t) => t.type === 'blob').map((t) => t.path);
+    const items = baseTree.tree.filter((t) => t.type === 'blob');
+    existing = items.map((t) => t.path);
+    blobs = new Map(items.map((t) => [t.path, t.sha]));
   }
 
   const tree = [];
   const gone = new Set();
   for (const file of files) {
+    if (file.from) {
+      const sha = blobs?.get(file.from);
+      if (!sha) {
+        const error = new Error(`The file '${file.from}' is not in the repository`);
+        error.status = 404;
+        error.code = 'moveMissing';
+        throw error;
+      }
+      tree.push({ path: file.path, mode: '100644', type: 'blob', sha });
+      if (!gone.has(file.from)) {
+        gone.add(file.from);
+        tree.push({ path: file.from, mode: '100644', type: 'blob', sha: null });
+      }
+      continue;
+    }
     if (file.delete) {
       const under = `${file.path}/`;
       for (const path of existing ?? []) {

@@ -33,7 +33,7 @@
           "fit": "shrink",
           "fitMin": 0.6,
           "props": {
-            "src": "/media/bytt-dette-bildet-84615e61.svg",
+            "src": "/media/images/bytt-dette-bildet-84615e61.svg",
             "alt": "Bytt dette bildet",
             "fit": "cover",
             "radius": "md",
@@ -115,7 +115,7 @@
           "type": "image",
           "version": 1,
           "props": {
-            "src": "/media/bytt-dette-bildet-2d12d623.svg",
+            "src": "/media/images/bytt-dette-bildet-2d12d623.svg",
             "alt": "Bytt dette bildet",
             "fit": "cover",
             "radius": "md",
@@ -163,7 +163,7 @@
           "type": "image",
           "version": 1,
           "props": {
-            "src": "/media/bytt-dette-bildet-2d12d623.svg",
+            "src": "/media/images/bytt-dette-bildet-2d12d623.svg",
             "alt": "Bytt dette bildet",
             "fit": "cover",
             "radius": "md",

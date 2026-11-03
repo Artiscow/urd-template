@@ -217,7 +217,7 @@
           "type": "product",
           "version": 1,
           "props": {
-            "collection": null,
+            "collection": "produkter",
             "limit": 0,
             "columns": 0,
             "currency": "kr"

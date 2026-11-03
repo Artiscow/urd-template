@@ -51,12 +51,19 @@
         {
           "id": "blk-f87d5062",
           "type": "checkout",
-          "version": 1,
+          "version": 2,
           "props": {
             "recipient": "",
             "endpoint": "",
-            "vipps": "",
-            "currency": "kr"
+            "currency": "kr",
+            "seller": true,
+            "payments": {
+              "vipps": false,
+              "card": "none",
+              "paypal": false,
+              "capture": "ship",
+              "manual": []
+            }
           },
           "animation": null,
           "frames": {

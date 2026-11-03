@@ -12,7 +12,6 @@
   --urd-font-body: system-ui, sans-serif;
   --urd-radius-sm: 6px;
   --urd-radius-md: 12px;
-  --urd-space-section: clamp(3rem, 8vw, 6rem);
 }
 
 /* The default theme follows OS lightness where light-dark() is supported (Baseline 2024),
@@ -10652,6 +10651,11 @@ textarea.urd-form-input {
   pointer-events: none;
 }
 
+/* On the phone the row grid flows the blocks, so the note stands in the flow and takes its own room under the calendar. */
+body.urd-mobile .urd-cal-note {
+  position: static;
+}
+
 .urd-preview .urd-audio-empty {
   display: grid;
   place-items: center;
@@ -10670,6 +10674,64 @@ textarea.urd-form-input {
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 18px;
   width: 100%;
+}
+
+/* The cards share their rows across the list (subgrid): the picture, the words, the price, the
+   sizes, the colours and the buy button stand at one height in every card of a row, and a card
+   with no sizes or colours leaves that row empty rather than stretching what it has. The badge
+   shares the title's row, above the title's words, or stands over the picture. The picture's
+   row exists only while a card in the list has a picture (urd-product-pictures, product.js).
+   A browser without subgrid shows each card as its own column. */
+@supports (grid-template-rows: subgrid) {
+  .urd-product-cardlist > .urd-product-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: subgrid;
+    grid-row: span 6;
+    align-content: start;
+  }
+
+  /* One column: the badge and the title share a row, and neither may open a second column */
+  .urd-product-cardlist > .urd-product-card > * {
+    grid-column: 1;
+  }
+
+  .urd-product-cardlist.urd-product-pictures > .urd-product-card {
+    grid-row: span 7;
+  }
+
+  /* Anything else in the list (the editor's «+ Product» card) spans the cards' rows, so its own height never stretches one of them */
+  .urd-product-cardlist > :not(.urd-product-card) {
+    grid-row: span 6;
+  }
+
+  .urd-product-cardlist.urd-product-pictures > :not(.urd-product-card) {
+    grid-row: span 7;
+  }
+
+  /* The children take their rows by what they are, so a missing part leaves its row to the others */
+  .urd-product-cardlist > .urd-product-card > .urd-product-badge { grid-row: 1; align-self: start; justify-self: start; }
+  .urd-product-cardlist > .urd-product-card > .urd-product-title { grid-row: 1; align-self: end; }
+  .urd-product-cardlist > .urd-product-card > .urd-product-badge + .urd-product-title { padding-top: 2em; }
+  .urd-product-cardlist > .urd-product-card > .urd-product-text { grid-row: 2; }
+  .urd-product-cardlist > .urd-product-card > .urd-product-price { grid-row: 3; }
+  .urd-product-cardlist > .urd-product-card > .urd-product-sizes { grid-row: 4; }
+  .urd-product-cardlist > .urd-product-card > .urd-product-colors { grid-row: 5; }
+  .urd-product-cardlist > .urd-product-card > .urd-product-buy,
+  .urd-product-cardlist > .urd-product-card > .urd-product-buyrow { grid-row: 6; margin-top: 4px; align-self: end; }
+
+  .urd-product-cardlist.urd-product-pictures > .urd-product-card > .urd-product-image { grid-row: 1; }
+  .urd-product-cardlist.urd-product-pictures > .urd-product-card > .urd-product-badge { grid-row: 2; }
+  /* Positioned in the picture's grid area, so its offsets count from the picture's corner: 8 px, where the card's padding and the 22 px of .urd-product-badge-over meet */
+  .urd-product-cardlist.urd-product-pictures > .urd-product-card > .urd-product-badge-over { grid-row: 1; z-index: 1; top: 8px; left: 8px; }
+  .urd-product-cardlist.urd-product-pictures > .urd-product-card > .urd-product-title { grid-row: 2; }
+  .urd-product-cardlist.urd-product-pictures > .urd-product-card > .urd-product-badge-over + .urd-product-title { padding-top: 0; }
+  .urd-product-cardlist.urd-product-pictures > .urd-product-card > .urd-product-text { grid-row: 3; }
+  .urd-product-cardlist.urd-product-pictures > .urd-product-card > .urd-product-price { grid-row: 4; }
+  .urd-product-cardlist.urd-product-pictures > .urd-product-card > .urd-product-sizes { grid-row: 5; }
+  .urd-product-cardlist.urd-product-pictures > .urd-product-card > .urd-product-colors { grid-row: 6; }
+  .urd-product-cardlist.urd-product-pictures > .urd-product-card > .urd-product-buy,
+  .urd-product-cardlist.urd-product-pictures > .urd-product-card > .urd-product-buyrow { grid-row: 7; }
 }
 
 /* The owner's own column count (product.columns), which a narrow block (its
@@ -10717,24 +10779,6 @@ textarea.urd-form-input {
   object-fit: cover;
 }
 
-/* The secondary image (the first color image) fades in on hover; an active
-   color choice with an image of its own wins over the hover swap. */
-.urd-product-image .urd-product-image-alt {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 0.25s;
-}
-
-.urd-product-card:hover .urd-product-image:not(.urd-product-color-selected) .urd-product-image-alt {
-  opacity: 1;
-}
-
-@media (hover: none) {
-  .urd-product-image .urd-product-image-alt {
-    display: none;
-  }
-}
 
 .urd-product-badge {
   align-self: flex-start;
@@ -10756,6 +10800,7 @@ textarea.urd-form-input {
 }
 
 .urd-product-title {
+  margin: 0;
   font-family: var(--urd-font-heading);
   font-size: 1.05em;
 }
@@ -10779,7 +10824,29 @@ textarea.urd-form-input {
 .urd-product-options {
   display: flex;
   flex-wrap: wrap;
+  /* The chips keep their own height where the shared row is taller (another card's request for a choice) */
+  align-items: center;
+  align-content: flex-start;
   gap: 6px;
+}
+
+/* A choice the product asks for (its requireSize, requireColor) and the buyer left open at «Add to basket»:
+   the chips' frames in the form error's colour, and the words under them (product.js markNeed). */
+.urd-product-options.urd-product-missing .urd-product-chip {
+  border-color: #e05252;
+}
+
+.urd-product-need {
+  flex-basis: 100%;
+  font-size: 0.8em;
+  color: #e05252;
+}
+
+/* A buy button waiting for its product's choices (disableUntilChosen, product.js holdBuy): greyed and inert until they are made */
+.urd-product-buy.urd-product-buy-wait {
+  opacity: 0.45;
+  filter: grayscale(1);
+  cursor: not-allowed;
 }
 
 .urd-product-chip {
@@ -10796,6 +10863,59 @@ textarea.urd-form-input {
 .urd-product-chip[aria-pressed="true"] {
   border-color: var(--urd-color-accent);
   background: color-mix(in srgb, var(--urd-color-accent) 16%, transparent);
+}
+
+/* The quantity the buyer types (product.js quantityRow) stands with the buy button in one row of the card: its name,
+   the basket's steps around the number, the limits beside it and the line's sum under it. */
+.urd-product-buyrow {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.urd-product-buyrow > .urd-product-buy {
+  margin-top: 0;
+}
+
+.urd-product-qty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 0.85em;
+}
+
+.urd-product-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.urd-product-qty-input {
+  width: 3.4em;
+  padding: 2px 4px;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 25%, transparent);
+  border-radius: var(--urd-radius-sm, 6px);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.urd-product-qty-note,
+.urd-cart-limit {
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.urd-product-qty-sum {
+  flex-basis: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.urd-product-qty-sum:empty {
+  display: none;
 }
 
 .urd-product-buy {
@@ -10828,11 +10948,29 @@ textarea.urd-form-input {
   cursor: pointer;
 }
 
+/* «Choose the catalogue» on a product block with none: a button beside the message, not a card. */
+.urd-preview .urd-product-adder.urd-product-choose {
+  min-height: 0;
+  padding: 0.4em 0.9em;
+  opacity: 0.8;
+}
+
 /* Quick view (visitors only): the product details in a native <dialog>.
    display is set ONLY in the open state, otherwise the built-in
    dialog:not([open]) { display: none } would be overridden. */
 .urd-product-opener {
   cursor: pointer;
+}
+
+/* The opener inside the title: a button that looks like the heading's words. */
+.urd-product-titlebtn {
+  all: unset;
+  cursor: pointer;
+}
+
+.urd-product-opener:focus-visible {
+  outline: 2px solid var(--urd-color-accent);
+  outline-offset: 2px;
 }
 
 .urd-product-dialog {
@@ -11081,6 +11219,11 @@ textarea.urd-form-input {
   cursor: pointer;
 }
 
+.urd-cart-step:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
 .urd-cart-number {
   min-width: 18px;
   text-align: center;
@@ -11097,6 +11240,43 @@ textarea.urd-form-input {
   display: flex;
   justify-content: space-between;
   font-size: 1.05em;
+}
+
+/* «Empty the basket» under the lines: a quiet text button that asks once in its own place (cart.js emptyRow) */
+.urd-cart-emptyrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px 10px;
+  font-size: 0.85em;
+}
+
+.urd-cart-emptybtn {
+  padding: 4px 6px;
+  border: none;
+  border-radius: var(--urd-radius-sm, 6px);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.urd-cart-emptybtn:hover,
+.urd-cart-emptybtn:focus-visible {
+  opacity: 1;
+}
+
+.urd-cart-emptyask {
+  font-weight: 600;
+}
+
+.urd-cart-emptyyes {
+  color: #e05252;
+  opacity: 1;
 }
 
 .urd-cart-checkout {
@@ -11173,6 +11353,41 @@ textarea.urd-form-input {
   opacity: 0.85;
 }
 
+/* The buyer's choice among the payment instructions: the form block's radio rows, each way to pay with its instruction under its name. */
+.urd-checkout-paychoice {
+  display: grid;
+  gap: 6px;
+  font-size: 0.88em;
+}
+
+.urd-checkout-paychoice .urd-form-check {
+  align-items: flex-start;
+}
+
+.urd-checkout-paychoice .urd-form-check input {
+  margin-top: 0.15em;
+}
+
+.urd-checkout-paychoice-text {
+  display: block;
+  opacity: 0.85;
+}
+
+/* The summary right above the order buttons (angrerettloven § 16): the order in one line and the total. */
+.urd-checkout-recap {
+  display: grid;
+  gap: 4px;
+  font-size: 0.9em;
+}
+
+.urd-checkout-recap[hidden] {
+  display: none;
+}
+
+.urd-checkout-recap-lines {
+  margin: 0;
+}
+
 .urd-checkout-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -11214,6 +11429,190 @@ textarea.urd-form-input {
 
 .urd-checkout-error {
   color: #c0392b;
+}
+
+/* The seller under the order buttons (angrerettloven § 8 d): one small wrapping row. */
+/* The printable order confirmation: a card above the form with the lines, the buyer, the seller and the withdrawal form; printed alone. */
+.urd-checkout-confirmation {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 25%, transparent);
+  border-radius: var(--urd-radius-sm, 6px);
+  background: var(--urd-color-surface);
+  font-size: 0.9em;
+}
+
+.urd-checkout-confirmation-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.urd-checkout-confirmation h2,
+.urd-checkout-confirmation h3,
+.urd-checkout-confirmation h4 {
+  margin: 0;
+  font-size: 1.1em;
+}
+
+.urd-checkout-confirmation h3,
+.urd-checkout-confirmation h4 {
+  font-size: 1em;
+}
+
+.urd-checkout-print {
+  padding: 6px 12px;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 30%, transparent);
+  border-radius: var(--urd-radius-sm, 6px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.urd-checkout-confirmation-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2em 1em;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.urd-checkout-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  margin: 0;
+}
+
+.urd-checkout-facts dt {
+  font-weight: 700;
+}
+
+.urd-checkout-facts dd {
+  margin: 0;
+}
+
+.urd-checkout-withdrawal {
+  display: grid;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--urd-color-text) 20%, transparent);
+}
+
+.urd-checkout-withdrawal p {
+  margin: 0;
+}
+
+.urd-checkout-wform {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 35%, transparent);
+  border-radius: var(--urd-radius-sm, 6px);
+}
+
+.urd-checkout-wform-note {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.urd-checkout-wform-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2em 0.5em;
+}
+
+.urd-checkout-wform-value {
+  opacity: 0.85;
+}
+
+/* The draft view's mark (?draft=1): the owner's unpublished changes are on the page, in this browser only. */
+.urd-draft-view {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 900;
+  margin: 0;
+  padding: 0.35em 0.85em;
+  font: 600 0.8rem/1.3 system-ui, sans-serif;
+  color: #241a00;
+  background: #f2b84b;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 25%);
+  pointer-events: none;
+}
+
+@media print {
+  .urd-draft-view {
+    display: none;
+  }
+}
+
+/* The line a checkout shows while a provider runs on its test keys: a note in a dashed box, never mistaken for the order. */
+.urd-checkout-testmode {
+  margin: 0 0 0.8em;
+  padding: 0.45em 0.75em;
+  border: 1px dashed currentColor;
+  border-radius: var(--urd-radius-sm);
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+
+/* Printing an order: the confirmation alone, at the top of the sheet, in black on white.
+   Everything beside the confirmation's own ancestors is left out, and those ancestors are taken out of the canvas's
+   absolute layout, so the confirmation stands at the top of the first sheet at the sheet's width. */
+@media print {
+  html.urd-print-order body > :not(:has(.urd-checkout-confirmation)),
+  html.urd-print-order #urd-root > :not(:has(.urd-checkout-confirmation)),
+  html.urd-print-order .urd-section:has(.urd-checkout-confirmation) > :not(:has(.urd-checkout-confirmation)),
+  html.urd-print-order .urd-canvas:has(.urd-checkout-confirmation) > :not(:has(.urd-checkout-confirmation)),
+  html.urd-print-order .urd-checkout > :not(.urd-checkout-confirmation) {
+    display: none;
+  }
+
+  html.urd-print-order :is(.urd-section, .urd-canvas, .urd-block, .urd-checkout):has(.urd-checkout-confirmation) {
+    position: static;
+    width: auto;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    transform: none;
+    background: #fff;
+  }
+
+  html.urd-print-order .urd-checkout-confirmation {
+    position: static;
+    width: auto;
+    border: 0;
+    padding: 0;
+    color: #000;
+    background: #fff;
+    font-size: 11pt;
+  }
+
+  html.urd-print-order .urd-checkout-print {
+    display: none;
+  }
+}
+
+.urd-checkout-seller {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2em 0.9em;
+  font-size: 0.8em;
+  font-style: normal;
+  opacity: 0.8;
+}
+.urd-checkout-seller a {
+  color: inherit;
+}
+.urd-checkout-seller-label {
+  font-weight: 600;
 }
 
 /* The formatting bar for text fields (preview mode only): shown above
@@ -11308,21 +11707,7 @@ textarea.urd-form-input {
   font: 12px/1 system-ui, sans-serif;
 }
 
-/* Inline link field (its own sub-row in the bar while the link button is active) */
-.urd-tt-linkrow {
-  display: none;
-  gap: 4px;
-  align-items: center;
-  padding-top: 4px;
-  margin-top: 2px;
-  border-top: 1px solid rgb(255 255 255 / 14%);
-}
-
-.urd-tt-linkrow.visible {
-  display: flex;
-}
-
-/* The color row (the dropdown behind the palette icon): its own sub-row, like the link field */
+/* The color row (the dropdown behind the palette icon): its own sub-row in the bar */
 .urd-tt-colorrow {
   display: none;
   gap: 2px;
@@ -11410,26 +11795,6 @@ textarea.urd-form-input {
   padding: 1px 3px 2px;
   border-bottom: 3px solid transparent;
   border-image: linear-gradient(to right, #e05252, #e2b84a, #4ac26b, #4a90e2, #a45ce2) 1;
-}
-
-.urd-tt-linkrow input {
-  flex: 1;
-  font: 12px/1.3 system-ui, sans-serif;
-  color: #e8eaf0;
-  background: rgb(255 255 255 / 6%);
-  border: 1px solid rgb(255 255 255 / 20%);
-  border-radius: 5px;
-  padding: 4px 6px;
-  min-width: 0;
-}
-
-.urd-tt-linkrow button {
-  flex: 0 0 auto;
-  white-space: nowrap;
-  font-size: 11px;
-  padding: 4px 8px;
-  border: 1px solid rgb(255 255 255 / 20%);
-  border-radius: 5px;
 }
 
 .urd-text-toolbar.visible {
@@ -11593,6 +11958,9 @@ body.urd-chrome-off .urd-text-toolbar {
   position: fixed;
   z-index: 100003;
   width: 236px;
+  /* Chrome, kept at the admin's size at any preview zoom.
+     Zoom scales the box itself, so the anchoring and the flip measure the size it is drawn at. */
+  zoom: var(--urd-chrome-scale, 1);
   display: grid;
   /* Bind the column to the box width: without this the implicit grid column
      becomes max-content wide (the RGB fields) and the content spills out of the box. */
@@ -11635,12 +12003,14 @@ body.urd-chrome-off .urd-text-toolbar {
 }
 
 .urd-cp-close {
+  display: inline-flex;
+  align-items: center;
   background: transparent;
   border: 0;
   color: inherit;
   font-size: 15px;
   line-height: 1;
-  padding: 2px 7px;
+  padding: 4px 6px;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -11830,6 +12200,11 @@ body.urd-chrome-off .urd-text-toolbar {
   cursor: pointer;
 }
 
+.urd-cp-del svg {
+  width: 7px;
+  height: 7px;
+}
+
 .urd-cp-saved:hover .urd-cp-del {
   display: flex;
 }
@@ -11872,12 +12247,14 @@ body.urd-chrome-off .urd-cp {
 }
 
 .urd-imged-close {
+  display: inline-flex;
+  align-items: center;
   background: transparent;
   border: 0;
   color: inherit;
   font-size: 15px;
   line-height: 1;
-  padding: 2px 7px;
+  padding: 4px 6px;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -12413,6 +12790,11 @@ a.urd-collection-title:hover {
    with chrome on, editing owns the click, so the cursor is neutral there. */
 .urd-lightbox-able {
   cursor: zoom-in;
+}
+
+.urd-lightbox-able:focus-visible {
+  outline: 2px solid var(--urd-color-accent);
+  outline-offset: 2px;
 }
 
 .urd-preview:not(.urd-chrome-off) .urd-lightbox-able {
@@ -13225,39 +13607,242 @@ body:has(dialog:modal) {
   border-color: var(--urd-color-accent);
 }
 
+/* The + New block menu (preview-edit.js addBlockAdder).
+   Groups on the side, the default form, is a box of fixed size: the search on top, the groups' list at the left and the chosen group's blocks beside it, where only the list and the blocks scroll, so the box never grows with the palette.
+   Its fit to the screen (turning upwards, the height held to the room, the sideways move) is set by fitBlockMenu. */
 .urd-preview .urd-add-block-menu {
   display: none;
   position: absolute;
   right: 0;
   top: calc(100% + 6px);
-  grid-template-columns: repeat(2, minmax(6.5rem, 1fr));
-  gap: 4px;
-  padding: 6px;
-  /* A menu taller than the screen scrolls rather than running off it, as the
-     image editor's panel does. */
-  max-height: calc(100vh - 16px);
-  overflow-y: auto;
+  box-sizing: border-box;
+  flex-direction: column;
+  gap: 6px;
+  width: 460px;
+  height: 340px;
+  padding: 8px;
+  overflow: hidden;
+  text-align: left;
   background: var(--urd-color-surface);
   border: 1px solid color-mix(in srgb, var(--urd-color-text) 15%, transparent);
-  border-radius: 10px;
+  border-radius: 12px;
   box-shadow: 0 10px 30px rgb(0 0 0 / 45%);
 }
 
-/* Opened in the lower half of the screen: the menu hangs upwards from the
-   pointer instead of down past the bottom edge (the class flip the block
-   toolbar uses, urd-toolbar-under). */
+.urd-preview .urd-add-block-menu.open {
+  display: flex;
+}
+
+/* Turned upwards from its chip or the pointer where the room below is too small (the class flip the block toolbar uses, urd-toolbar-under). */
 .urd-preview .urd-add-block-menu.urd-menu-up {
   top: auto;
   bottom: calc(100% + 6px);
 }
 
-/* Shapes: an expandable submenu spanning both columns */
+.urd-preview .urd-abm-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 10.5rem minmax(0, 1fr);
+  gap: 8px;
+}
+
+.urd-preview .urd-abm-rail,
+.urd-preview .urd-abm-pane {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.urd-preview .urd-abm-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-right: 8px;
+  border-right: 1px solid color-mix(in srgb, var(--urd-color-text) 12%, transparent);
+}
+
+.urd-preview .urd-abm-group {
+  display: none;
+}
+
+.urd-preview .urd-abm-group.open {
+  display: block;
+}
+
+.urd-preview .urd-abm-items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  align-content: start;
+}
+
+/* A heading in the menu: the open group's name in the slim form's panel, and the recent blocks' (in the side form the list's marked row names the group) */
+.urd-preview .urd-add-block-group {
+  margin: 2px 2px 4px;
+  font: 700 9.5px/1.3 system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--urd-color-text);
+  opacity: 0.55;
+}
+
+.urd-preview .urd-add-block-menu:not(.urd-abm-slim) .urd-abm-group > .urd-add-block-group,
+.urd-preview .urd-abm-recent {
+  display: none;
+}
+
+.urd-preview .urd-add-block-menu button {
+  font: 12px/1.2 system-ui, sans-serif;
+  color: var(--urd-color-text);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 18%, transparent);
+  border-radius: 7px;
+  padding: 6px 8px;
+  text-align: left;
+  cursor: pointer;
+  /* Long labels without spaces (plugin views, for example) must never
+     burst the cell: break the word instead of overflowing the menu. */
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Each kind and group with its picture before its name (block-palette.js) */
+.urd-preview .urd-add-block-menu button:has(> svg) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.urd-preview .urd-add-block-menu button > svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--urd-color-accent);
+}
+
+.urd-preview .urd-add-block-menu button:hover {
+  border-color: var(--urd-color-accent);
+  background: color-mix(in srgb, var(--urd-color-accent) 12%, transparent);
+}
+
+/* The row the arrow keys have walked to, marked a shade stronger than hover
+   so the keyboard and the pointer can be told apart. */
+.urd-preview .urd-add-block-menu button.urd-pick-active {
+  border-color: var(--urd-color-accent);
+  background: color-mix(in srgb, var(--urd-color-accent) 22%, transparent);
+}
+
+/* A group's row in the list: borderless, and filled with the accent while its blocks are shown */
+.urd-preview .urd-add-block-menu .urd-abm-tab {
+  flex: none;
+  border-color: transparent;
+}
+
+.urd-preview .urd-add-block-menu .urd-abm-tab[hidden] {
+  display: none;
+}
+
+.urd-preview .urd-add-block-menu .urd-abm-tab > span:not(.urd-abm-chevron) {
+  flex: 1;
+  min-width: 0;
+}
+
+.urd-preview .urd-add-block-menu .urd-abm-tab:hover {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--urd-color-text) 8%, transparent);
+}
+
+.urd-preview .urd-add-block-menu .urd-abm-tab.on {
+  border-color: var(--urd-color-accent);
+  background: var(--urd-color-accent);
+  color: var(--urd-color-bg);
+  font-weight: 600;
+}
+
+.urd-preview .urd-add-block-menu .urd-abm-tab.on > svg {
+  color: inherit;
+}
+
+.urd-preview .urd-abm-chevron {
+  display: none;
+  opacity: 0.6;
+}
+
+/* The slim form (the Urd settings): the groups' list alone, 240 px wide and as tall as its rows, under the blocks added last.
+   A group's blocks open in a panel beside the menu (fitFlyout), so this form lets the panel out of its box and scrolls the list instead.
+   The panel's arrow points to the side it opens on. */
+.urd-preview .urd-add-block-menu.urd-abm-slim {
+  width: 240px;
+  height: auto;
+  overflow: visible;
+}
+
+.urd-preview .urd-abm-slim .urd-abm-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.urd-preview .urd-abm-slim .urd-abm-rail {
+  flex: 1;
+  padding-right: 0;
+  border-right: 0;
+}
+
+.urd-preview .urd-abm-slim .urd-abm-chevron {
+  display: inline-flex;
+}
+
+.urd-preview .urd-abm-slim.urd-abm-flip .urd-abm-chevron {
+  transform: scaleX(-1);
+}
+
+.urd-preview .urd-abm-slim .urd-abm-recent:not(:empty) {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--urd-color-text) 12%, transparent);
+}
+
+.urd-preview .urd-abm-slim .urd-abm-pane {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: calc(100% + 6px);
+  box-sizing: border-box;
+  width: 220px;
+  padding: 8px;
+  background: var(--urd-color-surface);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 15%, transparent);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 45%);
+}
+
+.urd-preview .urd-abm-slim .urd-abm-pane.open {
+  display: block;
+}
+
+.urd-preview .urd-abm-slim.urd-abm-flip .urd-abm-pane {
+  left: auto;
+  right: calc(100% + 6px);
+}
+
+.urd-preview .urd-abm-slim .urd-abm-items {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+}
+
+.urd-preview .urd-abm-slim .urd-abm-recent button,
+.urd-preview .urd-abm-slim .urd-abm-items button {
+  border-color: transparent;
+}
+
+/* A plugin's fold: an expandable submenu across the group's columns */
 .urd-preview .urd-add-block-shapes-toggle {
   grid-column: 1 / -1;
 }
 
-/* The fold's caret is drawn, never a character, and turns over while the
-   fold is open (the FAQ block's chevron pattern). */
+/* The fold's caret is drawn, never a character, and turns over while the fold is open (the FAQ block's chevron pattern). */
 .urd-preview .urd-fold-caret {
   display: inline-flex;
   vertical-align: -1px;
@@ -13277,19 +13862,6 @@ body:has(dialog:modal) {
   }
 }
 
-/* Plugin blocks: their own labelled section below the built-in ones */
-.urd-preview .urd-add-block-plugins {
-  grid-column: 1 / -1;
-  margin-top: 2px;
-  padding-top: 6px;
-  border-top: 1px solid color-mix(in srgb, var(--urd-color-text) 15%, transparent);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.55;
-}
-
 .urd-preview .urd-add-block-shapes {
   display: none;
   grid-column: 1 / -1;
@@ -13302,37 +13874,6 @@ body:has(dialog:modal) {
 
 .urd-preview .urd-add-block-shapes.open {
   display: grid;
-}
-
-.urd-preview .urd-add-block-menu.open {
-  display: grid;
-}
-
-.urd-preview .urd-add-block-menu button {
-  font: 12px/1.2 system-ui, sans-serif;
-  color: var(--urd-color-text);
-  background: transparent;
-  border: 1px solid color-mix(in srgb, var(--urd-color-text) 18%, transparent);
-  border-radius: 6px;
-  padding: 6px 8px;
-  text-align: left;
-  cursor: pointer;
-  /* Long labels without spaces (plugin views, for example) must never
-     burst the cell: break the word instead of overflowing the menu. */
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.urd-preview .urd-add-block-menu button:hover {
-  border-color: var(--urd-color-accent);
-  background: color-mix(in srgb, var(--urd-color-accent) 12%, transparent);
-}
-
-/* The row the arrow keys have walked to, marked a shade stronger than hover
-   so the keyboard and the pointer can be told apart. */
-.urd-preview .urd-add-block-menu button.urd-pick-active {
-  border-color: var(--urd-color-accent);
-  background: color-mix(in srgb, var(--urd-color-accent) 22%, transparent);
 }
 
 /* Placeholder for unknown types: neutral, never destructive */
@@ -13733,10 +14274,13 @@ body:not(.urd-mobile) .urd-nav:not(.urd-nav-mobile) .urd-nav-tools-none {
 
 /* The panel takes the submenu's surface, so the launcher reads as part of the
    menu rather than as a page element. Any number of shortcuts is allowed, so
-   the panel scrolls rather than growing past the viewport. */
+   the panel scrolls rather than growing past the viewport. Its width, the marks
+   and the names follow the size's scale (--urd-launcher-s), or each its own px
+   value (--urd-launcher-w, -icon, -text; launcherVars in nav-model.js). */
 .urd-nav-launcher {
   display: none;
-  min-width: 15rem;
+  width: var(--urd-launcher-w, calc(15rem * var(--urd-launcher-s, 1)));
+  max-width: calc(100vw - 2rem);
   max-height: min(60vh, 26rem);
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -13850,9 +14394,34 @@ body:not(.urd-mobile) .urd-nav:not(.urd-nav-mobile) .urd-nav-tools-none {
   object-fit: cover;
 }
 
+/* A name never sets the panel's or a column's width: it takes the width its tile has (contain: inline-size), and a name too long for it is cut with an ellipsis or folded onto more lines (nav.launcher.longNames).
+   The grid's name stretches across its tile, the list's fills the row beside the mark, and the cover's spans its card already. */
+.urd-nav-launcher-name {
+  contain: inline-size;
+  min-width: 0;
+}
+
+.urd-nav-launcher-view-grid .urd-nav-launcher-name {
+  align-self: stretch;
+}
+
+.urd-nav-launcher-view-list .urd-nav-launcher-name {
+  flex: 1 1 auto;
+}
+
+.urd-nav-launcher-names-cut .urd-nav-launcher-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.urd-nav-launcher-names-wrap .urd-nav-launcher-name {
+  overflow-wrap: anywhere;
+}
+
 /* Grid: three columns of tiles, the mark on a soft plate over the label. */
 .urd-nav-launcher-view-grid {
-  grid-template-columns: repeat(3, minmax(4.5rem, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .urd-nav-launcher-view-grid .urd-nav-launcher-link {
@@ -13860,12 +14429,14 @@ body:not(.urd-mobile) .urd-nav:not(.urd-nav-mobile) .urd-nav-tools-none {
   gap: 0.4rem;
   padding: 0.7rem 0.4rem 0.6rem;
   text-align: center;
-  font-size: 0.78rem;
+  font-size: var(--urd-launcher-text, calc(0.78rem * var(--urd-launcher-s, 1)));
 }
 
 .urd-nav-launcher-view-grid .urd-nav-launcher-icon {
-  width: 2.6rem;
-  height: 2.6rem;
+  width: var(--urd-launcher-icon, calc(2.6rem * var(--urd-launcher-s, 1)));
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 1;
   border-radius: var(--urd-radius-md);
 }
 
@@ -13878,12 +14449,12 @@ body:not(.urd-mobile) .urd-nav:not(.urd-nav-mobile) .urd-nav-tools-none {
 .urd-nav-launcher-view-list .urd-nav-launcher-link {
   gap: 0.65rem;
   padding: 0.5rem 0.55rem;
-  font-size: 0.9rem;
+  font-size: var(--urd-launcher-text, calc(0.9rem * var(--urd-launcher-s, 1)));
 }
 
 .urd-nav-launcher-view-list .urd-nav-launcher-icon {
-  width: 1.9rem;
-  height: 1.9rem;
+  width: var(--urd-launcher-icon, calc(1.9rem * var(--urd-launcher-s, 1)));
+  height: var(--urd-launcher-icon, calc(1.9rem * var(--urd-launcher-s, 1)));
   border-radius: var(--urd-radius-sm);
 }
 
@@ -13891,7 +14462,7 @@ body:not(.urd-mobile) .urd-nav:not(.urd-nav-mobile) .urd-nav-tools-none {
    lies on a scrim along the bottom. A shortcut without an image keeps its
    drawn mark in the middle of the card. */
 .urd-nav-launcher-view-cover {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.45rem;
 }
 
@@ -13902,7 +14473,7 @@ body:not(.urd-mobile) .urd-nav:not(.urd-nav-mobile) .urd-nav-tools-none {
   overflow: hidden;
   border-radius: var(--urd-radius-md);
   background: color-mix(in srgb, var(--urd-color-accent) 12%, transparent);
-  font-size: 0.8rem;
+  font-size: var(--urd-launcher-text, calc(0.8rem * var(--urd-launcher-s, 1)));
   font-weight: 600;
 }
 
@@ -13915,8 +14486,8 @@ body:not(.urd-mobile) .urd-nav:not(.urd-nav-mobile) .urd-nav-tools-none {
 }
 
 .urd-nav-launcher-view-cover .urd-nav-launcher-icon svg {
-  width: 28px;
-  height: 28px;
+  width: var(--urd-launcher-icon, calc(28px * var(--urd-launcher-s, 1)));
+  height: var(--urd-launcher-icon, calc(28px * var(--urd-launcher-s, 1)));
 }
 
 .urd-nav-launcher-view-cover .urd-nav-launcher-name {
@@ -14079,7 +14650,10 @@ body:not(.urd-mobile) .urd-nav:not(.urd-nav-mobile) .urd-nav-tools-none {
   z-index: 1;
   min-width: 12rem;
   margin: 0;
-  padding: 0.5rem;
+  /* The padding as two variables, so the second level can stand clear of the panel (below) */
+  --urd-nav-sub-pad-y: 0.5rem;
+  --urd-nav-sub-pad-x: 0.5rem;
+  padding: var(--urd-nav-sub-pad-y) var(--urd-nav-sub-pad-x);
   list-style: none;
   /* Its own surface variable: by default only the color veil, never the background
      image (nav.style.subImage turns the image on; nav.js sets the variable) */
@@ -14125,11 +14699,13 @@ body:not(.urd-mobile) .urd-nav:not(.urd-nav-mobile) .urd-nav-tools-none {
   background: none;
   backdrop-filter: none;
   box-shadow: none;
-  padding: 0.4rem 0;
+  --urd-nav-sub-pad-y: 0.4rem;
+  --urd-nav-sub-pad-x: 0px;
   gap: 0.35rem;
 }
 
-.urd-nav-sub-pills .urd-nav-sub a {
+.urd-nav-sub-pills .urd-nav-sub a,
+.urd-nav-sub-pills .urd-nav-sub .urd-nav-toggle {
   /* Its own pill color (nav.style.subPillColor) with the submenu surface as the
      default; the shadow falls downwards only (see the card above) */
   background: var(--urd-nav-sub-pill, var(--urd-nav-sub-bg, color-mix(in srgb, var(--urd-color-surface) 92%, transparent)));
@@ -14139,10 +14715,45 @@ body:not(.urd-mobile) .urd-nav:not(.urd-nav-mobile) .urd-nav-tools-none {
   box-shadow: 0 6px 14px -4px rgb(0 0 0 / 15%);
 }
 
+/* An opener without a page of its own is the pill itself, its arrow at the end */
+.urd-nav-sub-pills .urd-nav-sub .urd-nav-toggle {
+  width: 100%;
+  justify-content: space-between;
+  opacity: 1;
+}
+
+/* A row with its own submenu keeps its arrow inside the pill: the link and
+   the caret share one grid cell, the caret at the pill's end over the link's
+   wider right padding. A submenu that stands in the flow (the phone menus, the
+   column) is placed in the row under it by itself; one that opens beside the
+   panel keeps no grid line, so it is placed from the row. */
+.urd-nav-sub-pills .urd-nav-sub .urd-nav-has-sub {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+}
+
+.urd-nav-sub-pills .urd-nav-sub .urd-nav-has-sub > a,
+.urd-nav-sub-pills .urd-nav-sub .urd-nav-has-sub > .urd-nav-caret {
+  grid-area: 1 / 1;
+}
+
+.urd-nav-sub-pills .urd-nav-sub .urd-nav-has-sub > a {
+  padding-right: 2.4rem;
+}
+
+.urd-nav-sub-pills .urd-nav-sub .urd-nav-has-sub > .urd-nav-caret {
+  justify-self: end;
+  margin-right: 0.6rem;
+  position: relative;
+  z-index: 1;
+}
+
 .urd-nav-sub-lines .urd-nav-sub {
   border-radius: 0;
   box-shadow: none;
-  padding: 0.25rem 0;
+  --urd-nav-sub-pad-y: 0.25rem;
+  --urd-nav-sub-pad-x: 0px;
 }
 
 .urd-nav-sub-lines .urd-nav-sub a {
@@ -15049,6 +15660,233 @@ body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav-hover-pill:not(.urd-na
   }
 }
 
+/* Menu item options (0.7.13.21). The description is a second line under the
+   label; the bar hides it on its own row, where a two-line item would grow
+   the bar, and the submenus, the column and the mobile menus show it. */
+.urd-nav-label,
+.urd-nav-desc {
+  display: block;
+}
+
+.urd-nav-desc {
+  font-size: 0.8em;
+  opacity: 0.7;
+  white-space: normal;
+  max-width: 18rem;
+  margin-top: 0.1rem;
+}
+
+body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav:not(.urd-nav-mobile) .urd-nav-list > li > a .urd-nav-desc,
+body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav:not(.urd-nav-mobile) .urd-nav-list > li > .urd-nav-toggle .urd-nav-desc {
+  display: none;
+}
+
+/* A call to action drawn as a button (item.look button): the accent surface
+   with its text colour, kept on hover, whatever the hover style. The
+   selectors carry the nav class so they outrank the row rules of the column
+   and the mobile menus above. */
+.urd-nav .urd-nav-list .urd-nav-btn > a {
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text, #fff);
+  padding: 0.45em 1.1em;
+  border-radius: 999px;
+  margin-inline: 0;
+  transition: filter 0.15s ease;
+}
+
+.urd-nav .urd-nav-list .urd-nav-btn > a:hover,
+.urd-nav .urd-nav-list .urd-nav-btn > a:focus-visible {
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text, #fff);
+  filter: brightness(1.1);
+}
+
+.urd-nav-hover-underline .urd-nav-list .urd-nav-btn > a::after {
+  content: none;
+}
+
+body.urd-mobile .urd-nav .urd-nav-list .urd-nav-btn > a,
+.urd-nav-mobile .urd-nav-list .urd-nav-btn > a,
+.urd-nav-side-host .urd-nav .urd-nav-list .urd-nav-btn > a {
+  text-align: center;
+  padding: 0.55em 1rem;
+  margin-top: 0.35rem;
+}
+
+/* The burger's word beside its drawing (nav.style.burger) */
+.urd-nav-burger {
+  gap: 0.35rem;
+  font: inherit;
+}
+
+.urd-nav-burger-label {
+  font-size: 0.9em;
+}
+
+/* The second submenu level: a child's own submenu opens beside the panel,
+   on the outer side, and stacks as an accordion in the column and the
+   mobile menus like the first level. It is placed past the panel's padding,
+   so it starts at the panel's outer edge, neither over the panel nor apart
+   from it, with its first entry level with the row that opened it. The two
+   panels touch: a gap between them would put the pointer on the page on its
+   way across, which leaves the menu. */
+.urd-nav-sub .urd-nav-has-sub {
+  position: relative;
+  align-self: auto;
+}
+
+.urd-nav-sub .urd-nav-has-sub > a {
+  flex: 1;
+}
+
+.urd-nav-sub .urd-nav-sub {
+  top: calc(-1 * var(--urd-nav-sub-pad-y));
+  left: calc(100% + var(--urd-nav-sub-pad-x));
+}
+
+.urd-nav-right .urd-nav-sub .urd-nav-sub {
+  left: auto;
+  right: calc(100% + var(--urd-nav-sub-pad-x));
+}
+
+/* The row reaches across the panel's padding to the second level with an
+   invisible bridge: the pointer on its way over stays inside the row, so a
+   slow move never counts as leaving it and never closes the second level. */
+.urd-nav-sub .urd-nav-has-sub::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  width: var(--urd-nav-sub-pad-x);
+}
+
+.urd-nav-right .urd-nav-sub .urd-nav-has-sub::after {
+  left: auto;
+  right: 100%;
+}
+
+/* Where the second level stands in the flow (the phone menus, the column, a
+   headed group) there is nothing to bridge, and the strip would reach past the
+   menu's edge over the page. */
+body.urd-mobile .urd-nav-sub .urd-nav-has-sub::after,
+.urd-nav-mobile .urd-nav-sub .urd-nav-has-sub::after,
+.urd-nav-side-host .urd-nav-sub .urd-nav-has-sub::after,
+.urd-nav-sub-grouped .urd-nav-sub .urd-nav-has-sub::after {
+  content: none;
+}
+
+/* In a column layout or the flyout the second level stands as a headed
+   group: the child is the heading (its link, or its opener without the
+   chevron) and its submenu is a list in the flow under it. nav.js keeps
+   these open and takes the opener out of the tab order. */
+body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav-sub-grouped:not(.urd-nav-mobile) .urd-nav-sub .urd-nav-has-sub {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Room for a heading with a description in every column (the flyout has the full width anyway) */
+body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav-sub-grouped:not(.urd-nav-mobile) .urd-nav-list > li > .urd-nav-sub {
+  min-width: calc(var(--urd-nav-sub-cols, 1) * 12rem);
+}
+
+body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav-sub-grouped:not(.urd-nav-mobile) .urd-nav-sub .urd-nav-has-sub > .urd-nav-caret,
+body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav-sub-grouped:not(.urd-nav-mobile) .urd-nav-sub .urd-nav-has-sub > .urd-nav-toggle svg {
+  display: none;
+}
+
+body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav-sub-grouped:not(.urd-nav-mobile) .urd-nav-sub .urd-nav-has-sub > a,
+body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav-sub-grouped:not(.urd-nav-mobile) .urd-nav-sub .urd-nav-has-sub > .urd-nav-toggle {
+  font-weight: 600;
+  justify-content: flex-start;
+}
+
+body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav-sub-grouped:not(.urd-nav-mobile) .urd-nav-sub .urd-nav-has-sub > .urd-nav-toggle {
+  cursor: default;
+  opacity: 1;
+}
+
+body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav-sub-grouped:not(.urd-nav-mobile) .urd-nav-sub .urd-nav-sub {
+  display: block;
+  position: static;
+  min-width: 0;
+  margin: 0;
+  padding: 0.15rem 0 0;
+  background: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+/* A menu tucked above the top edge (nav.hideMode on a page in nav.hideOn):
+   fixed and translated out of view; the pointer at the edge, the ghost or the
+   pull tab bring it in (nav.js). The page keeps no clearance for it. */
+.urd-nav-tuck {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5000;
+  transform: translateY(-100%);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.urd-preview .urd-nav-tuck {
+  z-index: 100001;
+}
+
+.urd-nav-tuck.urd-nav-peek {
+  transform: translateY(0);
+  opacity: 0.45;
+}
+
+.urd-nav-tuck.urd-nav-shown {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* The pull tab hangs below the host's bottom edge, so it stays in view while
+   the bar is tucked and sits under the bar once it is in. The default is
+   the burger lines in the submenu's surface; the owner's own colours come
+   as variables from nav.js. */
+.urd-nav-tab {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.9rem 0.35rem;
+  border: 0;
+  border-radius: 0 0 var(--urd-radius-md) var(--urd-radius-md);
+  background: var(--urd-nav-tab-bg, var(--urd-nav-sub-bg, color-mix(in srgb, var(--urd-color-surface) 92%, transparent)));
+  color: var(--urd-nav-tab-color, var(--urd-color-text));
+  backdrop-filter: var(--urd-nav-blur, blur(8px));
+  box-shadow: 0 6px 14px -4px rgb(0 0 0 / 18%);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85em;
+}
+
+.urd-nav-tab svg {
+  width: 18px;
+  height: 18px;
+}
+
+.urd-nav-tab img {
+  width: 1.4em;
+  height: 1.4em;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-nav-tuck {
+    transition: none;
+  }
+}
+
 /* Smart guides: snap lines while a block is dragged (preview only). A line
    between the block and a neighbour spans the two, a line of the content
    surface spans its section, so preview-edit sets the span inline. */
@@ -15071,6 +15909,27 @@ body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav-hover-pill:not(.urd-na
 
 .urd-preview .urd-smart-guide-h {
   height: calc(3px * var(--urd-chrome-scale, 1));
+}
+
+/* The section a dragged block will move to (preview-edit.js): a dashed frame
+   inside its edge in the admin accent while the block is held wholly outside
+   its own section over it, so the landing place is read before the release */
+.urd-preview .urd-section.urd-drop-target {
+  outline: calc(2px * var(--urd-chrome-scale, 1)) dashed var(--urd-admin-accent, #6c5ce7);
+  outline-offset: calc(-2px * var(--urd-chrome-scale, 1));
+}
+
+/* The row a block dragged in the phone view will be pinned into: a line across
+   the flow at that row's top, in the guides' magenta, moving with the drag */
+.urd-preview .urd-row-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  height: calc(2px * var(--urd-chrome-scale, 1));
+  background: #ff2d87;
+  box-shadow: 0 0 0 calc(1px * var(--urd-chrome-scale, 1)) color-mix(in srgb, #000 70%, transparent);
+  pointer-events: none;
 }
 
 /* Equal gaps: a band over each gap that becomes equal, with its size in px,
@@ -15517,6 +16376,649 @@ body.urd-marqueeing {
   gap: 0.4rem 1.2rem;
 }
 
+/* The site's contact details (site.site.contact) as an <address>, without the italic browsers give it: lines in the contact column, one wrapping row in the plain and the large CTA builds. */
+#urd-footer address {
+  font-style: normal;
+}
+.urd-footer-address {
+  display: grid;
+  gap: 0.55rem;
+}
+.urd-footer-address-lines {
+  white-space: pre-line;
+  line-height: 1.45;
+}
+.urd-footer-contact-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.2rem;
+}
+.urd-footer-center .urd-footer-contact-inline {
+  justify-content: center;
+}
+.urd-footer-right .urd-footer-contact-inline {
+  justify-content: flex-end;
+}
+.urd-footer-contact-inline a {
+  color: inherit;
+}
+.urd-footer-wrap > .urd-footer-contact-inline {
+  margin-top: 1.2rem;
+}
+
+/* The contact block (blocks/contact.js): the site's contact details in one of its designs, an <address> whose own width picks each design's narrow layout (a container query), so a phone and a narrow frame both get it. Links keep the text colour, labels and actions take the accent. */
+.urd-contact {
+  container-type: inline-size;
+  font-style: normal;
+  line-height: 1.5;
+}
+.urd-contact-in {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+}
+.urd-contact a {
+  color: inherit;
+}
+.urd-contact-link {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+.urd-contact-address {
+  white-space: pre-line;
+}
+.urd-contact-legal {
+  font-size: 0.85em;
+  opacity: 0.75;
+}
+.urd-contact-quiet {
+  opacity: 0.75;
+}
+.urd-contact-empty {
+  opacity: 0.6;
+}
+.urd-contact-label {
+  font-size: 0.75em;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--urd-color-accent);
+}
+.urd-contact-icon {
+  display: inline-flex;
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+}
+.urd-contact-icon svg {
+  display: block;
+}
+.urd-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  text-decoration: none;
+}
+a.urd-contact-row > span:last-child {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+.urd-contact-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+}
+.urd-contact-side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  min-width: 0;
+}
+
+/* Icon rows: each detail after its icon in a circle tinted with the accent. */
+.urd-contact-icons .urd-contact-in {
+  gap: 0.5em;
+}
+.urd-contact-icons .urd-contact-name {
+  margin-bottom: 0.2em;
+}
+.urd-contact-icons .urd-contact-row {
+  align-items: flex-start;
+  gap: 0.85em;
+  min-height: 2.75em;
+}
+.urd-contact-icons .urd-contact-row > :last-child {
+  padding-top: 0.4em;
+}
+.urd-contact-icons .urd-contact-icon {
+  box-sizing: border-box;
+  width: 2.3em;
+  height: 2.3em;
+  padding: 0.55em;
+  border-radius: 50%;
+  color: var(--urd-color-accent);
+  background: rgb(127 127 127 / 12%);
+  background: color-mix(in srgb, var(--urd-color-accent) 14%, transparent);
+}
+
+/* The card: the details on the theme's surface, two columns that stack when the card is narrow, the legal line along the bottom. */
+.urd-contact-card .urd-contact-in {
+  gap: 1.1em;
+  padding: 1.6em;
+  border-radius: var(--urd-radius-md, 14px);
+  background: var(--urd-color-surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 6%), 0 12px 32px rgb(0 0 0 / 8%);
+  overflow: hidden;
+}
+.urd-contact-card .urd-contact-name {
+  font-size: 1.3em;
+  line-height: 1.25;
+}
+.urd-contact-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1em 1.6em;
+}
+.urd-contact-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+}
+.urd-contact-col .urd-contact-label {
+  color: inherit;
+  opacity: 0.7;
+}
+.urd-contact-card .urd-contact-foot {
+  margin: 0 -1.6em -1.6em;
+  padding: 0.9em 1.6em;
+  border-top: 1px solid rgb(127 127 127 / 20%);
+  border-top-color: color-mix(in srgb, currentColor 12%, transparent);
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+@container (max-width: 30rem) {
+  .urd-contact-cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .urd-contact-card .urd-contact-in {
+    padding: 1.4em 1.3em;
+  }
+  .urd-contact-card .urd-contact-foot {
+    margin: 0 -1.3em -1.4em;
+    padding-inline: 1.3em;
+  }
+}
+
+/* Three tiles: visit, call and write, side by side while each has room and stacked when not. */
+.urd-contact-tiles .urd-contact-in {
+  gap: 0.9em;
+}
+.urd-contact-tilegrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13em, 1fr));
+  gap: 0.9em;
+}
+.urd-contact-tile {
+  display: flex;
+  gap: 0.9em;
+  padding: 1.2em;
+  border-radius: var(--urd-radius-md, 14px);
+  background: var(--urd-color-surface);
+  border: 1px solid rgb(127 127 127 / 18%);
+  border-color: color-mix(in srgb, currentColor 10%, transparent);
+  text-decoration: none;
+}
+.urd-contact-tile .urd-contact-icon {
+  width: 1.5em;
+  height: 1.5em;
+  color: var(--urd-color-accent);
+}
+.urd-contact-tiletext {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  min-width: 0;
+}
+.urd-contact-tile .urd-contact-label {
+  color: inherit;
+  opacity: 0.7;
+}
+.urd-contact-tile .urd-contact-value {
+  overflow-wrap: anywhere;
+}
+a.urd-contact-tile .urd-contact-value {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* The fact list: a named row for each detail between thin rules. */
+.urd-contact-facts .urd-contact-in {
+  gap: 0.8em;
+}
+.urd-contact-factlist {
+  display: grid;
+  grid-template-columns: minmax(6em, max-content) minmax(0, 1fr);
+  margin: 0;
+  border-top: 1px solid rgb(127 127 127 / 25%);
+  border-top-color: color-mix(in srgb, currentColor 15%, transparent);
+}
+.urd-contact-factlist dt,
+.urd-contact-factlist dd {
+  margin: 0;
+  padding: 0.65em 0;
+  border-bottom: 1px solid rgb(127 127 127 / 25%);
+  border-bottom-color: color-mix(in srgb, currentColor 15%, transparent);
+}
+.urd-contact-factlist dt {
+  padding-right: 1.4em;
+  opacity: 0.7;
+}
+@container (max-width: 20rem) {
+  .urd-contact-factlist {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .urd-contact-factlist dt {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+  .urd-contact-factlist dd {
+    padding-top: 0.1em;
+  }
+}
+
+/* Action buttons, and the save button every design but the strip can carry: round buttons, the first action filled with the accent. */
+.urd-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6em;
+  margin: 0.9em 0 0.5em;
+}
+.urd-contact-btn,
+.urd-contact-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  box-sizing: border-box;
+  min-height: 2.9em;
+  padding: 0 1.3em;
+  border: 1.5px solid rgb(127 127 127 / 40%);
+  border-color: color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.urd-contact .urd-contact-actions > .urd-contact-btn:first-child {
+  border-color: var(--urd-color-accent);
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text);
+}
+.urd-contact-save {
+  align-self: flex-start;
+  margin-top: 0.6em;
+  border-color: var(--urd-color-accent);
+  color: var(--urd-color-accent);
+}
+.urd-contact-actions .urd-contact-save {
+  margin-top: 0;
+}
+.urd-contact-poster .urd-contact-save {
+  border-color: currentColor;
+  color: inherit;
+}
+@container (max-width: 26rem) {
+  .urd-contact-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .urd-contact-actions > :first-child {
+    grid-column: 1 / -1;
+  }
+  .urd-contact-btn,
+  .urd-contact-save {
+    min-height: 3.2em;
+    padding-inline: 0.8em;
+  }
+  .urd-contact-save {
+    align-self: stretch;
+  }
+}
+
+/* Beside a map: the details and OpenStreetMap's map behind a cover that loads it on a tap, stacked when the block is narrow. */
+.urd-contact-map .urd-contact-in {
+  display: grid;
+  grid-template-columns: minmax(14em, 2fr) minmax(0, 3fr);
+  gap: 2em;
+  align-items: stretch;
+}
+.urd-contact-map .urd-contact-side {
+  justify-content: center;
+}
+.urd-contact .urd-contact-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  align-self: flex-start;
+  min-height: 2.75em;
+  font-weight: 600;
+  color: var(--urd-color-accent);
+}
+.urd-contact-mapbox {
+  position: relative;
+  min-height: 16em;
+  border: 1px solid rgb(127 127 127 / 20%);
+  border-color: color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: var(--urd-radius-md, 14px);
+  overflow: hidden;
+  background-color: rgb(127 127 127 / 10%);
+  background-image: linear-gradient(90deg, rgb(127 127 127 / 14%) 1px, transparent 1px), linear-gradient(rgb(127 127 127 / 14%) 1px, transparent 1px);
+  background-size: 2.4em 2.4em;
+}
+.urd-contact-mapcover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8em;
+  padding: 1.2em;
+  text-align: center;
+}
+.urd-contact-mapbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 3em;
+  padding: 0 1.5em;
+  border: 0;
+  border-radius: 999px;
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.urd-contact-mapnote {
+  max-width: 22em;
+  font-size: 0.8em;
+  opacity: 0.75;
+}
+.urd-contact-mapempty {
+  opacity: 0.7;
+}
+.urd-contact-mapframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+@container (max-width: 40rem) {
+  .urd-contact-map .urd-contact-in {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4em;
+  }
+  .urd-contact-mapbox {
+    min-height: 18em;
+  }
+}
+
+/* The strip: the name and every detail on one row, on a band in the theme's text colour unless the band is off; one per line when narrow. */
+.urd-contact-strip .urd-contact-in {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em 1.6em;
+}
+.urd-contact-band .urd-contact-in {
+  padding: 1.1em 1.6em;
+  border-radius: var(--urd-radius-sm, 8px);
+  background: var(--urd-color-text);
+  color: var(--urd-color-bg);
+}
+.urd-contact-strip .urd-contact-icon {
+  opacity: 0.75;
+}
+.urd-contact-strip .urd-contact-legal {
+  flex-basis: 100%;
+}
+@container (max-width: 40rem) {
+  .urd-contact-strip .urd-contact-in {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1em;
+  }
+  .urd-contact-band .urd-contact-in {
+    padding: 1.1em 1.2em;
+  }
+  .urd-contact-strip .urd-contact-name {
+    margin-bottom: 0.3em;
+  }
+  .urd-contact-strip .urd-contact-row {
+    min-height: 2.75em;
+  }
+}
+
+/* The poster: the email and the phone in large type on the accent colour, the address and the legal line small below. */
+.urd-contact-poster .urd-contact-in {
+  gap: 1.6em;
+  padding: 2em 2.2em;
+  border-radius: var(--urd-radius-md, 14px);
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text);
+}
+.urd-contact-poster .urd-contact-label {
+  color: inherit;
+  opacity: 0.8;
+}
+.urd-contact-big {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  font-family: var(--urd-font-heading, inherit);
+  font-size: 2.2em;
+  font-size: clamp(1.25em, 7cqi, 3.4em);
+  font-weight: 650;
+  line-height: 1.15;
+}
+.urd-contact-big .urd-contact-link {
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.15em;
+}
+.urd-contact-poster .urd-contact-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.5em 1.5em;
+}
+.urd-contact-poster .urd-contact-legal {
+  opacity: 0.8;
+}
+@container (max-width: 30rem) {
+  .urd-contact-poster .urd-contact-in {
+    padding: 1.6em 1.4em;
+  }
+  .urd-contact-poster .urd-contact-foot {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* By role: a card for each contact point, a divided list when narrow. */
+.urd-contact-roles .urd-contact-in {
+  gap: 1.1em;
+}
+.urd-contact-roles .urd-contact-head {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.2em 1.4em;
+}
+.urd-contact-roles .urd-contact-name {
+  font-size: 1.2em;
+}
+.urd-contact-rolelist {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15em, 1fr));
+  gap: 0.8em;
+  margin: 0;
+}
+.urd-contact-role {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  padding: 1.1em 1.25em;
+  border: 1px solid rgb(127 127 127 / 18%);
+  border-color: color-mix(in srgb, currentColor 10%, transparent);
+  border-radius: var(--urd-radius-md, 12px);
+  background: var(--urd-color-surface);
+}
+.urd-contact-role dd {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  margin: 0;
+}
+@container (max-width: 30rem) {
+  .urd-contact-roles .urd-contact-head {
+    flex-direction: column;
+  }
+  .urd-contact-rolelist {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    border-top: 1px solid rgb(127 127 127 / 25%);
+    border-top-color: color-mix(in srgb, currentColor 15%, transparent);
+  }
+  .urd-contact-role {
+    padding: 0.8em 0 0.4em;
+    border: 0;
+    border-bottom: 1px solid rgb(127 127 127 / 25%);
+    border-bottom-color: color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 0;
+    background: none;
+  }
+  .urd-contact-role .urd-contact-link {
+    display: flex;
+    align-items: center;
+    min-height: 2.75em;
+  }
+}
+
+/* Beside a QR code: the code on white with its caption, beside the details; under them in a row of its own when narrow. */
+.urd-contact-qr .urd-contact-in {
+  display: grid;
+  grid-template-columns: 12em minmax(0, 1fr);
+  gap: 2em;
+  align-items: center;
+}
+.urd-contact-qrfig {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6em;
+  margin: 0;
+  font-size: 0.85em;
+  text-align: center;
+}
+.urd-contact-qrcode {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0.5em;
+  border: 1px solid rgb(127 127 127 / 18%);
+  border-radius: var(--urd-radius-md, 14px);
+  background: #fff;
+}
+.urd-contact-qrcode svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@container (max-width: 30rem) {
+  .urd-contact-qr .urd-contact-in {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4em;
+  }
+  .urd-contact-qrfig {
+    order: 1;
+    flex-direction: row;
+    gap: 1em;
+    padding: 0.8em;
+    border-radius: var(--urd-radius-md, 14px);
+    background: var(--urd-color-surface);
+    text-align: start;
+  }
+  .urd-contact-qrcode {
+    flex: none;
+    width: 8.5em;
+    padding: 0.3em;
+  }
+}
+
+/* The bar docked to the bottom of a phone's screen (the dock option): call, email and the map, the first filled. It is a manual popover in the top layer, and these rules place it whether the Popover API is there or not; the page keeps room for it below its last line. */
+.urd-contact-dock {
+  position: fixed;
+  inset: auto 0.75rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  z-index: 900;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 0.4rem;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0.4rem;
+  overflow: visible;
+  border: 1px solid rgb(127 127 127 / 20%);
+  border-radius: 1.25rem;
+  background: var(--urd-color-bg);
+  color: var(--urd-color-text);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%), 0 12px 32px rgb(0 0 0 / 18%);
+}
+/* Until it stands in the top layer the bar is hidden where the Popover API exists; without the API the selector is unknown, the rule drops, and the bar stands fixed by the rule above. */
+.urd-contact-dock[popover]:not(:popover-open) {
+  display: none;
+}
+.urd-contact-dockbtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 3.6rem;
+  border-radius: 0.9rem;
+  color: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.urd-contact-dockbtn .urd-contact-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--urd-color-accent);
+}
+.urd-contact-dockbtn:first-child {
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text);
+}
+.urd-contact-dockbtn:first-child .urd-contact-icon {
+  color: inherit;
+}
+body:has(.urd-contact-dock) {
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+
 /* The doormat link row (Centered / Large CTA): one centered row of links. */
 .urd-footer-linkrow {
   display: flex;
@@ -15669,8 +17171,11 @@ body.urd-marqueeing {
   height: 200%;
 }
 
+/* Every gradient animation reads its time per round from --urd-grad-time, set
+   inline on the layer from its speed field (gradientRender); the fallback is
+   the animation's own pace. */
 .urd-bg-pan-runner {
-  animation: urd-bg-pan 18s ease-in-out infinite alternate;
+  animation: urd-bg-pan var(--urd-grad-time, 18s) ease-in-out infinite alternate;
 }
 
 @keyframes urd-bg-pan {
@@ -15690,7 +17195,7 @@ body.urd-marqueeing {
 .urd-bg-loop-runner {
   position: absolute;
   inset: 0;
-  animation: urd-bg-loop 30s linear infinite;
+  animation: urd-bg-loop var(--urd-grad-time, 30s) linear infinite;
 }
 
 @keyframes urd-bg-loop {
@@ -15700,7 +17205,7 @@ body.urd-marqueeing {
 /* Rotation: the angle spins through the registered --urd-grad-spin
    (CSS.registerProperty in gradient.js); without support it stands still */
 .urd-bg-rotate {
-  animation: urd-bg-rotate 40s linear infinite;
+  animation: urd-bg-rotate var(--urd-grad-time, 40s) linear infinite;
 }
 
 @keyframes urd-bg-rotate {
@@ -15710,7 +17215,7 @@ body.urd-marqueeing {
 /* Pulsing (radial): the strength breathes around the layer's own opacity;
    the 0/100 % frames inherit the inline value, so the breath always starts there */
 .urd-bg-pulse {
-  animation: urd-bg-pulse 7s ease-in-out infinite;
+  animation: urd-bg-pulse var(--urd-grad-time, 7s) ease-in-out infinite;
 }
 
 @keyframes urd-bg-pulse {
@@ -15721,7 +17226,7 @@ body.urd-marqueeing {
    so the center of the gradient stays in place, and the orbit swings it ±2 % of
    its own size (= 4 % of the surface) */
 .urd-bg-orbit-runner {
-  animation: urd-bg-orbit 26s ease-in-out infinite;
+  animation: urd-bg-orbit var(--urd-grad-time, 26s) ease-in-out infinite;
 }
 
 @keyframes urd-bg-orbit {
@@ -16158,6 +17663,22 @@ html.urd-arriving::view-transition-new(root) {
   }
 }
 
+/* A jump to a spot on the page (a link's fragment, the arrival jump in urd.js, and focus moving down the page) stops below a menu that stays on screen.
+   nav.js writes the room from the menu's own height (scrollClear in nav-model.js). */
+html {
+  scroll-padding-top: var(--urd-scroll-clear, 0px);
+}
+
+/* A named spot (render.js placeSpot): a zero-size marker at the top of its section or block, which a link's fragment lands on and which moves with the block. */
+.urd-anchor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
 /* The "Back to top" arrow (mountToTop in urd.js) */
 .urd-totop {
   position: fixed;
@@ -16280,12 +17801,6 @@ body.urd-mobile .urd-section-resize-top {
 .urd-preview .urd-mobile-pin svg {
   width: calc(11px * var(--urd-chrome-scale, 1));
   height: calc(11px * var(--urd-chrome-scale, 1));
-}
-
-/* Armed reset ("Sure?") in the section toolbar */
-.urd-preview .urd-section-toolbar button.urd-armed {
-  background: #d94f3d;
-  color: #fff;
 }
 
 /* The hidden-on-mobile list: a floating panel below the section toolbar, with
@@ -16512,6 +18027,50 @@ body.urd-mobile .urd-section-resize-top {
   display: block;
 }
 
+/* The handles on the other edges and corners: each sits on its edge, counter-scaled from the point that stays put, with the cursor of its direction. */
+.urd-preview .urd-edit-resize[data-edge="e"],
+.urd-preview .urd-edit-resize[data-edge="w"] {
+  top: 50%;
+  bottom: auto;
+  margin-top: -6px;
+  cursor: ew-resize;
+}
+
+.urd-preview .urd-edit-resize[data-edge="n"],
+.urd-preview .urd-edit-resize[data-edge="s"] {
+  left: 50%;
+  right: auto;
+  margin-left: -6px;
+  cursor: ns-resize;
+}
+
+.urd-preview .urd-edit-resize[data-edge="w"],
+.urd-preview .urd-edit-resize[data-edge="nw"],
+.urd-preview .urd-edit-resize[data-edge="sw"] {
+  right: auto;
+  left: -6px;
+}
+
+.urd-preview .urd-edit-resize[data-edge="n"],
+.urd-preview .urd-edit-resize[data-edge="ne"],
+.urd-preview .urd-edit-resize[data-edge="nw"] {
+  bottom: auto;
+  top: -6px;
+}
+
+.urd-preview .urd-edit-resize[data-edge="ne"],
+.urd-preview .urd-edit-resize[data-edge="sw"] {
+  cursor: nesw-resize;
+}
+
+.urd-preview .urd-edit-resize[data-edge="e"] { transform-origin: center right; }
+.urd-preview .urd-edit-resize[data-edge="w"] { transform-origin: center left; }
+.urd-preview .urd-edit-resize[data-edge="n"] { transform-origin: top center; }
+.urd-preview .urd-edit-resize[data-edge="s"] { transform-origin: bottom center; }
+.urd-preview .urd-edit-resize[data-edge="ne"] { transform-origin: top right; }
+.urd-preview .urd-edit-resize[data-edge="nw"] { transform-origin: top left; }
+.urd-preview .urd-edit-resize[data-edge="sw"] { transform-origin: bottom left; }
+
 /* A block whose height follows its content (ADR-0025): its handle changes the
    width only on the desktop, and a pull up or down stops at the content's edge,
    where a bar says why for as long as the pointer is held. The bar takes the
@@ -16634,11 +18193,10 @@ body.urd-mobile .urd-section-resize-top {
   cursor: text;
 }
 
-/* While editing, the hovered or selected block is raised visually to the top, so that
-   the handles can always be reached even if other blocks lie above it (z order).
-   The true layer order is shown when the block is deselected - and ALWAYS in Clean
-   view (chrome-off), which must be exactly what visitors see. */
-.urd-preview:not(.urd-chrome-off) .urd-editable:hover {
+/* While editing, the block under the pointer or the selected block is raised visually to the top, so that the handles can always be reached even if other blocks lie above it (z order).
+   The raised one is the smallest block under the pointer (preview-edit.js sets the class), so a small block over a larger one can be reached.
+   The true layer order is shown when the block is deselected - and ALWAYS in Clean view (chrome-off), which must be exactly what visitors see. */
+.urd-preview:not(.urd-chrome-off) .urd-editable.urd-hover-top {
   z-index: 99998 !important;
 }
 
@@ -16813,10 +18371,14 @@ body.urd-mobile .urd-section-resize-top {
   transform: translateX(-50%) scale(var(--urd-chrome-scale, 1));
   transform-origin: top center;
   display: flex;
-  width: min(560px, calc(100vw - 16px));
-  max-height: min(70vh, 460px);
+  /* The caps are divided by the scale, so the drawn gallery fits the frame.
+     placePresetMenu (preview-edit.js) chooses the side and holds the height to the room there. */
+  width: min(560px, calc((100vw - 16px) / var(--urd-chrome-scale, 1)));
+  max-height: min(calc(70vh / var(--urd-chrome-scale, 1)), 460px);
   overflow: hidden;
   background: var(--urd-color-bg);
+  /* The text takes the admin theme's colour set on the bar, not the page's inherited colour. */
+  color: var(--urd-color-text);
   border: 1px solid color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 45%, transparent);
   border-radius: 10px;
   box-shadow: 0 12px 32px rgb(0 0 0 / 45%);
@@ -16827,6 +18389,7 @@ body.urd-mobile .urd-section-resize-top {
 .urd-preview .urd-preset-menu.urd-preset-up {
   top: auto;
   bottom: 8px;
+  transform-origin: bottom center;
 }
 
 /* The category colors (F2): five fixed steps derived from
@@ -16972,6 +18535,21 @@ body.urd-mobile .urd-section-resize-top {
   cursor: pointer;
 }
 
+/* Both forms of the picker are counter-scaled like the section toolbar they open from, and kept clear of it.
+   The toolbar's height (--urd-picker-clear, measured when the picker opens) grows with the scale past its box in the flow, which the drop clears.
+   The sticky offset parks the picker under the parked toolbar.
+   The negative bottom margin gives the drop back, so the section takes the same height at any scale. */
+.urd-preview .urd-layout-strip,
+.urd-preview .urd-layout-menu {
+  --urd-picker-scale: var(--urd-chrome-scale, 1);
+  --urd-picker-drop: calc(var(--urd-picker-clear, 33px) * (var(--urd-picker-scale) - 1) + 6px * var(--urd-picker-scale));
+  top: calc(var(--urd-nav-h-base, var(--urd-nav-h, 56px)) + (var(--urd-picker-clear, 33px) + 14px) * var(--urd-picker-scale));
+  margin-top: var(--urd-picker-drop);
+  margin-bottom: calc(-1 * var(--urd-picker-drop));
+  transform: scale(var(--urd-picker-scale));
+  box-sizing: border-box;
+}
+
 /* The change-layout strip (variant B): a horizontal row of thumbnails that
    sticks to the screen while you are in the section (like the toolbar, right
    below it), so the choice stays visible in tall sections too. The same
@@ -16979,11 +18557,12 @@ body.urd-mobile .urd-section-resize-top {
    the floating menu. */
 .urd-preview .urd-layout-strip {
   position: sticky;
-  top: 96px;
   z-index: 100001;
   display: flex;
   gap: 6px;
-  margin: 0 8px;
+  width: calc((100% - 16px) / var(--urd-picker-scale));
+  margin-left: 8px;
+  transform-origin: top left;
   padding: 6px;
   overflow-x: auto;
   background: color-mix(in srgb, var(--urd-color-bg) 88%, transparent);
@@ -16996,10 +18575,14 @@ body.urd-mobile .urd-section-resize-top {
    cards in a 2-column panel anchored at the toolbar, also sticky. */
 .urd-preview .urd-layout-menu {
   position: sticky;
-  top: 96px;
   z-index: 100001;
-  width: min(320px, calc(100% - 16px));
-  margin: 0 8px 0 auto;
+  width: min(320px, calc((100% - 16px) / var(--urd-picker-scale)));
+  /* Held to the view below its parked place, scrolling inside when longer. */
+  max-height: max(120px, calc((100vh - var(--urd-nav-h-base, var(--urd-nav-h, 56px)) - 8px) / var(--urd-picker-scale) - var(--urd-picker-clear, 33px) - 14px));
+  overflow-y: auto;
+  margin-right: 8px;
+  margin-left: auto;
+  transform-origin: top right;
   padding: 6px;
   background: var(--urd-color-bg);
   border: 1px solid color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 45%, transparent);
@@ -17071,17 +18654,16 @@ body.urd-mobile .urd-section-resize-top {
   text-overflow: ellipsis;
 }
 
-/* Block search in the + New block menu (variant B): a field at the top; during
-   an active search the menu's ordinary content is hidden and a flat, ranked
-   result list is shown instead (the urd-searching class). */
+/* Block search in the + New block menu: a field at the top.
+   During an active search the menu's ordinary content is hidden and a flat, ranked result list is shown instead (the urd-searching class), scrolling inside the menu. */
 .urd-preview .urd-block-search {
-  grid-column: 1 / -1;
+  flex: none;
   display: flex;
   align-items: center;
   gap: 6px;
   border: 1px solid color-mix(in srgb, var(--urd-color-text) 20%, transparent);
   border-radius: 7px;
-  padding: 4px 8px;
+  padding: 5px 8px;
 }
 
 .urd-preview .urd-block-search svg {
@@ -17099,13 +18681,26 @@ body.urd-mobile .urd-section-resize-top {
   min-width: 0;
 }
 
-.urd-preview .urd-add-block-menu.urd-searching > :not(.urd-block-search):not(.urd-block-hits) {
+.urd-preview .urd-add-block-menu.urd-searching > :not(.urd-block-search):not(.urd-block-hits),
+.urd-preview .urd-block-hits {
   display: none;
 }
 
-/* The hits take part in the menu's own grid (two columns) */
-.urd-preview .urd-block-hits {
-  display: contents;
+.urd-preview .urd-add-block-menu.urd-searching .urd-block-hits {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  align-content: start;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* The slim form grows with its rows, so its hits are held to a height of their own */
+.urd-preview .urd-abm-slim.urd-searching .urd-block-hits {
+  grid-template-columns: minmax(0, 1fr);
+  max-height: 320px;
 }
 
 .urd-preview .urd-block-hits .urd-search-empty {
@@ -17318,6 +18913,17 @@ body.urd-mobile .urd-section-resize-top {
 .urd-preview .urd-section-toolbar button:hover {
   background: var(--urd-admin-accent, #5f6a75);
   color: var(--urd-admin-accent-text, #fff);
+}
+
+/* The section's name for links (preview-edit.js addSectionToolbar) */
+.urd-preview .urd-section-toolbar .urd-anchor-tag {
+  align-self: center;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--urd-color-surface) 85%, transparent);
+  color: var(--urd-color-text);
+  font-size: 12px;
+  line-height: 1;
+  padding: 5px 8px;
 }
 
 /* Clean view: the editor can hide every editing handle, so the page

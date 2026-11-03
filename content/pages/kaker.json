@@ -20,7 +20,7 @@
             "type": "image",
             "version": 2,
             "props": {
-              "src": "/media/bakgrunn-f5939d16.webp",
+              "src": "/media/images/bakgrunn-f5939d16.webp",
               "fit": "plain",
               "x": 0.5,
               "y": 0.5,
@@ -33,17 +33,17 @@
           },
           {
             "type": "gradient",
-            "version": 1,
+            "version": 2,
             "props": {
               "kind": "linear",
               "stops": [
                 {
                   "color": "#00fff5",
-                  "share": 50
+                  "at": 25
                 },
                 {
                   "color": "#00a19b",
-                  "share": 50
+                  "at": 75
                 }
               ],
               "angle": 160,
@@ -89,6 +89,7 @@
           "id": "blk-b35fc0b9",
           "type": "text",
           "version": 1,
+          "anchor": "meld-deg-inn",
           "props": {
             "html": "<h3>Meld deg inn</h3><p>Forklar dette steget kort.</p>",
             "align": "center",
@@ -538,6 +539,7 @@
     {
       "id": "sec-4c908354",
       "version": 1,
+      "anchor": "video",
       "preset": "blank",
       "size": {
         "minHeight": "640px"

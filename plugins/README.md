@@ -1,92 +1,47 @@
 # Plugins
 
-En Urd-plugin er en mappe her med et manifest (`plugin.json`) og en ES-modul
-(`index.js`) som eksporterer `register(Urd)`. Plugins bruker de samme
-define-API-ene som kjernen (blokker, seksjonspresets, bakgrunner, animasjoner,
-maler) og er underlagt samme migreringskontrakt: en plugin-oppdatering kan
-aldri knuse eksisterende innhold.
+An Urd plugin is a folder here with a manifest (`plugin.json`) and an ES module (`index.js`) that exports `register(Urd)`. Plugins use the same define APIs as the core (blocks, section presets, backgrounds, animations, templates) and are bound by the same migration contract: a plugin update can never break existing content.
 
-Aktive plugins listes i [`plugins.json`](plugins.json) (statiske hoster kan
-ikke liste mapper, derfor en indeksfil). Admin håndterer listen for deg:
-Plugins-panelet viser mappene her automatisk (via publiseringslaget, eller
-sist kjente liste), og av/på-valget publiseres som en vanlig endring.
+The active plugins are listed in [`plugins.json`](plugins.json) (static hosts cannot list folders, hence an index file). The admin handles the list for you: the Plugins panel shows the folders here automatically (through the publishing layer, or the last known list), and switching a plugin on or off is published as an ordinary change.
 
-Urd sender med én plugin: den svenske språkpakken [`lang-sv/`](lang-sv/),
-som er eksempelet på en språkpakke (se under). Kalender, skjema, kart og
-besøksmåling var referanseplugins til og med 0.7.3 og er kjerneblokker og
-en nettstedsinnstilling fra milepæl 0.7.18 (24. september 2026); mønstrene
-de viste står beskrevet under, med kjernens kode som lesestoff.
+Urd ships one plugin: the Swedish language pack [`lang-sv/`](lang-sv/), which is the example of a language pack (see below). Calendar, form, map and visitor measurement were reference plugins up to and including 0.7.3, and are core blocks and a site setting from milestone 0.7.18 (24 September 2026); the patterns they showed are described below, with the core's code to read.
 
-## Utvikle en plugin lokalt
+## Developing a plugin locally
 
-1. Start den lokale serveren fra nettstedets mappe (`python3 dev-server.py`;
-   i Urd-repoet fra repo-roten) og åpne `http://localhost:8000/admin/`. Den
-   sender ingenting som kan caches, så en vanlig oppdatering laster alltid den
-   nyeste koden i pluginen din; en vanlig statisk server lar nettleseren beholde
-   gamle filer til cachen tømmes.
-2. Legg mappen din her (`plugins/<din-id>/` med `plugin.json` + `index.js`).
-3. Aktiver den i Plugins-panelet (skriv mappenavnet hvis panelet ikke kan
-   liste mapper lokalt). Forhåndsvisningen laster pluginen fra UTKASTET,
-   så du ser blokkene dine live uten å publisere.
-4. Manifestfeil, motorversjonskrav og provides-avvik logges i nettleser-
-   konsollen og vises i panelet.
+1. Start the local server from the site's folder (`python3 dev-server.py`; in the Urd repo, from the repo root) and open `http://localhost:8000/admin/`. It sends nothing that can be cached, so an ordinary reload always loads the newest code of your plugin; an ordinary static server lets the browser keep old files until its cache is emptied.
+2. Put your folder here (`plugins/<your-id>/` with `plugin.json` and `index.js`).
+3. Switch it on in the Plugins panel (type the folder name if the panel cannot list folders locally). The preview loads the plugin from the DRAFT, so you see your blocks live without publishing.
+4. Manifest errors, engine version requirements and `provides` mismatches are logged in the browser console and shown in the panel.
 
-Manifestkrav: `requiresEngine` (semver-intervall mot motorversjonen i
-urd.json; en grense med flere enn tre tall leses av motorer fra 0.7.7), `provides` (hva pluginen definerer), og valgfritt `csp`
-(eksterne opprinnelser pluginen trenger; se ADR-0006 - `_headers` endres
-aldri automatisk, admin viser eieren hva som må legges inn). `entry` og
-`provides` er valgfrie for rene språkpakker, som ikke har kode (se under).
+Manifest requirements: `requiresEngine` (a semver range against the engine version in urd.json; a bound with more than three numbers is read by engines from 0.7.7), `provides` (what the plugin defines), and optionally `csp` (the external origins the plugin needs; see ADR-0006: `_headers` is never changed automatically, and the admin shows the owner what has to be added). `entry` and `provides` are optional for pure language packs, which have no code (see below).
 
-**Dele pluginen:** legg den i et eget offentlig GitHub-repo og sett
-GitHub-topicen `urd-plugin`, så den kan finnes med topic-søk (maler delt
-som repo bruker `urd-template`). Brukere installerer ved å kopiere mappen inn
-i `plugins/` og aktivere den i Plugins-panelet.
+**Sharing the plugin:** put it in a public GitHub repo of its own and give it the GitHub topic `urd-plugin`, so it can be found by topic search (templates shared as a repo use `urd-template`). Users install it by copying the folder into `plugins/` and switching it on in the Plugins panel.
 
-## Flerspråk (ADR-0012)
+## Several languages (ADR-0012)
 
-Sett `"locales": true` i manifestet og legg `locales/{nb,nn,en-GB,se,tr}.js`
-i pluginmappen, samme form som motorens locale-filer:
+Set `"locales": true` in the manifest and put `locales/{nb,nn,en-GB,se,tr}.js` in the plugin folder, in the same form as the engine's locale files:
 
 ```js
 // plugins/<id>/locales/nb.js
-export default { lang: 'nb', strings: { '<id>.nokkel': 'Tekst', '<id>.edit.nokkel': 'Panel-tekst' } };
+export default { lang: 'nb', strings: { '<id>.key': 'Tekst', '<id>.edit.key': 'Panel-tekst' } };
 ```
 
-- **Nøklene prefikses med plugin-id-en** (`calendar.*`); editor-/config-
-  panel-nøkler ligger under `<id>.edit.*`. Én strings-flate per fil.
-- **nb er basen**: lasteren legger nb i bunn og valgt språk oppå, så en
-  manglende nøkkel faller til bokmål. Paritetstesten (`node --test
-  tests/i18n.test.mjs`) finner `locales/`-mappen automatisk og krever
-  komplette nøkkelsett i kjernespråkene nb/en-GB/tr, ingen tomme verdier,
-  ingen tankestrek og samme `{var}`-tokens; nn/se kan ha etterslep (fylles
-  i oversettelsesrunder), men aldri ukjente nøkler.
-- **Oppslag**: `import { t, ta } from '/assets/urd/i18n.js'` - `t()` for
-  besøkende-tekster (site-språket), `ta()` for editor-chromen (admin-
-  språket). `/assets/urd/` er det STABILE plugin-API-et (ADR-0013):
-  motoren selv bor i en versjonert mappe (`/assets/engine/<versjon>/`)
-  som byttes ved hver Urd-utgivelse - hardkod aldri den versjonerte
-  stien i en plugin. Kall dem KUN i render-/fabrikkfunksjoner, aldri på modulnivå
-  (modulen kan evalueres før ordboka er lastet); tabeller på modulnivå
-  holder nøkkelNAVN, og blokk-/preset-defs bruker de additive feltene
-  `labelKey`/`hintKey` (behold `label`/`hint` som fallback).
-- **Seed-regelen**: tekst som SKRIVES INN i brukerdata (felt-defaults,
-  preset-innhold) oversettes ÉN gang ved innsetting med admin-språket -
-  `ta()` inne i `defaults()`/`create()`-kroppen, aldri ved rendering av
-  eksisterende data.
-- `"names": {"nb": "Kalender", "en-GB": "Calendar", …}` i manifestet gir
-  Plugins-panelet og «Fra pluginen …»-tekstene et visningsnavn per
-  admin-språk (`name` er fallback).
+- **The keys are prefixed with the plugin id** (`calendar.*`); editor and config panel keys go under `<id>.edit.*`. One `strings` object per file.
+- **nb is the base**: the loader puts nb at the bottom and the chosen language on top, so a missing key falls back to bokmål. The parity test (`node --test tests/i18n.test.mjs`) finds the `locales/` folder by itself and requires complete key sets in the core languages nb, en-GB and tr, no empty values, no em dash and the same `{var}` tokens; nn and se may lag behind (they are filled in translation rounds), but never with unknown keys.
+- **Lookups**: `import { t, ta } from '/assets/urd/i18n.js'`: `t()` for visitor texts (the site language), `ta()` for the editor chrome (the admin language). `/assets/urd/` is the STABLE plugin API (ADR-0013): the engine itself lives in a versioned folder (`/assets/engine/<version>/`) that is swapped at every Urd release, so never hard-code the versioned path in a plugin. Call them ONLY in render and factory functions, never at module level (the module can be evaluated before the dictionary has loaded); tables at module level hold key NAMES, and block and preset definitions use the additive fields `labelKey` and `hintKey` (keep `label` and `hint` as the fallback).
+- **The seed rule**: text that is WRITTEN INTO user data (field defaults, preset content) is translated ONCE on insertion with the admin language, through `ta()` inside the body of `defaults()` or `create()`, never when existing data is rendered.
+- `"names": {"nb": "Kalender", "en-GB": "Calendar", …}` in the manifest gives the Plugins panel and the «From the plugin …» texts a display name per admin language (`name` is the fallback).
 
-## Språkpakker: en plugin som KUN er et språk
+## Language packs: a plugin that is ONLY a language
 
-Trenger du et språk Urd ikke har innebygd, lages det som en plugin uten
-kode. `lang-sv` er referansen (svensk for både besøkende- og admin-siden):
+A language Urd does not have built in is made as a plugin without code. `lang-sv` is the reference (Swedish for both the visitor side and the admin side):
 
 ```json
-// plugins/lang-sv/plugin.json - ingen entry, ingen provides
+// plugins/lang-sv/plugin.json: no entry, no provides
 {
   "id": "lang-sv",
-  "name": "Svensk språkpakke",
+  "name": "Swedish language pack",
+  "names": { "nb": "Svensk språkpakke", "en-GB": "Swedish language pack", "tr": "İsveççe dil paketi" },
   "version": "1.0.0",
   "requiresEngine": ">=0.6.8 <1.0.0",
   "languages": [{ "code": "sv", "name": "Svenska", "site": true, "admin": true }]
@@ -94,64 +49,32 @@ kode. `lang-sv` er referansen (svensk for både besøkende- og admin-siden):
 ```
 
 ```
-plugins/lang-sv/locales/site/sv.js     besøkende-tekstene (t())
-plugins/lang-sv/locales/admin/sv.js    admin-chromen (ta())
+plugins/lang-sv/locales/site/sv.js     the visitor texts (t())
+plugins/lang-sv/locales/admin/sv.js    the admin chrome (ta())
 ```
 
-- **Filene har samme form og nøkler som motorens egne** locale-filer:
-  kopier motorens `locales/site/nb.js` (28 nøkler) eller
-  `.../admin/nb.js` (984 nøkler) og oversett verdiene. Nøklene endres
-  aldri.
-- **`site` og `admin` er uavhengige.** En pakke kan dekke besøkende-siden,
-  admin-chromen eller begge; feltene sier hva du faktisk leverer, og bare
-  det som er lovet blir etterspurt.
-- **Bokmålsbasen ligger under**, så en delvis pakke virker: nøkler du ikke
-  har oversatt vises på bokmål i stedet for å forsvinne. Paritetstesten
-  krever derfor ikke fullt sett for pakker, men slår ned på nøkler som
-  ikke finnes i basen (skrivefeil som aldri ville vist seg).
-- **Innebygde språk kan ikke overstyres** (`nb`, `nn`, `en-GB`, `se`,
-  `tr`): en plugin skal ikke kunne kapre bokmål. Vil du forbedre et av
-  dem, rediger motorens egen locale-fil (se [CONTRIBUTING.md](../../CONTRIBUTING.md)).
-- **Språket blir tilgjengelig når pakken er aktivert** i Plugins-panelet.
-  Besøkende-språket (Nettsted-panelet) følger utkastet med én gang;
-  admin-språkvelgeren tilbyr pakken etter publisering, siden admin leser
-  den publiserte plugin-lista ved oppstart.
-- **Datoer, flertall og relativ tid trenger ingen oversettelse**: de går
-  via `Intl` med språkkoden din, så lenge nettleseren har CLDR-data for
-  den.
+- **The files have the same form and keys as the engine's own** locale files: copy the engine's `locales/site/nb.js` or `.../admin/nb.js` and translate the values. The keys never change.
+- **`site` and `admin` are independent.** A pack can cover the visitor side, the admin chrome or both; the fields say what you actually deliver, and only what is promised is asked for.
+- **The bokmål base lies underneath**, so a partial pack works: keys you have not translated show in bokmål instead of disappearing. The parity test therefore does not require a full set for packs, but it catches keys that do not exist in the base (typos that would never show).
+- **Built-in languages cannot be overridden** (`nb`, `nn`, `en-GB`, `se`, `tr`): a plugin must not be able to hijack bokmål. To improve one of them, edit the engine's own locale file (see [CONTRIBUTING.md](../../CONTRIBUTING.md)).
+- **The language becomes available when the pack is switched on** in the Plugins panel. The visitor language (the Site panel) follows the draft at once; the admin language picker offers the pack after publishing, since the admin reads the published plugin list when it starts.
+- **Dates, plurals and relative time need no translation**: they go through `Intl` with your language code, as long as the browser has CLDR data for it.
 
-**Hjelpechip-regelen (ADR-0008)**: har blokken din spesialfunksjoner
-(egne paneler, konvensjoner i innholdet, automatikk), SKAL den ha en
-«?»-chip som forklarer dem. Bruk den felles hjelperen, kun i preview:
+**The help chip rule (ADR-0008)**: if your block has special functions (panels of its own, conventions in the content, automation), it MUST have a «?» chip that explains them. Use the shared helper, in the preview only:
 
 ```js
 if (ctx.preview) {
   import('/assets/urd/hint.js').then(({ attachHint }) => {
-    attachHint(host, { title: 'Blokken min', lines: ['Funksjon 1 …', 'Funksjon 2 …'] });
+    attachHint(host, { title: 'My block', lines: ['Function 1 …', 'Function 2 …'] });
   });
 }
 ```
 
-Plugin-blokker og -seksjonsmaler vises automatisk i egne «Plugins»-
-seksjoner i «+ Ny blokk», «+ Ny seksjon» og Blokker-panelet. En blokk-def
-kan i tillegg ha `variants: [{ label, props }, …]`: da blir den en
-foldemeny i blokkmenyene (kjernens kalenderblokk bruker det til
-visningene sine).
+Plugin blocks and section templates show up by themselves in «Plugins» sections of their own in «+ New block», «+ New section» and the Blocks panel. A block definition can also have `variants: [{ label, props }, …]`: it then becomes a fold-out menu in the block menus (the core's calendar block uses it for its views).
 
-Blokker der innholdet selv bestemmer høyden (som kalender, skjema og kart
-i kjernen) skal sette `autoGrow: true` på blokk-defen: da får blokken
-naturlig høyde i mobilvisningens autostabling i stedet for den faste
-desktophøyden, så høyere mobilinnhold aldri klippes. `autoGrow` kan også
-være en funksjon av blokkens props, for en blokk som vokser i noen
-visninger og fyller rammen i andre (kjernens galleri vokser som rutenett
-og holder rammens høyde som bånd). På desktop eier
-motorens dytt-pass boksens høyde (ADR-0024): en plugin-blokk trenger ikke
-måle seg selv, og skal aldri skrive målt høyde inn i rammen.
+Blocks whose content decides their height (like the calendar, the form and the map in the core) set `autoGrow: true` on the block definition: the block then gets its natural height in the phone view's automatic stacking instead of the fixed desktop height, so taller content on a phone is never clipped. `autoGrow` can also be a function of the block's props, for a block that grows in some views and fills its frame in others (the core's gallery grows as a grid and keeps the frame's height as a strip). On desktop the engine's push pass owns the box's height (ADR-0024): a plugin block does not need to measure itself, and must never write a measured height into its frame.
 
-**Innstillinger i Egenskaper (felt-kontrakten)**: har blokken din enkle
-innstillinger (tekst, tall, av/på, valg, sted), deklarer dem som `fields`
-på blokk-defen i stedet for å bygge et eget config-panel - admin rendrer
-dem rett i Egenskaper-panelet når blokken er markert:
+**Settings in Properties (the field contract)**: if your block has simple settings (text, number, on/off, choice, place), declare them as `fields` on the block definition instead of building a config panel of your own; the admin renders them straight in the Properties panel when the block is selected:
 
 ```js
 Urd.blocks.define('venue', {
@@ -163,51 +86,65 @@ Urd.blocks.define('venue', {
 });
 ```
 
-Typene er `text`, `number` (`min`/`max`/`step`), `toggle`, `select`
-(`options: [{ value, labelKey }]`) og `place` (stedssøk: teksten skrives
-til `key`, koordinater til props `lat`/`lon`; kjernens kartblokk bruker
-samme felt). Etikettnøklene løses av motoren før de sendes til admin, så
-bruk `labelKey` fra pluginens egen ordbok. Uten `fields` viser Egenskaper
-en «Innstillinger …»-knapp som åpner pluginens eget config-panel i
-forhåndsvisningen (referansepluginene kalender og skjema viste det
-mønsteret til og med v0.7.3, riktig for innstillinger som er mer enn en
-flat felt-liste, som kildelister). Kontrakten er beskrevet i
-[docs/SCHEMA.md](../../docs/SCHEMA.md#plugins).
+The types are `text`, `number` (`min`, `max`, `step`), `toggle`, `select` (`options: [{ value, labelKey }]`), `place` (a place search: the text is written to `key`, the coordinates to the props `lat` and `lon`; the core's map block uses the same field) and `link` (the same link field and link dialog as the core's blocks: a page or a spot on it, a web address, an email or a phone number; the link is written to `key`, and `null` when it is removed). A `link` is drawn with the resolver from `/assets/urd/links.js`, so the link follows a page's new address and a spot's new name, and an unsafe address never becomes a live link:
 
-**Temastyrt UI-regelen (ADR-0009)**: aldri native `<select>` i
-redigerings-UI - popupen følger OS-temaet og blir uleselig. Bruk
-`createDropdown` fra `/assets/urd/dropdown.js`, eller segmentknapper
-for små valgsett.
+```js
+import { resolveLink, linkAttrs } from '/assets/urd/links.js';
 
-## Mønstrene, med kjernens kode som lesestoff
+Urd.blocks.define('venue', {
+  // …
+  fields: [{ key: 'more', type: 'link', labelKey: 'venue.edit.more' }],
+  render(el, props, ctx) {
+    const a = document.createElement('a');
+    a.textContent = props.title;
+    Object.assign(a, linkAttrs(resolveLink(props.more ?? {}, ctx.site.pages ?? [])));
+    el.appendChild(a);
+  },
+});
+```
 
-Kontrakten er beskrevet i [docs/SCHEMA.md](../../docs/SCHEMA.md#plugins).
-Hele formen (manifest med provides, blokk med versjon og migrering,
-seksjonspreset, egen CSS via én style-tag, redigering i forhåndsvisningen
-via urd-edit, ren logikk i egen modul med kontraktstester) sto i
-referansepluginene kalender, skjema og kart til og med Urd 0.7.3; koden
-deres ligger i git-historikken (taggen v0.7.3, `template/plugins/`). Fra
-0.7.18 er de kjerneblokker, og motorens filer viser de samme mønstrene:
+The engine resolves the label keys before they are sent to the admin, so use a `labelKey` from the plugin's own dictionary. A field can also have a help text, `hintKey` (or `hint`), shown as the field's «?» tooltip; without it the tooltip shows the field's label. Without `fields`, Properties shows a «Settings …» button that opens the plugin's own config panel in the preview (the reference plugins calendar and form showed that pattern up to and including v0.7.3; it suits settings that are more than a flat list of fields, such as a list of sources). The contract is described in [docs/SCHEMA.md](../../docs/SCHEMA.md#plugins).
 
-- **Kalender** (`assets/engine/<versjon>/blocks/calendar.js` og `ics.js`):
-  `variants` for visningene, henting via sidens egen proxy `/api/ics` (så
-  ingen CSP-unntak), ren parser i egen modul med tester, og eksempeldata i
-  forhåndsvisningen når kilder mangler. Innstillingene (kildeliste,
-  visning, antall) redigeres i Egenskaper-panelet; som plugin (til og med
-  v0.7.3) hadde den et eget config-panel i forhåndsvisningen, mønsteret
-  for innstillinger som er mer enn en flat felt-liste.
-- **Skjema** (`blocks/form.js` og `form-model.js`): ekte skjemarendering,
-  besøkende-input som aldri blir HTML, `mailto` som nulloppsett med et
-  valgfritt endepunkt via `fetch` (som krever `connect-src` i `_headers`),
-  honeypot mot bots, og rolig degradering når endepunktet er blokkert.
-- **Kart** (`blocks/map.js` og `osm.js`): felt-kontrakten (`fields`) for
-  enkle innstillinger rett i Egenskaper, en iframe mot OpenStreetMap, og
-  en CSP-vaktpost som forklarer hvilken `frame-src`-linje som mangler om
-  en host blokkerer kartet (Urds egen `_headers` tillater den).
+**Designs (the design contract)**: if your block has several looks, declare them as `designs` on the block definition. The menu then gets the same Design row, quick tile and design picker as the core's blocks, with a picture and a live preview of the owner's own block in each design:
 
-Én forskjell gjelder for en plugin: kjernens blokker importerer
-`../i18n.js`, `../hint.js` og `../dropdown.js` direkte, mens en plugin
-ALLTID importerer fra `/assets/urd/` (motorkatalogen byttes ved hver
-utgivelse, ADR-0013). Besøksmåling (Cloudflare Web Analytics) var også en
-referanseplugin; den er nå nettstedsinnstillingen «Besøksmåling» bak
-tannhjulet i admin.
+```js
+Urd.blocks.define('venue', {
+  // …
+  designs: {
+    prop: 'variant',
+    items: [
+      { id: 'card', labelKey: 'venue.design.card', aboutKey: 'venue.design.card.about', picture: '/plugins/venue/designs/card.webp' },
+      { id: 'band', labelKey: 'venue.design.band', aboutKey: 'venue.design.band.about', picture: '/plugins/venue/designs/band.webp' },
+    ],
+  },
+});
+```
+
+`prop` is the prop the block keeps its design in, and `id` is the value written there. The engine resolves the labels and the descriptions as it does the fields'. The picture is optional and must be an image file on the site itself (a path from the root); without a picture the tile shows the name. Fewer than two designs is no choice.
+
+**The themed UI rule (ADR-0009)**: never a native `<select>` in editing UI, since its popup follows the operating system's theme and becomes unreadable. Use `createDropdown` from `/assets/urd/dropdown.js`, or segment buttons for small sets of choices. Its options are `[value, label]`, and an option may carry a fourth entry, a face `{ font, sample? }`, which draws the label in that font (a list of typefaces), or keeps the UI font for the label and draws `sample` beside it in the face.
+
+## The patterns, with the core's code to read
+
+The contract is described in [docs/SCHEMA.md](../../docs/SCHEMA.md#plugins). The whole form (a manifest with `provides`, a block with a version and migrations, a section preset, CSS of its own through one style tag, editing in the preview through `urd-edit`, pure logic in a module of its own with contract tests) stood in the reference plugins calendar, form and map up to and including Urd 0.7.3; their code is in the git history (the tag v0.7.3, `template/plugins/`). From 0.7.18 they are core blocks, and the engine's files show the same patterns:
+
+- **Calendar** (`assets/engine/<version>/blocks/calendar.js` and `ics.js`): `variants` for the views, fetching through the site's own proxy `/api/ics` (so no CSP exception), a pure parser in a module of its own with tests, and sample data in the preview while sources are missing. The settings (the list of sources, the view, the count) are edited in the Properties panel; as a plugin (up to and including v0.7.3) it had a config panel of its own in the preview, the pattern for settings that are more than a flat list of fields.
+- **Form** (`blocks/form.js` and `form-model.js`): real form rendering, visitor input that never becomes HTML, `mailto` as the zero setup with an optional endpoint through `fetch` (which needs `connect-src` in `_headers`), a honeypot against bots, and a calm fallback when the endpoint is blocked.
+- **Map** (`blocks/map.js` and `osm.js`): the field contract (`fields`) for simple settings straight in Properties, an iframe to OpenStreetMap, and a CSP sentry that explains which `frame-src` line is missing if a host blocks the map (Urd's own `_headers` allows it).
+
+One difference applies to a plugin: the core's blocks import `../i18n.js`, `../hint.js`, `../dropdown.js` and `../nav-model.js` directly, while a plugin ALWAYS imports from `/assets/urd/` (the engine folder is swapped at every release, ADR-0013). Visitor measurement (Cloudflare Web Analytics) was a reference plugin as well; it is now the site setting «Visitor measurement» behind the gear in the admin.
+
+## A command in the editor's palette
+
+The editor's command palette (Ctrl/⌘+K) lists what a plugin registers through `Urd.commands`, under a «Plugins» heading, and runs it in the preview where the plugin's code lives:
+
+```js
+export function register(Urd) {
+  Urd.commands.define('venue-refresh', {
+    labelKey: 'venue.refresh', // or label: 'Refresh the venues'
+    run({ Urd, page, site }) { /* what the command does in the preview */ },
+  });
+}
+```
+
+The label goes through the plugin's own admin dictionary (`labelKey`), with `label` as the English fallback. The palette reports the list when the plugins load, so a command defined later in the session shows after the next reload.

@@ -42,7 +42,7 @@
             "type": "image",
             "version": 2,
             "props": {
-              "src": "/media/bakgrunn-a1730034.svg",
+              "src": "/media/images/bakgrunn-a1730034.svg",
               "fit": "plain",
               "x": 0.5,
               "y": 0.5,
@@ -108,9 +108,6 @@
           "version": 1,
           "props": {
             "sources": [
-              {
-                "calendar": "apeiron"
-              },
               {
                 "calendar": "cal-5ed2f6ab"
               }
@@ -219,41 +216,41 @@
         "layers": [
           {
             "type": "gradient",
-            "version": 1,
+            "version": 2,
             "props": {
               "kind": "linear",
               "stops": [
                 {
                   "color": "#00fff5",
-                  "share": 50
+                  "at": 6.25
                 },
                 {
                   "color": "#db4949",
-                  "share": 50
+                  "at": 18.75
                 },
                 {
                   "color": "#00fff5",
-                  "share": 50
+                  "at": 31.25
                 },
                 {
                   "color": "#c0ff93",
-                  "share": 50
+                  "at": 43.75
                 },
                 {
                   "color": "#00fff5",
-                  "share": 50
+                  "at": 56.25
                 },
                 {
                   "color": "#a593ff",
-                  "share": 50
+                  "at": 68.75
                 },
                 {
                   "color": "#00fff5",
-                  "share": 50
+                  "at": 81.25
                 },
                 {
                   "color": "#ff93fb",
-                  "share": 50
+                  "at": 93.75
                 }
               ],
               "angle": 325,

@@ -4,8 +4,12 @@
     "title": "Urd",
     "lang": "no",
     "description": "Urd sin testside",
+    "commerce": {
+      "currency": "NOK",
+      "shop": true
+    },
     "meetingHosts": [],
-    "icon": "/media/ikon-9740643c.webp",
+    "icon": "/media/images/ikon-9740643c.webp",
     "setup": true,
     "calendars": [
       {
@@ -49,6 +53,13 @@
   "analytics": {
     "token": ""
   },
+  "shortcuts": [
+    "panel:collections",
+    "page:kaker"
+  ],
+  "admin": {
+    "updateNotice": "dot"
+  },
   "layout": {
     "contentWidth": 1440,
     "gutter": 6
@@ -74,9 +85,6 @@
       "radius": {
         "sm": "6px",
         "md": "12px"
-      },
-      "space": {
-        "section": "clamp(3rem, 8vw, 6rem)"
       }
     },
     "alt": {
@@ -147,7 +155,7 @@
     },
     "logo": {
       "type": "image",
-      "value": "/media/logo-91963a12.svg",
+      "value": "/media/images/logo-91963a12.svg",
       "size": 30,
       "mobileSize": 26,
       "order": "image-first",
@@ -167,7 +175,8 @@
       },
       {
         "label": "Kontakt",
-        "page": "kontakt"
+        "page": "kontakt",
+        "look": "button"
       },
       {
         "label": "Kaker",
@@ -179,11 +188,15 @@
         "children": [
           {
             "label": "Shop FP",
-            "page": "shop-fp"
-          },
-          {
-            "label": "Checkout",
-            "page": "checkout"
+            "page": "shop-fp",
+            "description": "Forsiden til butikken",
+            "children": [
+              {
+                "label": "Checkout",
+                "page": "checkout",
+                "description": "Betaling og levering"
+              }
+            ]
           },
           {
             "label": "Butikk",
@@ -192,11 +205,38 @@
         ]
       }
     ],
+    "hideOn": [
+      "checkout"
+    ],
+    "hideMode": "tab",
     "layout": "left",
     "sticky": true,
     "cart": {
       "show": true,
       "href": "/checkout"
+    },
+    "launcher": {
+      "show": false,
+      "view": "grid",
+      "size": "md",
+      "longNames": "cut",
+      "links": [
+        {
+          "label": "Bestill kaker til høstferien",
+          "page": "kaker",
+          "icon": "cart"
+        },
+        {
+          "label": "Kontakt oss",
+          "page": "kontakt",
+          "icon": "mail"
+        },
+        {
+          "label": "Butikk",
+          "page": "shop",
+          "icon": "gift"
+        }
+      ]
     },
     "style": {
       "background": {
@@ -252,7 +292,7 @@
       "title": "Urd",
       "tagline": "Bygg din egen nettside for din lille forening helt gratis!",
       "mode": "both",
-      "logo": "/media/footer-logo-84804c80.svg",
+      "logo": "/media/images/footer-logo-84804c80.svg",
       "logoHeight": 40
     },
     "columns": [
@@ -278,6 +318,16 @@
           {
             "label": "Kakevideoen",
             "href": "/kaker#sec-4c908354"
+          },
+          {
+            "label": "Bli med",
+            "page": "kaker",
+            "target": "blk-b35fc0b9"
+          },
+          {
+            "label": "Last ned logoen",
+            "href": "/media/images/footer-logo-84804c80.svg",
+            "download": true
           }
         ]
       },
@@ -287,6 +337,11 @@
           {
             "label": "Vi har ingen steder du kan følge oss",
             "href": "#"
+          },
+          {
+            "label": "Urd på GitHub",
+            "href": "https://github.com/Artiscow/Urd",
+            "newTab": true
           }
         ]
       }
