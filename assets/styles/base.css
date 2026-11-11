@@ -687,13 +687,23 @@ html {
   font-size: 0.98em;
 }
 
+/* The portrait's round frame clips its picture, which the image editor's settings place, turn and finish (picture.js) */
 .urd-quote-portrait {
+  display: block;
   width: 3rem;
   height: 3rem;
   flex: none;
   border-radius: 999px;
-  object-fit: cover;
+  overflow: hidden;
   border: 2px solid var(--urd-quote-glyph);
+}
+
+.urd-quote-portrait > img,
+.urd-quote-portrait > .urd-pic-turn > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .urd-quote-caption {
@@ -1057,6 +1067,139 @@ html {
   margin: 0;
   font-size: 11px;
   opacity: 0.6;
+}
+
+/* The cover a third-party frame stands behind until the visitor presses it (embed-cover.js): a card in the site's own colours with the provider named in a corner, the play button in the accent, a line on what loading does and the box that remembers the choice; the owner's own image under it, darkened a little so the words read. */
+.urd-cover {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.7em;
+  width: 100%;
+  height: 100%;
+  min-height: 3.5em;
+  padding: 1.2em 1em;
+  overflow: hidden;
+  text-align: center;
+  /* The cover fills the box it is given and never grows it: its own size decides what it has room for (the queries below) */
+  container: urd-cover / size;
+  color: var(--urd-color-text);
+  background: var(--urd-color-surface);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 14%, transparent);
+  border-radius: var(--urd-radius-md);
+}
+
+/* The owner's picture under the cover's words, in a frame of its own that clips it (picture.js draws its settings) */
+.urd-cover-frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.urd-cover-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.urd-cover > :not(.urd-cover-frame) {
+  position: relative;
+}
+
+.urd-cover > .urd-cover-provider {
+  position: absolute;
+  top: 0.75em;
+  left: 0.9em;
+  font-size: 0.72em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* The button stands above the words and the box, which come before it in the reading order (embed-cover.js) */
+.urd-cover-play {
+  order: -1;
+  /* Drawn above the cover's picture frame: `order` sets the painting order as well as the place */
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 3.4em;
+  height: 3.4em;
+  padding: 0;
+  color: var(--urd-color-accent-text);
+  cursor: pointer;
+  background: var(--urd-color-accent);
+  border: 0;
+  border-radius: 50%;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 25%);
+}
+
+.urd-cover-play svg {
+  width: 1.35em;
+  height: 1.35em;
+}
+
+.urd-cover-play:focus-visible {
+  outline: 3px solid var(--urd-color-accent);
+  outline-offset: 3px;
+}
+
+.urd-cover-note {
+  max-width: 34ch;
+  margin: 0;
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
+.urd-cover-always {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  font-size: 0.8em;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+/* A small cover keeps the button whole: the line goes first, then the box, then the provider's corner; the button still names the provider and is described by the line */
+@container urd-cover (max-height: 13em) or (max-width: 15em) {
+  .urd-cover-note {
+    display: none;
+  }
+}
+
+@container urd-cover (max-height: 9em) {
+  .urd-cover-always {
+    display: none;
+  }
+}
+
+@container urd-cover (max-height: 6em) {
+  .urd-cover > .urd-cover-provider {
+    display: none;
+  }
+}
+
+.urd-cover-always input {
+  accent-color: var(--urd-color-accent);
+}
+
+/* On the owner's own image the words are light, with a shadow to read on any picture */
+.urd-cover.urd-cover-pic {
+  color: #fff;
+  background: #000;
+  border: 0;
+}
+
+.urd-cover-pic .urd-cover-note,
+.urd-cover-pic .urd-cover-always,
+.urd-cover-pic .urd-cover-provider {
+  text-shadow: 0 1px 3px rgb(0 0 0 / 60%);
+  opacity: 1;
 }
 
 /* The form block: the visitor form. */
@@ -10656,6 +10799,23 @@ body.urd-mobile .urd-cal-note {
   position: static;
 }
 
+/* A note with an act (a feed that cannot be fetched offers the sample events): the act takes the pointer, the note stays clear */
+.urd-cal-note-act {
+  opacity: 0.8;
+}
+
+.urd-cal-note-btn {
+  pointer-events: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .urd-preview .urd-audio-empty {
   display: grid;
   place-items: center;
@@ -11614,6 +11774,23 @@ body.urd-mobile .urd-cal-note {
 .urd-checkout-seller-label {
   font-weight: 600;
 }
+/* A part of a template's text the owner fills in (sections/presets.js), marked in the editor's preview only: visitors see the words as text. */
+.urd-preview [data-urd-fill] {
+  background: color-mix(in srgb, var(--urd-color-accent) 16%, transparent);
+  outline: 1px dashed color-mix(in srgb, var(--urd-color-accent) 70%, transparent);
+  outline-offset: 1px;
+  border-radius: 3px;
+}
+
+/* The shop's terms of sale under the seller, in the same small type. */
+.urd-checkout-terms {
+  margin: 0;
+  font-size: 0.8em;
+  opacity: 0.8;
+}
+.urd-checkout-terms a {
+  color: inherit;
+}
 
 /* The formatting bar for text fields (preview mode only): shown above
    the block for as long as the field is being edited. Two fixed rows (Office style)
@@ -11631,8 +11808,8 @@ body.urd-mobile .urd-cal-note {
   gap: 0;
   max-width: min(760px, calc(100vw - 16px));
   padding: 4px 6px;
-  background: #151a23;
-  border: 1px solid rgb(255 255 255 / 18%);
+  background: var(--urd-admin-surface, #151a23);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 18%, transparent);
   border-radius: 8px;
   box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
 }
@@ -11646,7 +11823,7 @@ body.urd-mobile .urd-cal-note {
 }
 
 .urd-tt-row + .urd-tt-row {
-  border-top: 1px solid rgb(255 255 255 / 10%);
+  border-top: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 10%, transparent);
   padding-top: 4px;
   margin-top: 4px;
 }
@@ -11659,7 +11836,7 @@ body.urd-mobile .urd-cal-note {
 }
 
 .urd-tt-group + .urd-tt-group {
-  border-left: 1px solid rgb(255 255 255 / 18%);
+  border-left: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 18%, transparent);
   padding-left: 6px;
   margin-left: 2px;
 }
@@ -11689,15 +11866,15 @@ body.urd-mobile .urd-cal-note {
 }
 
 /* Active format button: the caret sits inside that format (bold, alignment, lists ...).
-   A neutral highlight (independent of the site theme), clear against the dark bar. */
+   The admin's accent, lightened a quarter toward its text, rings it at 3:1 or more against the bar and the fill in every admin theme. */
 .urd-text-toolbar button.active {
-  background: rgb(120 160 255 / 34%);
-  color: #fff;
-  box-shadow: inset 0 0 0 1px rgb(120 160 255 / 55%);
+  background: color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 18%, transparent);
+  color: var(--urd-admin-text, #e8eaf0);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 75%, var(--urd-admin-text, #e8eaf0));
 }
 
 .urd-text-toolbar button.active:hover {
-  background: rgb(120 160 255 / 44%);
+  background: color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 26%, transparent);
 }
 
 /* The line-height buttons in the spacing row. */
@@ -11714,7 +11891,7 @@ body.urd-mobile .urd-cal-note {
   align-items: center;
   padding-top: 4px;
   margin-top: 2px;
-  border-top: 1px solid rgb(255 255 255 / 14%);
+  border-top: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 14%, transparent);
 }
 
 .urd-tt-colorrow.visible {
@@ -11729,7 +11906,7 @@ body.urd-mobile .urd-cal-note {
   align-items: center;
   padding-top: 4px;
   margin-top: 2px;
-  border-top: 1px solid rgb(255 255 255 / 14%);
+  border-top: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 14%, transparent);
 }
 
 .urd-tt-spacerow.visible {
@@ -11740,16 +11917,16 @@ body.urd-mobile .urd-cal-note {
   font: 600 10px/1.2 system-ui, sans-serif;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgb(232 234 240 / 60%);
+  color: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 60%, transparent);
 }
 
 /* The number fields (size, letter spacing); an empty field means inherit from the theme */
 .urd-tt-num {
   width: 4em;
   font: 12px/1.3 system-ui, sans-serif;
-  color: #e8eaf0;
-  background: rgb(255 255 255 / 6%);
-  border: 1px solid rgb(255 255 255 / 20%);
+  color: var(--urd-admin-text, #e8eaf0);
+  background: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 20%, transparent);
   border-radius: 5px;
   padding: 3px 4px;
 }
@@ -11763,7 +11940,7 @@ body.urd-mobile .urd-cal-note {
   overflow-y: auto;
   padding-top: 4px;
   margin-top: 2px;
-  border-top: 1px solid rgb(255 255 255 / 14%);
+  border-top: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 14%, transparent);
 }
 
 .urd-tt-glyphrow.visible {
@@ -11774,7 +11951,7 @@ body.urd-mobile .urd-cal-note {
   font: 600 10px/1.2 system-ui, sans-serif;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgb(232 234 240 / 60%);
+  color: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 60%, transparent);
   padding: 6px 2px 3px;
 }
 
@@ -11808,7 +11985,7 @@ body.urd-mobile .urd-cal-note {
   min-width: 26px;
   height: 26px;
   font: 600 12px/1 system-ui, sans-serif;
-  color: #e8eaf0;
+  color: var(--urd-admin-text, #e8eaf0);
   background: transparent;
   border: 0;
   border-radius: 5px;
@@ -11817,24 +11994,14 @@ body.urd-mobile .urd-cal-note {
 }
 
 .urd-text-toolbar button:hover {
-  background: rgb(255 255 255 / 12%);
+  background: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 12%, transparent);
 }
 
 .urd-tt-sep {
   width: 1px;
   height: 18px;
   margin: 0 3px;
-  background: rgb(255 255 255 / 18%);
-}
-
-.urd-tt-level {
-  font: 12px/1.2 system-ui, sans-serif;
-  color: #e8eaf0;
-  background: transparent;
-  border: 1px solid rgb(255 255 255 / 20%);
-  border-radius: 5px;
-  padding: 4px 6px;
-  color-scheme: dark;
+  background: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 18%, transparent);
 }
 
 .urd-tt-color {
@@ -11842,7 +12009,7 @@ body.urd-mobile .urd-cal-note {
   height: 22px;
   padding: 1px;
   background: transparent;
-  border: 1px solid rgb(255 255 255 / 30%);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 30%, transparent);
   border-radius: 50%;
   cursor: pointer;
 }
@@ -11853,7 +12020,7 @@ body.urd-mobile .urd-cal-note {
   min-width: 18px;
   padding: 0;
   border-radius: 50%;
-  border: 1px solid rgb(255 255 255 / 30%);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 30%, transparent);
 }
 
 /* Alignment icons: three bars with different alignment */
@@ -11938,15 +12105,15 @@ body.urd-mobile .urd-cal-note {
 
 .urd-text-toolbar .urd-tt-hl-free {
   background: transparent;
-  color: #e8eaf0;
-  border: 1px dashed rgb(255 255 255 / 45%);
+  color: var(--urd-admin-text, #e8eaf0);
+  border: 1px dashed color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 45%, transparent);
 }
 
 /* "Remove highlight": an A chip with a red diagonal stroke across it */
 .urd-text-toolbar .urd-tt-hl-none {
   background: linear-gradient(to top right, transparent 44%, #e05252 44% 56%, transparent 56%);
-  color: #e8eaf0;
-  border: 1px solid rgb(255 255 255 / 30%);
+  color: var(--urd-admin-text, #e8eaf0);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 30%, transparent);
 }
 
 body.urd-chrome-off .urd-text-toolbar {
@@ -11967,9 +12134,9 @@ body.urd-chrome-off .urd-text-toolbar {
   grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   padding: 10px;
-  background: #151a23;
-  color: #e8eaf0;
-  border: 1px solid rgb(255 255 255 / 18%);
+  background: var(--urd-admin-surface, #151a23);
+  color: var(--urd-admin-text, #e8eaf0);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 18%, transparent);
   border-radius: 10px;
   box-shadow: 0 12px 36px rgb(0 0 0 / 55%);
   font: 12px/1.4 system-ui, sans-serif;
@@ -12016,7 +12183,7 @@ body.urd-chrome-off .urd-text-toolbar {
 }
 
 .urd-cp-close:hover {
-  background: rgb(255 255 255 / 12%);
+  background: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 12%, transparent);
 }
 
 .urd-cp-area {
@@ -12101,8 +12268,8 @@ body.urd-chrome-off .urd-text-toolbar {
 .urd-cp-fields input {
   font: 11px/1.3 ui-monospace, monospace;
   color: inherit;
-  background: rgb(255 255 255 / 6%);
-  border: 1px solid rgb(255 255 255 / 20%);
+  background: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 20%, transparent);
   border-radius: 5px;
   padding: 4px 5px;
   min-width: 0;
@@ -12120,8 +12287,8 @@ body.urd-chrome-off .urd-text-toolbar {
 .urd-cp-eye {
   flex: 0 0 auto;
   color: inherit;
-  background: rgb(255 255 255 / 8%);
-  border: 1px solid rgb(255 255 255 / 20%);
+  background: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 20%, transparent);
   border-radius: 5px;
   padding: 0 7px;
   cursor: pointer;
@@ -12145,7 +12312,7 @@ body.urd-chrome-off .urd-text-toolbar {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 1px solid rgb(255 255 255 / 35%);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 35%, transparent);
   cursor: pointer;
   padding: 0;
 }
@@ -12164,8 +12331,8 @@ body.urd-chrome-off .urd-text-toolbar {
   justify-content: center;
   padding: 0;
   color: inherit;
-  background: rgb(255 255 255 / 8%);
-  border: 1px solid rgb(255 255 255 / 20%);
+  background: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 20%, transparent);
   border-radius: 5px;
   font-size: 12px;
   line-height: 1;
@@ -12173,7 +12340,7 @@ body.urd-chrome-off .urd-text-toolbar {
 }
 
 .urd-cp-add:hover {
-  background: rgb(255 255 255 / 15%);
+  background: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 15%, transparent);
 }
 
 .urd-cp-saved {
@@ -12181,28 +12348,34 @@ body.urd-chrome-off .urd-text-toolbar {
   display: inline-flex;
 }
 
+/* A saved colour's deletion: the bin on the dark red every deletion draws, small on the swatch's corner */
 .urd-cp-del {
   position: absolute;
-  top: -5px;
-  right: -5px;
-  width: 13px;
-  height: 13px;
+  top: -6px;
+  right: -6px;
+  width: 16px;
+  height: 16px;
   display: none;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 0;
+  border: 1px solid #7d2a31;
   border-radius: 50%;
-  background: #e05252;
-  color: #fff;
+  background: #5e1c22;
+  color: #ffd4d4;
   font-size: 10px;
   line-height: 1;
   cursor: pointer;
 }
 
+.urd-cp-del:is(:hover, :focus-visible) {
+  background: #7a222a;
+  border-color: #9a3a42;
+}
+
 .urd-cp-del svg {
-  width: 7px;
-  height: 7px;
+  width: 9px;
+  height: 9px;
 }
 
 .urd-cp-saved:hover .urd-cp-del {
@@ -12215,228 +12388,6 @@ body.urd-chrome-off .urd-cp {
 
 /* The help chip (ADR-0008) styles itself: engine/hint.js injects its own
    style tag, so the chip can never end up unstyled with an outdated base.css. */
-
-/* The shared image editor (image-editor.js): a floating panel in preview mode */
-.urd-imged {
-  /* Counter-scaling (urd-zoom), as for the multi toolbar: the panel is
-     admin chrome and keeps the admin's size at any preview zoom. The
-     anchor is set by JS in viewport coordinates, so the origin is that
-     corner. */
-  transform: scale(var(--urd-chrome-scale, 1));
-  transform-origin: top left;
-  position: fixed;
-  z-index: 100002;
-  width: 260px;
-  max-height: calc((100vh - 16px) / var(--urd-chrome-scale, 1));
-  overflow-y: auto;
-  display: grid;
-  gap: 8px;
-  padding: 10px;
-  background: #151a23;
-  color: #e8eaf0;
-  border: 1px solid rgb(255 255 255 / 18%);
-  border-radius: 10px;
-  box-shadow: 0 12px 36px rgb(0 0 0 / 55%);
-  font: 13px/1.4 system-ui, sans-serif;
-}
-
-.urd-imged-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.urd-imged-close {
-  display: inline-flex;
-  align-items: center;
-  background: transparent;
-  border: 0;
-  color: inherit;
-  font-size: 15px;
-  line-height: 1;
-  padding: 4px 6px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.urd-imged-close:hover {
-  background: rgb(255 255 255 / 12%);
-}
-
-.urd-imged-thumb {
-  position: relative;
-  height: 130px;
-  border-radius: 8px;
-  background-size: cover;
-  background-position: center;
-  background-color: rgb(255 255 255 / 6%);
-  cursor: crosshair;
-  touch-action: none;
-}
-
-.urd-imged-thumb-empty::after {
-  content: attr(data-empty);
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  opacity: 0.5;
-}
-
-.urd-imged-dot {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  background: rgb(0 0 0 / 35%);
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 45%);
-  pointer-events: none;
-}
-
-.urd-imged-dot::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #fff;
-}
-
-.urd-imged-hint {
-  font-size: 10.5px;
-  line-height: 1.35;
-  opacity: 0.62;
-}
-
-/* Rule-of-thirds grid (as in cameras): over the image on the canvas while the editor
-   is open, and in the panel thumbnail. Faint lines at the thirds. */
-.urd-imged-grid,
-.urd-imged-thumbgrid {
-  background-image:
-    linear-gradient(to right, transparent calc(33.33% - 1px), rgb(255 255 255 / 40%) 0 33.33%, transparent 0 calc(66.67% - 1px), rgb(255 255 255 / 40%) 0 66.67%, transparent 0),
-    linear-gradient(to bottom, transparent calc(33.33% - 1px), rgb(255 255 255 / 40%) 0 33.33%, transparent 0 calc(66.67% - 1px), rgb(255 255 255 / 40%) 0 66.67%, transparent 0);
-}
-
-.urd-imged-grid {
-  position: fixed;
-  z-index: 100001;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.urd-imged-thumbgrid {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-body.urd-chrome-off .urd-imged-grid {
-  display: none !important;
-}
-
-.urd-imged-actions {
-  display: flex;
-  gap: 6px;
-}
-
-.urd-imged-btn {
-  flex: 1;
-  font: inherit;
-  color: inherit;
-  background: rgb(255 255 255 / 8%);
-  border: 1px solid rgb(255 255 255 / 20%);
-  border-radius: 6px;
-  padding: 5px 8px;
-  cursor: pointer;
-}
-
-.urd-imged-btn:hover {
-  background: rgb(255 255 255 / 15%);
-}
-
-.urd-imged-danger {
-  flex: 0 0 auto;
-  border-color: color-mix(in srgb, #e05252 60%, transparent);
-}
-
-.urd-imged-row {
-  display: grid;
-  grid-template-columns: 72px minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-}
-
-.urd-imged-row input[type='range'] {
-  width: 100%;
-  accent-color: #7c5cff;
-}
-
-.urd-imged-slider {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}
-
-.urd-imged-value {
-  flex: 0 0 auto;
-  width: 30px;
-  text-align: right;
-  font: 10px/1 ui-monospace, monospace;
-  opacity: 0.7;
-}
-
-.urd-imged-row input:not([type='range']) {
-  font: inherit;
-  color: inherit;
-  background: rgb(255 255 255 / 6%);
-  border: 1px solid rgb(255 255 255 / 20%);
-  border-radius: 6px;
-  padding: 4px 6px;
-  min-width: 0;
-  color-scheme: dark;
-}
-
-/* Segmented choices (Fit/Rounding): a styled replacement for a native select */
-.urd-imged-seg {
-  display: flex;
-  padding: 2px;
-  background: rgb(255 255 255 / 6%);
-  border: 1px solid rgb(255 255 255 / 20%);
-  border-radius: 6px;
-}
-
-.urd-imged-seg button {
-  flex: 1;
-  padding: 4px 2px;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: inherit;
-  font: 11px/1.2 system-ui, sans-serif;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.urd-imged-seg button:hover {
-  background: rgb(255 255 255 / 10%);
-}
-
-.urd-imged-seg button.selected {
-  background: #7c5cff;
-  color: #fff;
-}
-
-body.urd-chrome-off .urd-imged {
-  display: none !important;
-}
 
 /* Animations (Urd.animations). Entrance animations start invisible and
    slide in when .urd-anim-in is set (IntersectionObserver in animations/
@@ -12721,6 +12672,18 @@ a.urd-collection-title:hover {
 
 /* The video block: a placeholder without a URL, and a click shield while editing
    (a click should select the block, not start the player) */
+/* A video given a shape: that shape at the block's width, and the block's height follows it (keepsShape in push-model.js) */
+.urd-video-ratio {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--urd-ratio, 1.7778);
+}
+
+.urd-video-ratio > .urd-video-file {
+  width: 100%;
+  height: 100%;
+}
+
 .urd-video-empty {
   display: grid;
   place-items: center;
@@ -12742,9 +12705,11 @@ a.urd-collection-title:hover {
   background: #000;
 }
 
+/* In the editor's desktop view a press on the video selects the block: the shield stands above the player and above the cover's button, which is lifted over its own picture */
 .urd-video-shield {
   position: absolute;
   inset: 0;
+  z-index: 2;
 }
 
 /* The icon block: the glyph is centered in the frame */
@@ -12784,6 +12749,73 @@ a.urd-collection-title:hover {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* An image given a shape in the image editor: the frame is that shape at the block's width, and the block's height follows it (keepsShape in push-model.js) */
+.urd-image-frame.urd-image-shaped {
+  height: auto;
+}
+
+/* The picture's own shape: the picture gives the frame its height (a turned one gives it its ratio, picture.js) */
+.urd-image-frame.urd-image-own:not(.urd-pic-turned) img {
+  height: auto;
+}
+
+/* A picture's settings beyond the focus point, zoom and adjustments (picture.js).
+   The turn (quarter turns, flips, straightening) is drawn on a wrapper around the image, so the zoom keeps its focal point inside it; a quarter turn lays the wrapper across its frame, which is then a size container for it.
+   The vintage look's vignette and the overlay are drawn over the picture inside its frame, which isolates them; the duotone is a filter on the picture (an SVG gradient map, picture.js).
+   The frame is placed for its layers only where it has no place of its own (:where), so a frame laid over its box (the embed cover's) stays where it is. */
+:where(.urd-pic-turned, .urd-pic-look-vintage, .urd-pic-overlaid) {
+  position: relative;
+  isolation: isolate;
+}
+
+.urd-pic-turn {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 50%;
+}
+
+/* Over the views' own image sizes (a ribbon's image is as wide as it is), so the turned image fills its wrapper */
+.urd-pic-turned.urd-pic-turned > .urd-pic-turn > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.urd-pic-quarter {
+  container-type: size;
+}
+
+.urd-pic-quarter > .urd-pic-turn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100cqh;
+  height: 100cqw;
+  translate: -50% -50%;
+}
+
+.urd-pic-look-vintage::before,
+.urd-pic-overlaid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* The vintage tone's vignette, as the slideshow lays it over its pictures */
+.urd-pic-look-vintage::before {
+  box-shadow: inset 0 0 60px rgb(0 0 0 / 0.45);
+}
+
+.urd-pic-overlaid::after {
+  background: var(--urd-pic-overlay);
+  opacity: var(--urd-pic-overlay-strength, 0.35);
 }
 
 /* Image block with a lightbox: a zoom cursor for visitors and in Clean view;
@@ -13466,6 +13498,12 @@ body:has(dialog:modal) {
   max-height: 82vh;
   object-fit: contain;
   border-radius: 4px;
+}
+
+/* A picture given a quarter turn lies across the view, so its largest width and height swap */
+.urd-lightbox-img.urd-lightbox-across {
+  max-width: 82vh;
+  max-height: 92vw;
 }
 
 .urd-lightbox-caption {
@@ -14224,6 +14262,12 @@ body:not(.urd-mobile) .urd-nav:not(.urd-nav-mobile) .urd-nav-tools-none {
 }
 
 .urd-nav-left .urd-nav-tools {
+  margin-left: auto;
+}
+
+/* A bar without its logo (nav.logo.show false): on the phone, where the list has left the row, the burger keeps its outer edge */
+body.urd-mobile .urd-nav-no-logo:not(.urd-nav-tools-start) .urd-nav-tools,
+.urd-nav-mobile.urd-nav-no-logo:not(.urd-nav-tools-start) .urd-nav-tools {
   margin-left: auto;
 }
 
@@ -15887,28 +15931,70 @@ body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav-sub-grouped:not(.urd-n
   }
 }
 
-/* Smart guides: snap lines while a block is dragged (preview only). A line
-   between the block and a neighbour spans the two, a line of the content
-   surface spans its section, so preview-edit sets the span inline. */
+/* Smart guides: snap lines while a block is dragged (preview only).
+   A line between the block and a neighbour spans the two, a line of the content surface reaches a little past the block with its share in a label, so preview-edit sets the span inline.
+   Each line ends in a dot. */
 .urd-preview .urd-smart-guide {
   position: absolute;
-  z-index: 1001;
+  /* Above the block lift (99999): the dragged block is raised to it, and a line through an opaque block (a video, a picture) must still show */
+  z-index: 100000;
   /* The thickness is counter-scaled (urd-zoom), so the line keeps its on-screen
      thickness at every zoom level. The color is DELIBERATELY a fixed magenta and not
      the admin accent: guides must stand apart from both the grid (which uses
      the accent) and the page's own colors, whatever the admin theme. The same
      convention as Figma and Wix. The shadow gives contrast against light surfaces. */
   background: #ff2d87;
-  box-shadow: 0 0 0 calc(1px * var(--urd-chrome-scale, 1)) color-mix(in srgb, #000 70%, transparent);
+  box-shadow: 0 0 0 calc(0.5px * var(--urd-chrome-scale, 1)) color-mix(in srgb, #000 45%, transparent);
   pointer-events: none;
 }
 
 .urd-preview .urd-smart-guide-v {
-  width: calc(3px * var(--urd-chrome-scale, 1));
+  width: calc(1.5px * var(--urd-chrome-scale, 1));
 }
 
 .urd-preview .urd-smart-guide-h {
-  height: calc(3px * var(--urd-chrome-scale, 1));
+  height: calc(1.5px * var(--urd-chrome-scale, 1));
+}
+
+/* A dot at each end of the line, so a short line reads as a measure between two points. */
+.urd-preview .urd-smart-guide::before,
+.urd-preview .urd-smart-guide::after {
+  content: '';
+  position: absolute;
+  width: calc(7px * var(--urd-chrome-scale, 1));
+  height: calc(7px * var(--urd-chrome-scale, 1));
+  border-radius: 50%;
+  background: #ff2d87;
+  box-shadow: 0 0 0 calc(1px * var(--urd-chrome-scale, 1)) color-mix(in srgb, #000 50%, transparent);
+  translate: -50% -50%;
+}
+
+.urd-preview .urd-smart-guide-v::before { left: 50%; top: 0; }
+.urd-preview .urd-smart-guide-v::after { left: 50%; top: 100%; }
+.urd-preview .urd-smart-guide-h::before { left: 0; top: 50%; }
+.urd-preview .urd-smart-guide-h::after { left: 100%; top: 50%; }
+
+/* A line of the content's own: its share in a label past the line's end, below a block (clear of its toolbar above) and left of it. */
+.urd-preview .urd-smart-guide-share {
+  position: absolute;
+  padding: calc(2px * var(--urd-chrome-scale, 1)) calc(5px * var(--urd-chrome-scale, 1));
+  font: 600 calc(10px * var(--urd-chrome-scale, 1)) / 1 system-ui, sans-serif;
+  color: #fff;
+  white-space: nowrap;
+  background: #ff2d87;
+  border-radius: calc(3px * var(--urd-chrome-scale, 1));
+}
+
+.urd-preview .urd-smart-guide-v .urd-smart-guide-share {
+  left: 50%;
+  top: calc(100% + 10px * var(--urd-chrome-scale, 1));
+  translate: -50% 0;
+}
+
+.urd-preview .urd-smart-guide-h .urd-smart-guide-share {
+  left: calc(-10px * var(--urd-chrome-scale, 1));
+  top: 50%;
+  translate: -100% -50%;
 }
 
 /* The section a dragged block will move to (preview-edit.js): a dashed frame
@@ -15925,7 +16011,7 @@ body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav-sub-grouped:not(.urd-n
   position: absolute;
   left: 0;
   right: 0;
-  z-index: 1001;
+  z-index: 100000;
   height: calc(2px * var(--urd-chrome-scale, 1));
   background: #ff2d87;
   box-shadow: 0 0 0 calc(1px * var(--urd-chrome-scale, 1)) color-mix(in srgb, #000 70%, transparent);
@@ -15936,7 +16022,7 @@ body:not(.urd-mobile) :not(.urd-nav-side-host) > .urd-nav-sub-grouped:not(.urd-n
    in the same magenta as the lines */
 .urd-preview .urd-smart-gap {
   position: absolute;
-  z-index: 1001;
+  z-index: 100000;
   display: grid;
   place-items: center;
   pointer-events: none;
@@ -15983,8 +16069,8 @@ body.urd-marqueeing {
   align-items: center;
   gap: 2px;
   padding: 4px 6px;
-  background: #151a23;
-  border: 1px solid rgb(255 255 255 / 18%);
+  background: var(--urd-admin-surface, #151a23);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 18%, transparent);
   border-radius: 8px;
   box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
 }
@@ -15999,7 +16085,7 @@ body.urd-marqueeing {
   justify-content: center;
   min-width: 26px;
   height: 26px;
-  color: #e8eaf0;
+  color: var(--urd-admin-text, #e8eaf0);
   background: transparent;
   border: 0;
   border-radius: 5px;
@@ -16008,13 +16094,17 @@ body.urd-marqueeing {
 }
 
 .urd-multi-toolbar button:hover {
-  background: rgb(255 255 255 / 12%);
+  background: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 12%, transparent);
 }
 
-/* The delete button in the selection bar: a destructive tone on hover. */
-.urd-multi-toolbar .urd-multi-delete:hover {
-  background: rgb(224 82 82 / 25%);
-  color: #ffb4b4;
+/* The delete button in the selection bar: the bin on the dark red of every deletion, lighter on hover. */
+.urd-multi-toolbar .urd-multi-delete {
+  background: #5e1c22;
+  color: #ffd4d4;
+}
+
+.urd-multi-toolbar .urd-multi-delete:is(:hover, :focus-visible) {
+  background: #7a222a;
 }
 
 /* The drag handle in the selection bar: the whole selection is dragged as one. */
@@ -16029,44 +16119,68 @@ body.urd-marqueeing {
 
 .urd-multi-count {
   font: 600 11px/1 system-ui, sans-serif;
-  color: rgb(232 234 240 / 70%);
+  color: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 70%, transparent);
   padding: 0 6px 0 2px;
   white-space: nowrap;
 }
 
-/* Page-wide guides (the on/off button next to the view choices):
-   a dashed accent, in contrast to the solid smart drag lines.
-   Below the smart guides in z, never clickable, never shown to visitors.
-   Line and dash are counter-scaled like the rest of the editing chrome, so
-   the guide stays readable at a strong zoom out instead of thinning to
-   nothing. */
 .urd-preview .urd-page-guide {
   position: absolute;
-  z-index: 1000;
+  /* Above the block lift (99999), like the smart guides: the lines are drawn over the blocks, so an opaque block (a video, a picture) never hides one */
+  z-index: 100000;
   pointer-events: none;
-  opacity: 0.9;
 }
 
+/* Page-wide guides (the on/off button next to the view choices): the content's quarters as solid lines in the full accent with a thin dark edge, each with its share written at its top.
+   Opaque, so the three look the same whether or not a grid line lies under one, and set apart from the grid's faint lines and from the smart guides' magenta.
+   Never clickable, never shown to visitors.
+   Line and label are counter-scaled like the rest of the editing chrome, so the guide stays readable at a strong zoom out instead of thinning to nothing. */
 .urd-preview .urd-page-guide-v {
   top: 0;
   bottom: 0;
-  width: calc(2px * var(--urd-chrome-scale, 1));
-  background: repeating-linear-gradient(
-    to bottom,
-    var(--urd-admin-accent, #5f6a75) 0 calc(6px * var(--urd-chrome-scale, 1)),
-    transparent calc(6px * var(--urd-chrome-scale, 1)) calc(12px * var(--urd-chrome-scale, 1))
-  );
+  width: calc(1.5px * var(--urd-chrome-scale, 1));
+  background: var(--urd-admin-accent, #5f6a75);
+  box-shadow: 0 0 0 calc(0.5px * var(--urd-chrome-scale, 1)) color-mix(in srgb, #000 40%, transparent);
 }
 
-.urd-preview .urd-page-guide-h {
-  left: 0;
-  right: 0;
-  height: calc(2px * var(--urd-chrome-scale, 1));
-  background: repeating-linear-gradient(
-    to right,
-    var(--urd-admin-accent, #5f6a75) 0 calc(6px * var(--urd-chrome-scale, 1)),
-    transparent calc(6px * var(--urd-chrome-scale, 1)) calc(12px * var(--urd-chrome-scale, 1))
-  );
+.urd-preview .urd-page-guide-share {
+  position: absolute;
+  top: calc(4px * var(--urd-chrome-scale, 1));
+  left: calc(4px * var(--urd-chrome-scale, 1));
+  padding: calc(2px * var(--urd-chrome-scale, 1)) calc(4px * var(--urd-chrome-scale, 1));
+  font: 600 calc(10px * var(--urd-chrome-scale, 1)) / 1 ui-monospace, monospace;
+  white-space: nowrap;
+  color: var(--urd-admin-accent, #5f6a75);
+  background: color-mix(in srgb, var(--urd-admin-bg, #0e0f11) 70%, transparent);
+  border-radius: calc(3px * var(--urd-chrome-scale, 1));
+}
+
+/* Where the grid is drawn as dots: a tick on the section's top and bottom edges, with a faint line between and the share by the top tick. */
+.urd-preview .urd-page-guide-v.urd-page-guide-ticks {
+  background: color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 22%, transparent);
+  box-shadow: none;
+}
+
+.urd-preview .urd-page-guide-ticks::before,
+.urd-preview .urd-page-guide-ticks::after {
+  content: '';
+  position: absolute;
+  left: calc(-0.5px * var(--urd-chrome-scale, 1));
+  width: calc(2px * var(--urd-chrome-scale, 1));
+  height: calc(14px * var(--urd-chrome-scale, 1));
+  background: var(--urd-admin-accent, #5f6a75);
+}
+
+.urd-preview .urd-page-guide-ticks::before {
+  top: 0;
+}
+
+.urd-preview .urd-page-guide-ticks::after {
+  bottom: 0;
+}
+
+.urd-preview .urd-page-guide-ticks .urd-page-guide-share {
+  top: calc(16px * var(--urd-chrome-scale, 1));
 }
 
 /* Shared footer (site.footer): shown on every page when show is on */
@@ -16376,6 +16490,12 @@ body.urd-marqueeing {
   gap: 0.4rem 1.2rem;
 }
 
+/* The privacy page's link in the simple footer (footer.privacyPage): one small line under the legal line */
+.urd-footer-privacy {
+  margin-top: 0.4rem;
+  font-size: 0.85em;
+}
+
 /* The site's contact details (site.site.contact) as an <address>, without the italic browsers give it: lines in the contact column, one wrapping row in the plain and the large CTA builds. */
 #urd-footer address {
   font-style: normal;
@@ -16404,6 +16524,875 @@ body.urd-marqueeing {
 }
 .urd-footer-wrap > .urd-footer-contact-inline {
   margin-top: 1.2rem;
+}
+
+/* Documents (doc-look.js): a long text in one of its designs, the privacy page (blocks/privacy.js) and a text block's document designs (blocks/text.js).
+   The root's own width picks the narrow layout (a container query), so a phone and a narrow block both get it. The look comes as custom properties
+   the owner sets (the accent, the headings' and the cards' colours, the corners, the fonts), each falling back to the theme; data-rules="off" takes the lines between the parts away. */
+.urd-doc {
+  container: urd-doc / inline-size;
+}
+
+.urd-doc :is(h1, h2, h3) {
+  font-family: var(--urd-doc-heading-font, var(--urd-font-heading));
+  color: var(--urd-doc-heading, inherit);
+}
+
+/* A text in a document design: room above each heading and between the paragraphs, the text's own sizes kept. */
+.urd-text-doc .urd-text > h1 {
+  margin: 0 0 0.5em;
+}
+
+.urd-text-doc .urd-text > h2 {
+  margin: 1.8em 0 0.5em;
+}
+
+.urd-text-doc .urd-text > h3 {
+  margin: 1.4em 0 0.4em;
+}
+
+.urd-text-doc .urd-text > :is(p, ul, ol, blockquote),
+.urd-doc-answer > :is(p, ul, ol, blockquote) {
+  margin: 0 0 0.75em;
+}
+
+.urd-text-doc .urd-text > :first-child {
+  margin-top: 0;
+}
+
+.urd-text-doc .urd-text a {
+  color: var(--urd-doc-accent, var(--urd-color-accent));
+}
+
+/* The lines between the parts: a short rule in the accent over each part's heading, in the long read, the contents, the main points and the ledgers. */
+.urd-doc:not([data-rules="off"]):is([data-design="long"], [data-design="contents"], [data-design="glance"], [data-design="ledger"], [data-design="ledger-cards"]) :is(.urd-text > h2, .urd-doc-part > h2) {
+  position: relative;
+  padding-top: 0.8em;
+}
+
+.urd-doc:not([data-rules="off"]):is([data-design="long"], [data-design="contents"], [data-design="glance"], [data-design="ledger"], [data-design="ledger-cards"]) :is(.urd-text > h2, .urd-doc-part > h2)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2.5rem;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--urd-doc-accent, var(--urd-color-accent));
+}
+
+/* A withdrawal form in a text (data-urd-form, the terms of sale): a card with a dashed edge, set apart to be filled in or printed. */
+.urd-text-doc [data-urd-form] {
+  margin: 1em 0;
+  padding: 1em 1.2em;
+  border: 1.5px dashed color-mix(in srgb, currentColor 38%, transparent);
+  border-radius: var(--urd-doc-radius, var(--urd-radius-md));
+  background: var(--urd-doc-card, var(--urd-color-surface));
+  opacity: 1;
+}
+
+.urd-text-doc [data-urd-form] > :first-child {
+  margin-top: 0;
+}
+
+.urd-text-doc [data-urd-form] > :last-child {
+  margin-bottom: 0;
+}
+
+.urd-doc-print {
+  margin: -0.4em 0 1em;
+  padding: 0.5em 1em;
+  border: 1px solid var(--urd-doc-accent, var(--urd-color-accent));
+  border-radius: var(--urd-radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.urd-doc-print:hover,
+.urd-doc-print:focus-visible {
+  background: var(--urd-doc-accent, var(--urd-color-accent));
+  color: var(--urd-color-accent-text, var(--urd-color-bg));
+}
+
+/* Contents beside: the parts listed in a column that follows the reader down, the part they are in marked; a narrow document folds the list into one row above the text. */
+.urd-doc-cols {
+  display: grid;
+  grid-template-columns: minmax(8rem, 13rem) minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.urd-doc[data-side="right"] .urd-doc-cols {
+  grid-template-columns: minmax(0, 1fr) minmax(8rem, 13rem);
+}
+
+.urd-doc[data-side="right"] .urd-doc-toc {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.urd-doc[data-side="right"] .urd-doc-body {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* The text centred: it stands in the middle column and the list at the block's outer edge, an empty column of the list's width on the other side, so a block as wide as the page centres its text on the page. */
+.urd-doc[data-align="center"] .urd-doc-cols {
+  grid-template-columns: minmax(8rem, 13rem) minmax(0, 1fr) minmax(8rem, 13rem);
+}
+
+.urd-doc[data-align="center"] .urd-doc-toc {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.urd-doc[data-align="center"][data-side="right"] .urd-doc-toc {
+  grid-column: 3;
+}
+
+.urd-doc[data-align="center"] .urd-doc-body {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.urd-doc-toc {
+  position: sticky;
+  top: calc(var(--urd-scroll-clear, 0px) + 1rem);
+  font-size: 0.9em;
+  line-height: 1.3;
+}
+
+.urd-doc-toc-label {
+  margin: 0 0 0.7em;
+  font-family: var(--urd-doc-heading-font, var(--urd-font-heading));
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.urd-doc-toc ol,
+.urd-doc-fold ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5em;
+}
+
+.urd-doc-toc a,
+.urd-doc-fold a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.urd-doc-toc a {
+  display: block;
+  opacity: 0.72;
+}
+
+.urd-doc-toc a:hover,
+.urd-doc-fold a:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-decoration-color: var(--urd-doc-accent, var(--urd-color-accent));
+}
+
+.urd-doc-toc a[aria-current] {
+  opacity: 1;
+  font-weight: 700;
+}
+
+.urd-doc-toc a[aria-current]::before {
+  content: '';
+  display: inline-block;
+  width: 0.45em;
+  height: 0.45em;
+  margin-right: 0.45em;
+  border-radius: 50%;
+  vertical-align: 0.12em;
+  background: var(--urd-doc-accent, var(--urd-color-accent));
+}
+
+.urd-doc-fold {
+  display: none;
+  margin: 0 0 1.4em;
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: var(--urd-doc-radius, var(--urd-radius-md));
+  background: var(--urd-doc-card, var(--urd-color-surface));
+}
+
+.urd-doc-fold > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.7em 1em;
+  font-weight: 700;
+  list-style: none;
+  cursor: pointer;
+}
+
+.urd-doc-fold > summary::-webkit-details-marker {
+  display: none;
+}
+
+.urd-doc-fold > summary::after,
+.urd-doc .urd-doc-part > summary::after,
+.urd-doc[data-design="questions"] .urd-text > h2::after {
+  content: '';
+  flex: none;
+  width: 0.5em;
+  height: 0.5em;
+  border-right: 2px solid var(--urd-doc-accent, var(--urd-color-accent));
+  border-bottom: 2px solid var(--urd-doc-accent, var(--urd-color-accent));
+  transform: translateY(-0.15em) rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.urd-doc-fold[open] > summary::after {
+  transform: translateY(0.1em) rotate(-135deg);
+}
+
+.urd-doc-fold ol {
+  padding: 0 1em 0.9em 1em;
+}
+
+@container urd-doc (max-width: 640px) {
+  .urd-doc .urd-doc-cols,
+  .urd-doc[data-side="right"] .urd-doc-cols,
+  .urd-doc[data-align="center"] .urd-doc-cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .urd-doc[data-align="center"] .urd-doc-body {
+    grid-column: 1;
+  }
+
+  .urd-doc-toc {
+    display: none;
+  }
+
+  .urd-doc-fold {
+    display: block;
+  }
+}
+
+@supports not (container-type: inline-size) {
+  @media (max-width: 640px) {
+    .urd-doc .urd-doc-cols,
+    .urd-doc[data-side="right"] .urd-doc-cols,
+    .urd-doc[data-align="center"] .urd-doc-cols {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .urd-doc[data-align="center"] .urd-doc-body {
+      grid-column: 1;
+    }
+
+    .urd-doc-toc {
+      display: none;
+    }
+
+    .urd-doc-fold {
+      display: block;
+    }
+  }
+}
+
+/* The main points at a glance: cards above the page, a marker in the accent beside each label. In a text they are its first list before the first heading, each item a bold label over its words. */
+.urd-doc-glance,
+.urd-text-doc[data-design="glance"] .urd-text > ul:not(h2 ~ ul, ul ~ ul) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin: 1em 0 1.4em;
+  padding: 0;
+  list-style: none;
+}
+
+/* The cards fill their rows: two by two, three or four across where the document is wide enough for them, one under the other in a very narrow one. */
+@container urd-doc (min-width: 560px) {
+  .urd-text-doc[data-design="glance"] .urd-text > ul:not(h2 ~ ul, ul ~ ul):has(> li:nth-child(3):last-child) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container urd-doc (min-width: 820px) {
+  .urd-doc-glance,
+  .urd-text-doc[data-design="glance"] .urd-text > ul:not(h2 ~ ul, ul ~ ul):has(> li:nth-child(4):last-child) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@container urd-doc (max-width: 300px) {
+  .urd-doc-glance,
+  .urd-text-doc[data-design="glance"] .urd-text > ul:not(h2 ~ ul, ul ~ ul) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.urd-doc-fact,
+.urd-text-doc[data-design="glance"] .urd-text > ul:not(h2 ~ ul, ul ~ ul) > li {
+  display: grid;
+  align-content: start;
+  gap: 0.25em;
+  margin: 0;
+  padding: 0.8em 1em;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: var(--urd-doc-radius, var(--urd-radius-md));
+  background: var(--urd-doc-card, var(--urd-color-surface));
+  line-height: 1.4;
+}
+
+.urd-doc-fact > b,
+.urd-text-doc[data-design="glance"] .urd-text > ul:not(h2 ~ ul, ul ~ ul) > li > strong:first-child {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45em;
+  font-family: var(--urd-doc-heading-font, var(--urd-font-heading));
+  font-size: 0.78em;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* The marker's foot stands on the label's baseline and its height is about the capitals', so it centres on the uppercase label in any font. */
+.urd-doc-fact > b::before,
+.urd-text-doc[data-design="glance"] .urd-text > ul:not(h2 ~ ul, ul ~ ul) > li > strong:first-child::before {
+  content: '';
+  flex: none;
+  width: 0.6em;
+  height: 0.6em;
+  border-radius: 2px;
+  background: var(--urd-doc-accent, var(--urd-color-accent));
+}
+
+.urd-text-doc[data-design="glance"] .urd-text > ul:not(h2 ~ ul, ul ~ ul) > li > strong:first-child + br {
+  display: none;
+}
+
+/* Questions: each part a row that folds out, a line between the rows (data-rules="off" takes the lines away). For a visitor each is a <details>; in the editor the text is typed into, so its headings are drawn as open rows. */
+.urd-doc[data-design="questions"] :is(.urd-doc-part, .urd-text > h2) {
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.urd-doc[data-design="questions"] .urd-doc-part:last-of-type {
+  border-bottom: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.urd-doc[data-design="questions"][data-rules="off"] :is(.urd-doc-part, .urd-doc-part:last-of-type, .urd-text > h2) {
+  border-top: 0;
+  border-bottom: 0;
+}
+
+/* The row's room is the heading's own (in its own size), so a row is as tall in the editor, where the heading is the row, as on the page. */
+.urd-doc .urd-doc-part > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  margin: 0;
+  padding: 0;
+}
+
+/* In the editor a question's row is its heading itself, a plain block so its formatted words keep their spaces, the chevron at its right. */
+.urd-doc[data-design="questions"] .urd-text > h2 {
+  position: relative;
+  margin: 0;
+  padding: 0.8em 2em 0.8em 0;
+}
+
+.urd-doc .urd-doc-part > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.urd-doc .urd-doc-part > summary::-webkit-details-marker {
+  display: none;
+}
+
+.urd-doc .urd-doc-part > summary > h2 {
+  margin: 0;
+  padding: 0.8em 0;
+}
+
+.urd-privacy .urd-doc-part > summary > h2 {
+  font-size: 1.1em;
+}
+
+.urd-doc[data-design="questions"] .urd-text > h2::after {
+  position: absolute;
+  top: calc(50% - 0.2em);
+  right: 0.3em;
+  transform: rotate(-135deg);
+}
+
+.urd-doc .urd-doc-part[open] > summary::after {
+  transform: translateY(0.1em) rotate(-135deg);
+}
+
+.urd-doc .urd-doc-part > summary:focus-visible {
+  outline: 2px solid var(--urd-doc-accent, var(--urd-color-accent));
+  outline-offset: 3px;
+}
+
+.urd-privacy .urd-doc-answer {
+  padding: 0 0 0.4em;
+}
+
+@supports (interpolate-size: allow-keywords) {
+  .urd-doc {
+    interpolate-size: allow-keywords;
+  }
+
+  .urd-doc :is(.urd-doc-part, .urd-doc-fold)::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition: block-size 0.3s ease, content-visibility 0.3s allow-discrete;
+  }
+
+  .urd-doc :is(.urd-doc-part, .urd-doc-fold)[open]::details-content {
+    block-size: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-doc-fold > summary::after,
+  .urd-doc .urd-doc-part > summary::after {
+    transition: none;
+  }
+
+  @supports (interpolate-size: allow-keywords) {
+    .urd-doc :is(.urd-doc-part, .urd-doc-fold)::details-content {
+      transition: none;
+    }
+  }
+}
+
+/* Numbered clauses: each part numbered in a badge in the accent, and its paragraphs numbered under it (7.1, 7.2), as a contract sets them; a withdrawal form inside is left unnumbered. */
+.urd-text-doc[data-design="clauses"] .urd-text {
+  counter-reset: urd-clause;
+}
+
+.urd-text-doc[data-design="clauses"] .urd-text > h2 {
+  counter-increment: urd-clause;
+  counter-reset: urd-sub;
+}
+
+/* The clause's number stands before the heading's words as an inline badge, so the words keep their own spacing. */
+.urd-text-doc[data-design="clauses"] .urd-text > h2::before {
+  content: counter(urd-clause);
+  display: inline-block;
+  margin-right: 0.6em;
+  vertical-align: 0.12em;
+  min-width: 1.6em;
+  height: 1.6em;
+  padding: 0 0.3em;
+  box-sizing: border-box;
+  border-radius: min(var(--urd-doc-radius, var(--urd-radius-md)), 0.8em);
+  background: var(--urd-doc-accent, var(--urd-color-accent));
+  color: var(--urd-color-accent-text, var(--urd-color-bg));
+  font-size: 0.8em;
+  line-height: 1.6em;
+  text-align: center;
+}
+
+.urd-text-doc[data-design="clauses"] .urd-text > h2 ~ p {
+  position: relative;
+  padding-left: 2.8em;
+  counter-increment: urd-sub;
+}
+
+.urd-text-doc[data-design="clauses"] .urd-text > h2 ~ p::before {
+  content: counter(urd-clause) '.' counter(urd-sub);
+  position: absolute;
+  left: 0;
+  font-family: var(--urd-doc-heading-font, var(--urd-font-heading));
+  font-weight: 700;
+  opacity: 0.6;
+}
+
+/* The ledgers: what is collected, why, who gets it and how long, at the text's own width and with the same look on a phone.
+   The table puts it in three columns, who gets it under the why in a quieter line; the cards give each kind its own card, the names beside their lines. */
+.urd-doc-ledger-wrap {
+  margin: 0.4em 0 1em;
+}
+
+.urd-doc-ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92em;
+  line-height: 1.45;
+}
+
+.urd-doc-ledger th {
+  padding: 0.5em 0.8em 0.5em 0;
+  border-bottom: 2px solid var(--urd-doc-accent, var(--urd-color-accent));
+  font-family: var(--urd-doc-heading-font, var(--urd-font-heading));
+  font-size: 0.85em;
+  letter-spacing: 0.05em;
+  text-align: left;
+  text-transform: uppercase;
+  vertical-align: bottom;
+}
+
+.urd-doc[data-rules="off"] .urd-doc-ledger th {
+  border-bottom-color: color-mix(in srgb, currentColor 30%, transparent);
+}
+
+.urd-doc-ledger td {
+  padding: 0.6em 0.8em 0.6em 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  vertical-align: top;
+  overflow-wrap: break-word;
+}
+
+.urd-doc-ledger td:first-child {
+  width: 34%;
+  font-weight: 700;
+}
+
+.urd-doc-ledger td:last-child {
+  width: 26%;
+  padding-right: 0;
+}
+
+.urd-doc-who {
+  display: block;
+  margin-top: 0.15em;
+  opacity: 0.68;
+}
+
+/* A narrow document keeps the table, a little tighter. */
+@container urd-doc (max-width: 480px) {
+  .urd-doc-ledger {
+    font-size: 0.84em;
+  }
+
+  .urd-doc-ledger :is(th, td) {
+    padding-right: 0.6em;
+  }
+}
+
+@supports not (container-type: inline-size) {
+  @media (max-width: 480px) {
+    .urd-doc-ledger {
+      font-size: 0.84em;
+    }
+
+    .urd-doc-ledger :is(th, td) {
+      padding-right: 0.6em;
+    }
+  }
+}
+
+.urd-doc-ledger-cards,
+.urd-privacy .urd-doc-ledger-cards {
+  display: grid;
+  gap: 0.6em;
+  margin: 0.4em 0 1em;
+  padding: 0;
+  list-style: none;
+}
+
+.urd-privacy .urd-doc-ledger-cards > li {
+  margin: 0;
+  padding: 0.75em 1em;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: var(--urd-doc-radius, var(--urd-radius-md));
+  background: var(--urd-doc-card, var(--urd-color-surface));
+  line-height: 1.45;
+}
+
+.urd-doc-ledger-cards b {
+  display: block;
+  margin-bottom: 0.45em;
+  padding-bottom: 0.4em;
+  border-bottom: 2px solid var(--urd-doc-accent, var(--urd-color-accent));
+}
+
+.urd-doc[data-rules="off"] .urd-doc-ledger-cards b {
+  border-bottom-color: color-mix(in srgb, currentColor 30%, transparent);
+}
+
+.urd-doc-ledger-cards dl {
+  display: grid;
+  grid-template-columns: minmax(6.5em, max-content) minmax(0, 1fr);
+  gap: 0.2em 0.9em;
+  margin: 0;
+  font-size: 0.95em;
+}
+
+.urd-doc-ledger-cards dt {
+  opacity: 0.65;
+}
+
+.urd-doc-ledger-cards dd {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+/* A withdrawal form printed alone (doc-look.js addFormPrint): everything else on the page is left out of the print. */
+@media print {
+  html.urd-print-form body > :not(:has([data-urd-printing])),
+  html.urd-print-form #urd-root > :not(:has([data-urd-printing])),
+  html.urd-print-form .urd-section:has([data-urd-printing]) > :not(:has([data-urd-printing])),
+  html.urd-print-form .urd-canvas:has([data-urd-printing]) > :not(:has([data-urd-printing])),
+  html.urd-print-form :is(.urd-doc, .urd-doc-cols, .urd-doc-body, .urd-text, .urd-doc-answer):has([data-urd-printing]) > :not([data-urd-printing], :has([data-urd-printing])),
+  html.urd-print-form details.urd-doc-part:has([data-urd-printing]) > summary {
+    display: none;
+  }
+
+  /* The blocks and sections carry their sizes inline (render.js frameToCss), so the print's reset has to outweigh them, or the form prints with the section's height of blank paper after it. */
+  html.urd-print-form :is(.urd-section, .urd-canvas, .urd-block, .urd-doc, .urd-text):has([data-urd-printing]) {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    zoom: 1 !important;
+    background: #fff;
+  }
+
+  html.urd-print-form [data-urd-printing] {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    color: #000;
+    background: #fff;
+    font-size: 11pt;
+  }
+}
+
+/* The privacy block (blocks/privacy.js): the site's privacy page, written from its settings, in its document design: a long read in a comfortable measure, the lists with room, and the visitor's own choices in a card with the press that takes a choice back. */
+.urd-privacy {
+  max-width: 68ch;
+  padding-bottom: 3.5rem;
+  font-family: var(--urd-doc-font, inherit);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--urd-color-text);
+}
+
+.urd-privacy[data-design="contents"] {
+  max-width: none;
+}
+
+/* The privacy page centred in its block, as it stands unless the owner sets it to the left: its column stands in the middle of the block (the contents design centres its text between the list and the block's other edge instead). */
+.urd-privacy[data-align="center"]:not([data-design="contents"]) {
+  margin-inline: auto;
+}
+
+/* Beside its contents the privacy page keeps its text at its measure, on either side; a narrow page has the one column every document has. */
+@container urd-doc (min-width: 641px) {
+  .urd-privacy .urd-doc-cols {
+    grid-template-columns: minmax(8rem, 13rem) minmax(0, 68ch);
+  }
+
+  .urd-privacy[data-side="right"] .urd-doc-cols {
+    grid-template-columns: minmax(0, 68ch) minmax(8rem, 13rem);
+  }
+
+  .urd-privacy[data-align="center"] .urd-doc-cols {
+    grid-template-columns: minmax(8rem, 13rem) minmax(0, 1fr) minmax(8rem, 13rem);
+  }
+
+  .urd-privacy[data-align="center"] .urd-doc-body {
+    justify-self: center;
+    width: 100%;
+  }
+}
+
+@supports not (container-type: inline-size) {
+  @media (min-width: 641px) {
+    .urd-privacy .urd-doc-cols {
+      grid-template-columns: minmax(8rem, 13rem) minmax(0, 68ch);
+    }
+
+    .urd-privacy[data-side="right"] .urd-doc-cols {
+      grid-template-columns: minmax(0, 68ch) minmax(8rem, 13rem);
+    }
+
+    .urd-privacy[data-align="center"] .urd-doc-cols {
+      grid-template-columns: minmax(8rem, 13rem) minmax(0, 1fr) minmax(8rem, 13rem);
+    }
+
+    .urd-privacy[data-align="center"] .urd-doc-body {
+      justify-self: center;
+      width: 100%;
+    }
+  }
+}
+
+/* Contents and text centred between them need room for both columns and the text: a document narrower than that stands beside its list, centred again once the block is wide enough. */
+@container urd-doc (min-width: 641px) and (max-width: 940px) {
+  .urd-doc[data-align="center"] .urd-doc-cols {
+    grid-template-columns: minmax(8rem, 13rem) minmax(0, 1fr);
+  }
+
+  .urd-doc[data-align="center"][data-side="right"] .urd-doc-cols {
+    grid-template-columns: minmax(0, 1fr) minmax(8rem, 13rem);
+  }
+
+  .urd-doc[data-align="center"] .urd-doc-toc {
+    grid-column: 1;
+  }
+
+  .urd-doc[data-align="center"][data-side="right"] .urd-doc-toc {
+    grid-column: 2;
+  }
+
+  .urd-doc[data-align="center"] .urd-doc-body {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .urd-doc[data-align="center"][data-side="right"] .urd-doc-body {
+    grid-column: 1;
+  }
+}
+
+@supports not (container-type: inline-size) {
+  @media (min-width: 641px) and (max-width: 940px) {
+    .urd-doc[data-align="center"] .urd-doc-cols {
+      grid-template-columns: minmax(8rem, 13rem) minmax(0, 1fr);
+    }
+
+    .urd-doc[data-align="center"][data-side="right"] .urd-doc-cols {
+      grid-template-columns: minmax(0, 1fr) minmax(8rem, 13rem);
+    }
+
+    .urd-doc[data-align="center"] .urd-doc-toc {
+      grid-column: 1;
+    }
+
+    .urd-doc[data-align="center"][data-side="right"] .urd-doc-toc {
+      grid-column: 2;
+    }
+
+    .urd-doc[data-align="center"] .urd-doc-body {
+      grid-column: 2;
+      justify-self: start;
+    }
+
+    .urd-doc[data-align="center"][data-side="right"] .urd-doc-body {
+      grid-column: 1;
+    }
+  }
+}
+
+.urd-privacy .urd-doc-body {
+  max-width: 68ch;
+}
+
+.urd-privacy-title {
+  margin: 0 0 0.5em;
+  font-size: 2.4em;
+  line-height: 1.1;
+}
+
+.urd-privacy-intro {
+  font-size: 1.15em;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.urd-privacy .urd-doc-part > h2 {
+  margin: 2.2em 0 0.6em;
+  font-size: 1.4em;
+  line-height: 1.2;
+}
+
+.urd-privacy[data-design="questions"] .urd-doc-part:first-of-type {
+  margin-top: 1.2em;
+}
+
+.urd-privacy h3 {
+  margin: 1.4em 0 0.35em;
+  font-size: 1.1em;
+  line-height: 1.3;
+}
+
+.urd-privacy p,
+.urd-privacy ul {
+  margin: 0 0 0.85em;
+}
+
+.urd-privacy ul {
+  padding-left: 1.3em;
+}
+
+.urd-privacy li {
+  margin: 0.3em 0;
+}
+
+.urd-privacy a {
+  color: var(--urd-doc-accent, var(--urd-color-accent));
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+.urd-privacy :is(.urd-doc-toc, .urd-doc-fold) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.urd-privacy-choices {
+  margin-top: 0.4em;
+  padding: 1.1rem 1.3rem;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 14%, transparent);
+  border-radius: var(--urd-doc-radius, var(--urd-radius-md));
+  background: var(--urd-doc-card, var(--urd-color-surface));
+}
+
+.urd-privacy-choices > p:last-child,
+.urd-privacy-list {
+  margin-bottom: 0;
+}
+
+.urd-privacy-list {
+  list-style: none;
+  padding: 0;
+}
+
+.urd-privacy-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin: 0;
+  padding: 0.6rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--urd-color-text) 14%, transparent);
+}
+
+.urd-privacy-takeback {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--urd-doc-accent, var(--urd-color-accent));
+  border-radius: var(--urd-radius-sm);
+  background: transparent;
+  color: var(--urd-doc-accent, var(--urd-color-accent));
+  font: inherit;
+  cursor: pointer;
+}
+
+.urd-privacy-takeback:hover,
+.urd-privacy-takeback:focus-visible {
+  background: var(--urd-doc-accent, var(--urd-color-accent));
+  color: var(--urd-color-bg);
+}
+
+.urd-privacy-said {
+  margin-top: 0.6em;
+  font-size: 0.9em;
+  opacity: 0.85;
 }
 
 /* The contact block (blocks/contact.js): the site's contact details in one of its designs, an <address> whose own width picks each design's narrow layout (a container query), so a phone and a narrow frame both get it. Links keep the text colour, labels and actions take the accent. */
@@ -16731,27 +17720,15 @@ a.urd-contact-tile .urd-contact-value {
   padding: 1.2em;
   text-align: center;
 }
-.urd-contact-mapbtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6em;
-  min-height: 3em;
-  padding: 0 1.5em;
-  border: 0;
-  border-radius: 999px;
-  background: var(--urd-color-accent);
-  color: var(--urd-color-accent-text);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-.urd-contact-mapnote {
-  max-width: 22em;
-  font-size: 0.8em;
-  opacity: 0.75;
-}
 .urd-contact-mapempty {
   opacity: 0.7;
+}
+/* The site's cover over the contact map: it fills the box and leaves the box's own grid behind it */
+.urd-contact-mapbox > .urd-cover {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: 0;
 }
 .urd-contact-mapframe {
   position: absolute;
@@ -17141,11 +18118,17 @@ body:has(.urd-contact-dock) {
   text-decoration: none;
 }
 
+/* The owner's colours (button.js) stand in --urd-btn-*: the fill, the words, the outline and the fill under the pointer; one not set falls back to the design's colour from the theme */
 .urd-button-primary {
-  background: var(--urd-color-accent);
+  background: var(--urd-btn-bg, var(--urd-color-accent));
   /* Text on accent: without the token the background color is used, so
      palettes that do not define it render unchanged */
-  color: var(--urd-color-accent-text, var(--urd-color-bg));
+  color: var(--urd-btn-text, var(--urd-color-accent-text, var(--urd-color-bg)));
+}
+
+/* A filled button has a line only where the owner gives it one, so a button without one keeps every pixel of its room for its words */
+.urd-button-primary.urd-button-own-border {
+  border: 1px solid var(--urd-btn-border);
 }
 
 .urd-button-primary:hover {
@@ -17153,8 +18136,15 @@ body:has(.urd-contact-dock) {
 }
 
 .urd-button-secondary {
-  border: 1px solid var(--urd-color-accent);
-  color: var(--urd-color-accent);
+  background: var(--urd-btn-bg, transparent);
+  border: 1px solid var(--urd-btn-border, var(--urd-color-accent));
+  color: var(--urd-btn-text, var(--urd-color-accent));
+}
+
+/* A fill of the owner's own under the pointer takes the place of the design's lightening */
+.urd-button.urd-button-own-hover:hover {
+  background: var(--urd-btn-hover);
+  filter: none;
 }
 
 /* Animated gradient background (pan/orbit): the gradient is painted on a 200 % runner
@@ -17817,7 +18807,7 @@ body.urd-mobile .urd-section-resize-top {
   min-width: 170px;
   padding: 6px;
   border-radius: 10px;
-  border: 1px solid rgb(255 255 255 / 12%);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 12%, transparent);
   background: var(--urd-admin-surface, #151a23);
   color: var(--urd-admin-text, #e6e8ea);
   font: 500 12px system-ui, sans-serif;
@@ -17838,28 +18828,71 @@ body.urd-mobile .urd-section-resize-top {
   border: 0;
   border-radius: 6px;
   padding: 4px;
-  background: rgb(255 255 255 / 8%);
+  background: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 8%, transparent);
   color: inherit;
   cursor: pointer;
 }
 
 .urd-preview .urd-hidden-list button:hover {
-  background: rgb(255 255 255 / 16%);
+  background: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 16%, transparent);
 }
 
 /* The editing layer - applies ONLY in preview mode (body.urd-preview,
    set by the engine inside the editor's iframe) */
 .urd-preview .urd-grid-overlay {
+  /* The cell size (preview-edit.js sets --urd-grid) and the line's width.
+     The line width is counter-scaled (urd-zoom), so the lines keep their on-screen width and stay crisp at every zoom level.
+     The cell size itself is NOT counter-scaled: it is the page's own geometry and follows the zoom. */
+  --urd-grid-cell: var(--urd-grid, 16px);
+  --urd-grid-line: calc(1px * var(--urd-chrome-scale, 1));
+  --urd-grid-minor: color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 10%, transparent);
+  --urd-grid-major: color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 26%, transparent);
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  /* The line width is counter-scaled (urd-zoom), so the lines keep their on-screen
-     width and stay crisp at every zoom level. The cell size itself is
-     NOT counter-scaled: it is the page's own geometry and follows the zoom. */
+  /* The quiet grid (0.7.34, the default look): faint lines with every fourth stronger, so it measures without covering the page.
+     The columns are counted out from the content's middle: a line on its centre (each tile starts at 50 % plus half its own width), the part cell left over split equally between the two edges, as snap-model.js gridLine snaps.
+     The rows run from the section's top. */
   background-image:
-    linear-gradient(to right, color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 45%, transparent) calc(1px * var(--urd-chrome-scale, 1)), transparent calc(1px * var(--urd-chrome-scale, 1))),
-    linear-gradient(to bottom, color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 45%, transparent) calc(1px * var(--urd-chrome-scale, 1)), transparent calc(1px * var(--urd-chrome-scale, 1)));
+    linear-gradient(to right, var(--urd-grid-major) var(--urd-grid-line), transparent var(--urd-grid-line)),
+    linear-gradient(to bottom, var(--urd-grid-major) var(--urd-grid-line), transparent var(--urd-grid-line)),
+    linear-gradient(to right, var(--urd-grid-minor) var(--urd-grid-line), transparent var(--urd-grid-line)),
+    linear-gradient(to bottom, var(--urd-grid-minor) var(--urd-grid-line), transparent var(--urd-grid-line));
+  background-size:
+    calc(var(--urd-grid-cell) * 4) calc(var(--urd-grid-cell) * 4),
+    calc(var(--urd-grid-cell) * 4) calc(var(--urd-grid-cell) * 4),
+    var(--urd-grid-cell) var(--urd-grid-cell),
+    var(--urd-grid-cell) var(--urd-grid-cell);
+  background-position:
+    calc(50% + var(--urd-grid-cell) * 2) 0,
+    0 0,
+    calc(50% + var(--urd-grid-cell) / 2) 0,
+    0 0;
+}
+
+/* The grid as dots where its lines would cross, larger every fourth, centred on the crossings: the page between them stays untouched. */
+.urd-preview .urd-grid-overlay[data-look="dots"] {
+  --urd-grid-dot: calc(2px * var(--urd-chrome-scale, 1));
+  background-image:
+    radial-gradient(circle at var(--urd-grid-dot) var(--urd-grid-dot), color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 70%, transparent) calc(1.6px * var(--urd-chrome-scale, 1)), transparent calc(2px * var(--urd-chrome-scale, 1))),
+    radial-gradient(circle at var(--urd-grid-dot) var(--urd-grid-dot), color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 40%, transparent) calc(1px * var(--urd-chrome-scale, 1)), transparent calc(1.4px * var(--urd-chrome-scale, 1)));
+  background-size:
+    calc(var(--urd-grid-cell) * 4) calc(var(--urd-grid-cell) * 4),
+    var(--urd-grid-cell) var(--urd-grid-cell);
+  background-position:
+    calc(50% + var(--urd-grid-cell) * 2 - var(--urd-grid-dot)) calc(0px - var(--urd-grid-dot)),
+    calc(50% + var(--urd-grid-cell) / 2 - var(--urd-grid-dot)) calc(0px - var(--urd-grid-dot));
+}
+
+/* The grid drawn only in a drag: at rest the content's edges and its quarters as faint alternate columns, the cells left to the drag. */
+.urd-preview .urd-grid-overlay[data-look="columns"] {
+  background-image:
+    linear-gradient(to right, var(--urd-grid-major) var(--urd-grid-line), transparent var(--urd-grid-line)),
+    linear-gradient(to left, var(--urd-grid-major) var(--urd-grid-line), transparent var(--urd-grid-line)),
+    linear-gradient(to right, color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 6%, transparent) 0 25%, transparent 25% 50%, color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 6%, transparent) 50% 75%, transparent 75%);
+  background-size: 100% 100%;
+  background-position: 0 0;
 }
 
 .urd-preview .urd-editable:hover {
@@ -17916,7 +18949,7 @@ body.urd-mobile .urd-section-resize-top {
   box-sizing: border-box;
   background: var(--urd-admin-surface, #1b2030);
   color: var(--urd-admin-text, #e9ebf2);
-  border: 1px solid rgb(255 255 255 / 20%);
+  border: 1px solid color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 20%, transparent);
   border-radius: 10px;
   box-shadow: 0 14px 34px rgb(0 0 0 / 55%);
   font: 500 13px/1.3 system-ui, sans-serif;
@@ -17966,8 +18999,20 @@ body.urd-mobile .urd-section-resize-top {
   font-weight: 700;
 }
 
+/* A deletion: the bin and its words on the dark red every deletion stands on, lighter under the pointer, brightest while a second press waits */
 .urd-preview .urd-ctx-danger {
-  color: #ff8a80;
+  color: #ffd4d4;
+  background: #5e1c22;
+}
+
+.urd-preview .urd-ctx-danger:hover,
+.urd-preview .urd-ctx-danger:focus-visible {
+  color: #ffd4d4;
+  background: #7a222a;
+}
+
+.urd-preview .urd-ctx-danger svg {
+  flex: none;
 }
 
 .urd-preview .urd-ctx-item[aria-disabled="true"] {
@@ -17975,15 +19020,16 @@ body.urd-mobile .urd-section-resize-top {
   cursor: default;
 }
 
-.urd-preview .urd-ctx-armed {
-  color: #ff8a80;
+.urd-preview .urd-ctx-danger.urd-ctx-armed {
+  color: #fff;
+  background: #c62828;
   font-weight: 700;
 }
 
 .urd-preview .urd-ctx-sep {
   height: 1px;
   margin: 4px 6px;
-  background: rgb(255 255 255 / 12%);
+  background: color-mix(in srgb, var(--urd-admin-text, #e8eaf0) 12%, transparent);
 }
 
 .urd-preview .urd-edit-toolbar button {
@@ -17999,12 +19045,223 @@ body.urd-mobile .urd-section-resize-top {
   font-size: 14px;
   line-height: 1;
   padding: 0 6px;
+  cursor: pointer;
+}
+
+/* The grip moves the block: the open hand on it alone, closed while it drags */
+.urd-preview .urd-edit-toolbar .urd-edit-move {
   cursor: grab;
 }
 
+.urd-preview .urd-edit-toolbar .urd-edit-move:active {
+  cursor: grabbing;
+}
+
+/* The bar's words (Urd settings «Toolbar»: the main act, or the settings, on the bar with small panels): a smaller, bolder word than the bar's drawn buttons */
+.urd-preview .urd-edit-toolbar .urd-edit-lead,
+.urd-preview .urd-section-toolbar .urd-edit-lead {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 9px;
+  cursor: pointer;
+}
+
+/* The bar's size (Urd settings «Toolbar size», preview-edit.js barSize), for the block's bar and the section's: the bar laid out at the size with zoom, so its words and drawings are drawn sharp at it rather than a scaled picture of them; the regular size, the default, is the bar as drawn, and a browser without zoom draws every size so */
+.urd-preview .urd-edit-toolbar.urd-bar-size-small .urd-bar-body,
+.urd-preview .urd-section-toolbar.urd-bar-size-small {
+  zoom: 0.85;
+}
+
+.urd-preview .urd-edit-toolbar.urd-bar-size-medium .urd-bar-body,
+.urd-preview .urd-section-toolbar.urd-bar-size-medium {
+  zoom: 1.12;
+}
+
+.urd-preview .urd-edit-toolbar.urd-bar-size-large .urd-bar-body,
+.urd-preview .urd-section-toolbar.urd-bar-size-large {
+  zoom: 1.25;
+}
+
+/* The bar's own body inside the toolbar, which keeps the hover bridge to the block; the looks below frame it (Urd settings «Toolbar look», preview-edit.js barLook) */
+.urd-preview .urd-edit-toolbar .urd-bar-body {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.urd-preview .urd-bar-cluster {
+  display: flex;
+  align-items: center;
+}
+
+/* Dark strip: light drawings on one dark strip, the main act alone in the accent */
+.urd-preview .urd-bar-strip .urd-bar-body,
+.urd-preview .urd-bar-glass .urd-bar-body,
+.urd-preview .urd-bar-glass-accent .urd-bar-body {
+  gap: 1px;
+  padding: 3px;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 7px;
+  background: var(--urd-admin-surface, #1b252d);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
+}
+
+.urd-preview .urd-edit-toolbar:is(.urd-bar-strip, .urd-bar-glass, .urd-bar-glass-accent, .urd-bar-capsule, .urd-bar-glass-capsule, .urd-bar-capsule-areas, .urd-bar-large-capsule, .urd-bar-soft, .urd-bar-white) button {
+  background: transparent;
+  color: var(--urd-admin-text, #e2e5e8);
+}
+
+.urd-preview .urd-edit-toolbar:is(.urd-bar-strip, .urd-bar-glass, .urd-bar-glass-accent, .urd-bar-capsule, .urd-bar-glass-capsule, .urd-bar-capsule-areas, .urd-bar-large-capsule, .urd-bar-soft, .urd-bar-white) .urd-edit-lead {
+  background: var(--urd-admin-accent, #5f6a75);
+  color: var(--urd-admin-accent-text, #fff);
+}
+
+.urd-preview .urd-edit-toolbar:is(.urd-bar-strip, .urd-bar-glass, .urd-bar-glass-accent, .urd-bar-capsule, .urd-bar-glass-capsule, .urd-bar-capsule-areas, .urd-bar-large-capsule, .urd-bar-soft, .urd-bar-white) .urd-edit-delete {
+  background: #5e1c22;
+  color: #ffd4d4;
+}
+
+/* By area: the tools in three joined clusters, Content, Style and Placement, each its own shade of the accent */
+.urd-preview .urd-bar-areas .urd-bar-body {
+  gap: 6px;
+}
+
+.urd-preview .urd-bar-areas .urd-bar-cluster {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.urd-preview .urd-bar-areas .urd-bar-cluster button {
+  border-radius: 0;
+  border-left: 1px solid rgb(0 0 0 / 16%);
+}
+
+.urd-preview .urd-bar-areas .urd-bar-cluster button:first-child {
+  border-left: 0;
+}
+
+.urd-preview .urd-bar-areas .urd-bar-content button {
+  background: color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 62%, #fff);
+}
+
+.urd-preview .urd-bar-areas .urd-bar-placement button {
+  background: color-mix(in srgb, var(--urd-admin-accent, #5f6a75) 72%, #000);
+  color: #fff;
+}
+
+/* Small captions: each tool's word in small capitals under its drawing */
+.urd-preview .urd-bar-captions button {
+  flex-direction: column;
+  gap: 2px;
+  height: 34px;
+  min-width: 40px;
+}
+
+.urd-preview .urd-bar-captions button[data-cap]::after {
+  content: attr(data-cap);
+  max-width: 64px;
+  overflow: hidden;
+  font: 600 8.5px/1 system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.urd-preview .urd-bar-captions .urd-edit-lead {
+  height: 34px;
+}
+
+/* Glass: the strip frosted, the page showing through it (its body after the capsules', below); the accent glass, the default, keeps the main act in the admin's accent, the glass a white one */
+.urd-preview .urd-edit-toolbar:is(.urd-bar-glass, .urd-bar-glass-accent, .urd-bar-glass-capsule) button {
+  color: #fff;
+}
+
+.urd-preview .urd-edit-toolbar:is(.urd-bar-glass, .urd-bar-glass-capsule) .urd-edit-lead {
+  background: rgb(255 255 255 / 92%);
+  color: #17221f;
+}
+
+/* Large and round, and the large capsule: tools made for a finger as well as a pointer */
+.urd-preview .urd-edit-toolbar:is(.urd-bar-large, .urd-bar-large-capsule) button {
+  height: 34px;
+  min-width: 34px;
+}
+
+.urd-preview .urd-bar-large button {
+  border-radius: 9px;
+}
+
+.urd-preview .urd-edit-toolbar:is(.urd-bar-large, .urd-bar-large-capsule) button svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* The capsules: one rounded body, the tools round inside it */
+.urd-preview .urd-edit-toolbar:is(.urd-bar-capsule, .urd-bar-glass-capsule, .urd-bar-capsule-areas, .urd-bar-large-capsule, .urd-bar-soft, .urd-bar-white) .urd-bar-body {
+  gap: 1px;
+  padding: 3px;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 999px;
+  background: var(--urd-admin-surface, #1b252d);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 35%);
+}
+
+.urd-preview .urd-edit-toolbar:is(.urd-bar-capsule, .urd-bar-glass-capsule, .urd-bar-capsule-areas, .urd-bar-large-capsule, .urd-bar-white) button {
+  border-radius: 999px;
+}
+
+/* The capsules' own bodies, at the weight of the capsule's rule above so they follow it: large, white, glass and soft square */
+.urd-preview .urd-edit-toolbar.urd-bar-large-capsule .urd-bar-body {
+  padding: 5px;
+}
+
+/* White capsule: dark drawings on white, standing on the page like part of it */
+.urd-preview .urd-edit-toolbar.urd-bar-white .urd-bar-body {
+  background: #fff;
+  border-color: rgb(0 0 0 / 12%);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 18%);
+}
+
+.urd-preview .urd-edit-toolbar:is(.urd-bar-glass, .urd-bar-glass-accent, .urd-bar-glass-capsule) .urd-bar-body {
+  background: rgb(27 37 45 / 55%);
+  border-color: rgb(255 255 255 / 25%);
+  backdrop-filter: blur(10px);
+}
+
+.urd-preview .urd-edit-toolbar.urd-bar-white button {
+  color: #23272c;
+}
+
+.urd-preview .urd-edit-toolbar:is(.urd-bar-strip, .urd-bar-glass, .urd-bar-glass-accent, .urd-bar-capsule, .urd-bar-glass-capsule, .urd-bar-capsule-areas, .urd-bar-large-capsule, .urd-bar-soft, .urd-bar-white) .urd-edit-delete:is(:hover, :focus-visible) {
+  background: #7a222a;
+}
+
+/* Areas apart: one capsule, a line between Content, Style and Placement */
+.urd-preview .urd-bar-capsule-areas .urd-bar-cluster + .urd-bar-cluster {
+  margin-left: 4px;
+  padding-left: 4px;
+  border-left: 1px solid rgb(255 255 255 / 22%);
+}
+
+/* Soft square: the dark capsule with soft corners and square tools, as the admin's own buttons */
+.urd-preview .urd-edit-toolbar.urd-bar-soft .urd-bar-body {
+  border-radius: 10px;
+}
+
+.urd-preview .urd-bar-soft button {
+  border-radius: 7px;
+}
+
+/* The block's delete on its bar: a bin on the dark red of every deletion, the admin's too, lighter on hover; each look above keeps it so */
 .urd-preview .urd-edit-toolbar .urd-edit-delete {
   cursor: pointer;
-  background: #c0392b;
+  background: #5e1c22;
+  color: #ffd4d4;
+}
+
+.urd-preview .urd-edit-toolbar .urd-edit-delete:is(:hover, :focus-visible) {
+  background: #7a222a;
 }
 
 .urd-preview .urd-edit-resize {
@@ -18191,6 +19448,16 @@ body.urd-mobile .urd-section-resize-top {
 
 .urd-preview .urd-editable :is([contenteditable='true'], [contenteditable='plaintext-only']) {
   cursor: text;
+}
+
+/* In the Clean view no block is moved and no text written in (preview-edit.js, urd.js), so the cursors are the published page's, and a link in a block, which is followed there, shows the pointer; while editing, a press on a link selects the block or places the caret, and the cursors above stand. */
+.urd-preview.urd-chrome-off .urd-editable {
+  cursor: auto;
+}
+
+.urd-preview.urd-chrome-off .urd-editable a[href],
+.urd-preview.urd-chrome-off .urd-editable a[href] * {
+  cursor: pointer;
 }
 
 /* While editing, the block under the pointer or the selected block is raised visually to the top, so that the handles can always be reached even if other blocks lie above it (z order).
@@ -18775,16 +20042,19 @@ body.urd-mobile .urd-section-resize-top {
   opacity: 1;
   border: 0;
   border-radius: 5px;
-  padding: 2px 6px;
+  padding: 4px 5px;
   cursor: pointer;
-  background: rgb(224 82 82 / 25%);
-  color: #ffb4b4;
-  font-size: 11px;
-  line-height: 1.4;
+  background: #5e1c22;
+  color: #ffd4d4;
+  line-height: 0;
 }
 
 .urd-preview .urd-template-card:hover .urd-template-delete {
   display: block;
+}
+
+.urd-preview .urd-preset-menu .urd-template-delete:is(:hover, :focus-visible) {
+  background: #7a222a;
 }
 
 .urd-preview .urd-template-empty {
@@ -18913,6 +20183,22 @@ body.urd-mobile .urd-section-resize-top {
 .urd-preview .urd-section-toolbar button:hover {
   background: var(--urd-admin-accent, #5f6a75);
   color: var(--urd-admin-accent-text, #fff);
+}
+
+/* The section's delete: the bin on the dark red of every deletion, lighter on hover, and bright red while armed by its first press (preview-edit.js armedButton), until the second press or until the pointer or the focus leaves it */
+.urd-preview .urd-section-toolbar button.urd-sec-delete {
+  background: #5e1c22;
+  color: #ffd4d4;
+}
+
+.urd-preview .urd-section-toolbar button.urd-sec-delete:is(:hover, :focus-visible) {
+  background: #7a222a;
+  color: #ffd4d4;
+}
+
+.urd-preview .urd-section-toolbar button.urd-sec-delete.urd-armed {
+  background: #c62828;
+  color: #fff;
 }
 
 /* The section's name for links (preview-edit.js addSectionToolbar) */

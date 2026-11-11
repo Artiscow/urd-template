@@ -1,8 +1,9 @@
 {
-  "schemaVersion": 7,
+  "schemaVersion": 8,
   "meta": {
     "id": "checkout",
-    "title": "Checkout"
+    "title": "Checkout",
+    "searchTitle": "Bestilling og betaling"
   },
   "sections": [
     {

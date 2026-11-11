@@ -54,6 +54,7 @@ export async function onRequestPost({ request, env }) {
     }
     // A file whose content is checked (a PDF in media/) must be what its name says, and within its size.
     if (file.delete !== true && !isAllowedContent(file.path, file.content, file.encoding)) {
+      if (file.path === '_redirects') return json({ error: 'The redirect file holds a line that is not a redirect Urd writes', code: 'redirectsNotAllowed', path: file.path }, 400);
       return json({ error: `The file '${file.path}' is not a PDF, or is too large`, code: 'fileNotAllowed', path: file.path }, 400);
     }
   }

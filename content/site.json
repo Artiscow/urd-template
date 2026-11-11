@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 5,
+  "schemaVersion": 6,
   "site": {
     "title": "Urd",
     "lang": "no",
@@ -7,6 +7,11 @@
     "commerce": {
       "currency": "NOK",
       "shop": true
+    },
+    "retention": {
+      "forms": { "until": "period", "count": 12, "unit": "months" },
+      "newsletter": { "until": "unsubscribe" },
+      "orders": { "until": "bookkeeping" }
     },
     "meetingHosts": [],
     "icon": "/media/images/ikon-9740643c.webp",
@@ -142,18 +147,28 @@
       "title": "Shop",
       "path": "/shop",
       "file": "content/pages/shop.json"
+    },
+    {
+      "id": "personvern",
+      "title": "Personvern",
+      "path": "/personvern",
+      "file": "content/pages/personvern.json"
     }
   ],
   "nav": {
     "version": 1,
     "announcement": {
       "show": true,
+      "hideOn": [
+        "checkout"
+      ],
       "text": "Nyhet: bestill kaker til høstferien",
       "page": "kaker",
       "place": "nav",
       "followNav": false
     },
     "logo": {
+      "show": true,
       "type": "image",
       "value": "/media/images/logo-91963a12.svg",
       "size": 30,
@@ -194,7 +209,14 @@
               {
                 "label": "Checkout",
                 "page": "checkout",
-                "description": "Betaling og levering"
+                "description": "Betaling og levering",
+                "children": [
+                  {
+                    "label": "Personvern",
+                    "page": "personvern",
+                    "description": "Slik behandler vi opplysningene dine"
+                  }
+                ]
               }
             ]
           },
@@ -371,14 +393,11 @@
     },
     "baseline": [
       {
-        "label": "Personvern",
-        "href": "#"
-      },
-      {
         "label": "Laget med Urd",
         "href": "#"
       }
     ],
-    "copyright": "© Min forening"
+    "copyright": "© Min forening",
+    "privacyPage": "personvern"
   }
 }

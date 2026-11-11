@@ -96,8 +96,6 @@ export default {
     'contact.directions': 'Vägbeskrivning',
     'contact.call': 'Ring',
     'contact.map': 'Karta',
-    'contact.showMap': 'Visa karta',
-    'contact.mapNote': 'Kartan laddas från OpenStreetMap först när du trycker.',
     'contact.addContact': 'Lägg till i kontakter',
     'contact.scan': 'Skanna för att spara kontakten',
     'contact.qr': 'QR-kod med kontaktuppgifterna',

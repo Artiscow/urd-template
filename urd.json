@@ -1,5 +1,5 @@
 {
-  "engine": "0.7.8",
+  "engine": "0.7.9",
   "schemaVersion": 1,
   "ownedPaths": [
     "index.html",
@@ -22,6 +22,7 @@
     "media/**",
     "plugins/**",
     "sitemap.xml",
-    "robots.txt"
+    "robots.txt",
+    "_redirects"
   ]
 }

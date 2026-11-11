@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 7,
+  "schemaVersion": 8,
   "meta": {
     "id": "hjem",
     "title": "Hjem",
@@ -61,7 +61,7 @@
           "type": "text",
           "version": 1,
           "props": {
-            "html": "<h1>Velkommen til Urd</h1>",
+            "html": "<h1>Welcome to Urd's Pre-release page</h1>",
             "align": "left",
             "box": false
           },
@@ -85,15 +85,15 @@
           "fit": "shrink",
           "fitMin": 0.6,
           "props": {
-            "html": "<p>Urd er under oppbygging og alt du ser er testing.&nbsp;</p><p>Gjerne følg prosjektet på vår Github side!</p>",
+            "html": "<p>Urd is still under construction, but here you can see everything that has been done and not yet released.&nbsp;</p><p>See&nbsp;our github repo for how far we've come!</p>",
             "align": "left",
             "box": false
           },
           "animation": null,
           "frames": {
             "desktop": {
-              "x": 19.4,
-              "y": 320,
+              "x": 19.38,
+              "y": 336,
               "w": 27.78,
               "h": 80,
               "z": 1,
@@ -123,8 +123,8 @@
           "animation": null,
           "frames": {
             "desktop": {
-              "x": 54.44,
-              "y": 208,
+              "x": 53.25,
+              "y": 256,
               "w": 41.11,
               "h": 336,
               "z": 3,
@@ -140,10 +140,9 @@
           "type": "button",
           "version": 1,
           "props": {
-            "label": "Les mer",
-            "page": null,
-            "href": "https://github.com/Artiscow/Urd",
-            "style": "secondary"
+            "label": "See more",
+            "style": "secondary",
+            "href": "https://github.com/Artiscow/Urd"
           },
           "animation": null,
           "frames": {
@@ -190,6 +189,30 @@
               "w": 88.89,
               "h": 70,
               "z": 4,
+              "rot": 0
+            },
+            "mobile": null
+          }
+        },
+        {
+          "id": "blk-54fcc56f",
+          "type": "text",
+          "version": 1,
+          "decor": false,
+          "hideMobile": false,
+          "props": {
+            "html": "<p>Everything on this site is pre-release and for testing purposes</p>",
+            "align": "left",
+            "box": true
+          },
+          "animation": null,
+          "frames": {
+            "desktop": {
+              "x": 33.5,
+              "y": 128,
+              "w": 33,
+              "h": 58,
+              "z": 5,
               "rot": 0
             },
             "mobile": null

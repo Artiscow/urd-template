@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 8,
+  "meta": {
+    "id": "personvern",
+    "title": "Personvern"
+  },
+  "sections": [
+    {
+      "id": "sec-642051d3",
+      "version": 1,
+      "preset": "privacy",
+      "size": {},
+      "grid": null,
+      "background": {
+        "version": 1,
+        "layers": [
+          {
+            "type": "color",
+            "version": 1,
+            "props": {
+              "value": "bg"
+            }
+          }
+        ]
+      },
+      "blocks": [
+        {
+          "id": "blk-576abe9c",
+          "type": "privacy",
+          "version": 1,
+          "props": {
+            "heading": true
+          },
+          "animation": null,
+          "frames": {
+            "desktop": {
+              "x": 10,
+              "y": 56,
+              "w": 80,
+              "h": 700,
+              "z": 1,
+              "rot": 0
+            },
+            "mobile": null
+          }
+        }
+      ],
+      "responsive": {
+        "mobile": {
+          "mode": "auto",
+          "attention": null
+        }
+      }
+    }
+  ]
+}

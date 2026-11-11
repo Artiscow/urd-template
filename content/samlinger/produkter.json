@@ -10,15 +10,16 @@
       "text": "Saftig sjokoladekake med mørk ganache. Bakes på bestilling.",
       "price": 350,
       "badge": "Bestselger",
-      "sizes": ["Liten", "Stor"],
-      "requireSize": true
+      "sizes": [
+        "Liten",
+        "Stor"
+      ]
     },
     {
       "id": "kanelboller",
       "title": "Kanelboller (6 stk.)",
       "text": "Nybakte kanelboller med kardemomme.",
       "price": 120,
-      "quantity": { "max": 10 },
       "memberPrice": 100
     },
     {
@@ -26,13 +27,188 @@
       "title": "Marsipankake",
       "text": "Klassisk marsipankake med vaniljekrem og bær.",
       "price": 420,
-      "sizes": ["8 biter", "12 biter"],
-      "requireSize": true,
-      "disableUntilChosen": true,
+      "sizes": [
+        "8 biter",
+        "12 biter"
+      ],
       "colors": [
-        { "name": "Grønn" },
-        { "name": "Rosa" }
+        {
+          "name": "Grønn"
+        },
+        {
+          "name": "Rosa"
+        }
       ]
+    },
+    {
+      "id": "innslag-57ea8a9a",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-c2de1766",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-62fdc6db",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-ebc1991c",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-c19ab230",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-9d1df97d",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-ed56c26f",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-bb2772e3",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-4daadf59",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-0c3e976a",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-9d7dc3b3",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-537ee157",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-008137e4",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-6224c0f5",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-c83f4746",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-3b6bd18a",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-3f91a7e0",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-c1359944",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-9fbfadff",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-b9fee393",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-2cad447c",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-aef2e186",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-56f981ca",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-2a6d7286",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-006d157c",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-bae32983",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-cf039061",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-f3dac336",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-75cf91cc",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-e88e3291",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-66894c2e",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-5e598958",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-b045ac73",
+      "title": "New product",
+      "text": ""
+    },
+    {
+      "id": "innslag-8d23ec99",
+      "title": "New product",
+      "text": ""
     }
   ]
 }
