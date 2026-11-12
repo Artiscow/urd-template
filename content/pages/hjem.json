@@ -201,7 +201,7 @@
           "decor": false,
           "hideMobile": false,
           "props": {
-            "html": "<p>Everything on this site is pre-release and for testing purposes</p>",
+            "html": "<p style=\"text-align: center; \">Everything on this site is pre-release and for testing purposes</p>",
             "align": "left",
             "box": true
           },

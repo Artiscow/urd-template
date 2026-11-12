@@ -243,28 +243,33 @@ export async function commitFiles(token, config, { message, files, expect }) {
  * blob POST per file - that is what keeps a ~90-file engine update under
  * Cloudflare's subrequest limit. Large entry counts are split into CHAINED
  * trees (base_tree = the previous tree), still as ONE commit.
+ * With `orphan`, the branch is made by this commit: a first tree with no base, a commit with no parent, and the ref created, which fails with 409 where the branch exists already (the saved drafts' branch, ADR-0032).
  *
  * @param {string} token
  * @param {{repo: string, branch: string}} config
- * @param {{message: string, entries: Array<{path: string, content?: string, sha?: string|null}>, expect?: string}} payload
+ * @param {{message: string, entries: Array<{path: string, content?: string, sha?: string|null}>, expect?: string, orphan?: boolean}} payload
  *   `content` for text files, `sha` for pre-made blobs (binary/truncated),
  *   `sha: null` for deletion. Deletions must target paths that exist.
  * @param {(entries: Array<object>) => Array<Array<object>>} chunk Pure chunking (from update-plan.js)
  * @returns {Promise<{sha: string}>}
  */
-export async function commitTree(token, config, { message, entries, expect }, chunk) {
+export async function commitTree(token, config, { message, entries, expect, orphan = false }, chunk) {
   const { repo, branch } = config;
 
-  const ref = await gh(token, `/repos/${repo}/git/ref/heads/${branch}`);
-  const baseSha = ref.object.sha;
-  if (expect && expect !== baseSha) {
-    const error = new Error('HEAD has moved since the update check');
-    error.status = 409;
-    throw error;
+  let baseSha = null;
+  let treeSha = null;
+  if (!orphan) {
+    const ref = await gh(token, `/repos/${repo}/git/ref/heads/${branch}`);
+    baseSha = ref.object.sha;
+    if (expect && expect !== baseSha) {
+      const error = new Error('HEAD has moved since the update check');
+      error.status = 409;
+      throw error;
+    }
+    const baseCommit = await gh(token, `/repos/${repo}/git/commits/${baseSha}`);
+    treeSha = baseCommit.tree.sha;
   }
-  const baseCommit = await gh(token, `/repos/${repo}/git/commits/${baseSha}`);
 
-  let treeSha = baseCommit.tree.sha;
   for (const group of chunk(entries.map((e) => ({
     path: e.path,
     mode: '100644',
@@ -273,20 +278,37 @@ export async function commitTree(token, config, { message, entries, expect }, ch
   })))) {
     const tree = await gh(token, `/repos/${repo}/git/trees`, {
       method: 'POST',
-      body: JSON.stringify({ base_tree: treeSha, tree: group }),
+      body: JSON.stringify({ ...(treeSha ? { base_tree: treeSha } : {}), tree: group }),
     });
     treeSha = tree.sha;
   }
 
   const commit = await gh(token, `/repos/${repo}/git/commits`, {
     method: 'POST',
-    body: JSON.stringify({ message, tree: treeSha, parents: [baseSha] }),
+    body: JSON.stringify({ message, tree: treeSha, parents: baseSha ? [baseSha] : [] }),
   });
 
-  await gh(token, `/repos/${repo}/git/refs/heads/${branch}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ sha: commit.sha, force: false }),
-  });
+  if (orphan) {
+    try {
+      await gh(token, `/repos/${repo}/git/refs`, {
+        method: 'POST',
+        body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: commit.sha }),
+      });
+    } catch (err) {
+      // GitHub answers 422 «Reference already exists» where another save made the branch first.
+      if (err.status === 422 && /already exists/i.test(err.message)) {
+        const error = new Error('The branch exists already');
+        error.status = 409;
+        throw error;
+      }
+      throw err;
+    }
+  } else {
+    await gh(token, `/repos/${repo}/git/refs/heads/${branch}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ sha: commit.sha, force: false }),
+    });
+  }
 
   return { sha: commit.sha };
 }

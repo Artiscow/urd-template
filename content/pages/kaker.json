@@ -557,6 +557,11 @@
           }
         ]
       },
+      "blocksHover": {
+        "type": "hover-lift",
+        "version": 1,
+        "props": {}
+      },
       "blocks": [
         {
           "id": "blk-92417959",

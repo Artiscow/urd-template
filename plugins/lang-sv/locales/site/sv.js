@@ -156,7 +156,6 @@ export default {
     'calendar.todayCount.one': '{n} i dag',
     'calendar.todayCount.other': '{n} i dag',
     'calendar.wheel': 'Årshjul',
-    'calendar.pickMonth': 'Välj en månad på hjulet för att se dess evenemang',
     'calendar.wholeYear': 'Hela året',
     'calendar.fewer': 'Färre',
     'calendar.moreLegend': 'Fler',

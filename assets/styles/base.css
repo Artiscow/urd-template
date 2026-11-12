@@ -5321,8 +5321,7 @@ textarea.urd-form-input {
   border-radius: var(--urd-radius-sm);
 }
 
-.urd-cal-wheel-none,
-.urd-cal-wheel-hint {
+.urd-cal-wheel-none {
   margin: 0;
   font-size: 0.78em;
   opacity: 0.7;
@@ -13573,24 +13572,25 @@ body:has(dialog:modal) {
   opacity: 1;
 }
 
-/* "+ New block" (revealed on hover, preview only): top right in the section,
-   below the section toolbar. Absolute position: the pill must never
-   take part in the flow (a flow margin would collapse out of the section and
-   leave a band without background at the top of every section). */
+/* The block menu's place (preview only): top right in the section, below the section
+   toolbar, where the / key opens it; the toolbar's «New block» and a double click move it
+   under themselves. Absolute position: it must never take part in the flow (a flow margin
+   would collapse out of the section and leave a band without background at the top of
+   every section). */
 .urd-preview .urd-add-block {
   /* Counter-scaling: the handle should keep the same on-screen size as
      the admin panels at any zoom level (urd-zoom). */
   transform: scale(var(--urd-chrome-scale, 1));
   transform-origin: top right;
   position: absolute;
-  /* The offset is counter-scaled along with the chip: the section toolbar above
+  /* The offset is counter-scaled along with the menu: the section toolbar above
      is counter-scaled too, so a fixed offset keeps the two apart at
      every zoom level. The nav clearance (--urd-section-clear, first section only,
-     under a menu outside the flow) is added, so the chip starts below the
-     parked toolbar instead of behind the menu. */
+     under a menu outside the flow) is added, so the menu starts below the
+     parked toolbar instead of behind the site's menu. */
   top: calc(var(--urd-section-clear, 0px) + 46px * var(--urd-chrome-scale, 1));
   right: calc(10px * var(--urd-chrome-scale, 1));
-  /* Above the block lift (99999): an overhanging block must not cover the button */
+  /* Above the block lift (99999): an overhanging block must not cover the menu */
   z-index: 100000;
   display: grid;
   justify-items: end;
@@ -13617,32 +13617,13 @@ body:has(dialog:modal) {
   pointer-events: auto;
 }
 
-/* Opened with a double click: the menu stands alone at the pointer, the chip button
-   is hidden, and the menu stays visible regardless of the hover rules. Raised ABOVE
-   the section chrome (+ New section 100001, the section lines 100000), so that chrome
-   sits UNDER the menu instead of poking through it. */
+/* Opened with a double click or from the toolbar: the menu stands at the pointer or under
+   the button, visible regardless of the hover rules. Raised ABOVE the section chrome (the
+   seams 100001), so that chrome sits UNDER the menu instead of poking through it. */
 .urd-preview .urd-add-block.urd-at-pointer {
   opacity: 1;
   pointer-events: auto;
   z-index: 100002;
-}
-
-.urd-preview .urd-add-block.urd-at-pointer .urd-add-block-open {
-  display: none;
-}
-
-.urd-preview .urd-add-block-open {
-  font: 500 12px/1 system-ui, sans-serif;
-  color: var(--urd-color-text);
-  background: color-mix(in srgb, var(--urd-color-surface) 85%, transparent);
-  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 35%, transparent);
-  border-radius: 999px;
-  padding: 6px 14px;
-  cursor: pointer;
-}
-
-.urd-preview .urd-add-block-open:hover {
-  border-color: var(--urd-color-accent);
 }
 
 /* The + New block menu (preview-edit.js addBlockAdder).
@@ -18712,11 +18693,9 @@ html:has(body.urd-preview)::-webkit-scrollbar {
   display: none;
 }
 
-/* Mobile view in the editor: the structure tools (add bars, height handles)
+/* Mobile view in the editor: the structure tools (the bars on the seams with their grips)
    are hidden; mobile is for layout adjustment and review */
-body.urd-mobile .urd-add-section,
-body.urd-mobile .urd-section-resize,
-body.urd-mobile .urd-section-resize-top {
+body.urd-mobile .urd-add-section {
   display: none !important;
 }
 
@@ -19530,11 +19509,9 @@ body.urd-mobile .urd-section-resize-top {
   display: flex;
   justify-content: center;
   gap: 6px;
-  /* Above the section line grips (.urd-section-resize/-top, 100000): where
-     the chip sits it has to be CLICKABLE, not captured by the drag surface
-     (the chip drags that same boundary itself via wireHeightDrag anyway). The bar
-     itself is 0 px tall and pointer-events: none, so only the chip pill
-     and the gallery sit above anything. */
+  /* Above the block lift on hover and selection (99998/99999): the chip, the seam's grip
+     and the gallery are never taken by a block that hangs over the seam. The bar itself
+     is 0 px tall and pointer-events: none, so only they sit above anything. */
   z-index: 100001;
   /* Hidden until the mouse is over an adjacent section (or the bar itself):
      less noise, and the topmost bar does not collide with the menu. Shown
@@ -19545,7 +19522,8 @@ body.urd-mobile .urd-section-resize-top {
 
 .urd-preview .urd-add-section:hover,
 .urd-preview .urd-section:hover + .urd-add-section,
-.urd-preview .urd-add-section:has(+ .urd-section:hover) {
+.urd-preview .urd-add-section:has(+ .urd-section:hover),
+.urd-preview .urd-add-section:has(.urd-seam-active) {
   opacity: 1;
   pointer-events: auto;
 }
@@ -19602,21 +19580,133 @@ body.urd-mobile .urd-section-resize-top {
   border-style: solid;
 }
 
-/* The topmost bar: the chip is placed BELOW the boundary line instead of on top
-   of it, with the counter-scaling intact (a bare translateY here would drop it
-   and give the chip the wrong size). */
-#urd-root > .urd-add-section:first-child > button {
-  transform: translateY(4px) scale(var(--urd-chrome-scale, 1));
-  transform-origin: top center;
+/* The seam's «New section» chip stands only on an empty page, as its start; on a seam
+   the section toolbar's «New section» opens the gallery of the seam below (preview-edit.js
+   openSectionGalleryBelow), and the seam holds its grip alone */
+.urd-preview #urd-root > .urd-add-section:not(:only-child) > .urd-add-section-chip {
+  display: none;
 }
 
-/* With the menu outside the flow (floating pill or overlay) the boundary line sits in
-   the menu band: the chip is placed below the unshrunk menu height (--urd-nav-h-base
-   from nav.js), so it can be seen and clicked instead of sitting behind the menu, and
-   keeps its place while the scroll shrink runs. */
-#urd-nav.urd-nav-float + #urd-root > .urd-add-section:first-child > button,
-#urd-nav.urd-nav-overlay + #urd-root > .urd-add-section:first-child > button {
-  transform: translateY(calc(var(--urd-nav-h-base, var(--urd-nav-h, 0px)) + 6px)) scale(var(--urd-chrome-scale, 1));
+/* The seam's grip (preview-edit.js seamGrip; the Section Seams canvas, look A): a pill on the
+   line that grows a section, a tab above and below it that shrinks the section it stands in.
+   It stands in the middle of the line at the admin's own size; the tabs come forward while
+   the pointer is on the grip (their own places included), a part has the focus, or a drag lasts. */
+.urd-preview .urd-seam-grip {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform: scale(var(--urd-chrome-scale, 1));
+}
+
+.urd-preview .urd-add-section .urd-seam-grip > button {
+  position: absolute;
+  left: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 15%);
+  background: var(--urd-admin-surface, #1b252d);
+  color: var(--urd-admin-text, #e2e5e8);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 25%);
+  opacity: 1;
+  font-size: 0;
+  cursor: ns-resize;
+  touch-action: none;
+  transition: background 0.12s ease, opacity 0.12s ease;
+}
+
+.urd-preview .urd-add-section .urd-seam-grip > .urd-seam-pill {
+  width: 44px;
+  height: 20px;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+}
+
+.urd-preview .urd-add-section .urd-seam-grip > .urd-seam-up {
+  top: -13px;
+  width: 28px;
+  height: 18px;
+  border-radius: 9px 9px 4px 4px;
+  transform: translate(-50%, -100%);
+}
+
+.urd-preview .urd-add-section .urd-seam-grip > .urd-seam-down {
+  top: 13px;
+  width: 28px;
+  height: 18px;
+  border-radius: 4px 4px 9px 9px;
+  transform: translateX(-50%);
+}
+
+.urd-preview .urd-add-section .urd-seam-grip > button:hover,
+.urd-preview .urd-add-section .urd-seam-grip > button.urd-seam-on {
+  background: var(--urd-admin-accent, #5f6a75);
+  color: var(--urd-admin-accent-text, #fff);
+}
+
+.urd-preview .urd-add-section .urd-seam-grip > button:focus-visible {
+  outline: 2px solid var(--urd-admin-accent, #5f6a75);
+  outline-offset: 2px;
+}
+
+.urd-preview .urd-seam-grip:not(:hover, :focus-within, .urd-seam-active) > .urd-seam-tab {
+  opacity: 0;
+}
+
+/* While the grip is in hand the seam's line is drawn whole, in the accent */
+.urd-preview .urd-add-section:has(.urd-seam-grip:hover, .urd-seam-active)::before {
+  top: -1px;
+  height: 2px;
+  background: var(--urd-admin-accent, #5f6a75);
+}
+
+/* The height, or the space at the top, while a part is dragged */
+.urd-preview .urd-seam-readout {
+  position: absolute;
+  left: 30px;
+  top: 0;
+  transform: translateY(-50%);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #ff2d87;
+  color: #fff;
+  font: 600 11px/1.5 system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Where a shrink meets the section's content, while the tab is dragged; in pink once Alt has passed it */
+.urd-preview .urd-seam-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 2px dashed #e2a400;
+  z-index: 100002;
+  pointer-events: none;
+}
+
+.urd-preview .urd-seam-floor.urd-seam-past {
+  border-top-color: #ff2d87;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-preview .urd-add-section .urd-seam-grip > button {
+    transition: none;
+  }
+}
+
+/* With the menu outside the flow (floating pill or overlay) the first section's top lies
+   under the menu, and its content starts the menu's height below it (the nav clearance).
+   The first seam stands there, its line, chip and grip with it, so they are seen and
+   reached on the line where the content starts, as on every other seam. */
+#urd-nav.urd-nav-float + #urd-root > .urd-add-section:first-child,
+#urd-nav.urd-nav-overlay + #urd-root > .urd-add-section:first-child {
+  top: var(--urd-nav-h, 0px);
 }
 
 /* The preset gallery (an open "+ New section"): a grouped panel with scrolling.
@@ -20165,11 +20255,27 @@ body.urd-mobile .urd-section-resize-top {
   z-index: 100001;
 }
 
-.urd-preview .urd-section:hover > .urd-section-toolbar {
+/* New block and New section, together at the toolbar's right end, set apart from the section's own tools */
+.urd-preview .urd-section-toolbar .urd-sec-adds {
   display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 4px;
+  padding-left: 4px;
+  border-left: 1px solid color-mix(in srgb, currentColor 25%, transparent);
 }
 
+.urd-preview .urd-section:hover > .urd-section-toolbar {
+  display: flex;
+  align-items: center;
+}
+
+/* Each button holds its drawing or its word in the middle, off the text's baseline, and all stand one height */
 .urd-preview .urd-section-toolbar button {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  height: 24px;
   border: 0;
   border-radius: 4px;
   background: color-mix(in srgb, var(--urd-color-surface) 85%, transparent);
@@ -20178,6 +20284,10 @@ body.urd-mobile .urd-section-resize-top {
   line-height: 1;
   padding: 5px 8px;
   cursor: pointer;
+}
+
+.urd-preview .urd-section-toolbar button > svg {
+  display: block;
 }
 
 .urd-preview .urd-section-toolbar button:hover {
@@ -20222,8 +20332,7 @@ body.urd-mobile .urd-section-resize-top {
 .urd-preview.urd-chrome-off .urd-edit-stop,
 .urd-preview.urd-chrome-off .urd-video-shield,
 .urd-preview.urd-chrome-off .urd-section-toolbar,
-.urd-preview.urd-chrome-off .urd-section-resize,
-.urd-preview.urd-chrome-off .urd-section-resize-top,
+.urd-preview.urd-chrome-off .urd-seam-floor,
 .urd-preview.urd-chrome-off .urd-smart-guide,
 .urd-preview.urd-chrome-off .urd-smart-gap,
 .urd-preview.urd-chrome-off .urd-page-guide,
@@ -20268,57 +20377,6 @@ body.urd-mobile .urd-section-resize-top {
 /* Editorial markers sit as classes on the section itself and cannot
    be display:none-d: the effects are zeroed instead, so Clean view is
    identical to the published page. */
-/* The height handle at the bottom edge of the section: the hit zone is 10px, but the
-   visible line sits exactly on the section edge */
-/* Above the block lift on hover and selection (99998/99999): a block that hangs
-   past the section edge must never be able to steal the grip on the section line */
-.urd-preview .urd-section-resize {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: calc(10px * var(--urd-chrome-scale, 1));
-  cursor: ns-resize;
-  z-index: 100000;
-}
-
-/* The hover line is drawn as an inset shadow on the section itself, so it always
-   sits exactly on the visible bottom edge */
-.urd-preview .urd-section:has(> .urd-section-resize:hover),
-.urd-preview .urd-section:has(> .urd-section-resize:active) {
-  box-shadow: inset 0 -2px 0 var(--urd-admin-accent, #5f6a75);
-}
-
-/* The top edge handle: mirrors the bottom handle, but adds or removes air at the TOP
-   of the section (the blocks come along, the content stays put) */
-.urd-preview .urd-section-resize-top {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: calc(10px * var(--urd-chrome-scale, 1));
-  cursor: ns-resize;
-  z-index: 100000;
-}
-
-.urd-preview .urd-section:has(> .urd-section-resize-top:hover),
-.urd-preview .urd-section:has(> .urd-section-resize-top:active) {
-  box-shadow: inset 0 2px 0 var(--urd-admin-accent, #5f6a75);
-}
-
-/* The block chrome wins over the section boundaries while a block is hovered or
-   selected: the toolbar (with ⠿) sits above the block's top edge, that is, inside
-   the boundary band, and the strips (z 100000, above the block lift) would otherwise
-   steal the clicks there. The strips in the block's own section let clicks through, and
-   so does the previous section's bottom strip (the boundary is shared). The grip on
-   the section line holds as soon as the pointer does not come from the block. */
-.urd-preview .urd-section:has(.urd-editable:hover) > .urd-section-resize,
-.urd-preview .urd-section:has(.urd-editable:hover) > .urd-section-resize-top,
-.urd-preview .urd-section:has(.urd-block.urd-selected) > .urd-section-resize-top,
-.urd-preview .urd-section:has(+ .urd-add-section + .urd-section .urd-editable:hover) > .urd-section-resize {
-  pointer-events: none;
-}
-
 /* A directional cursor while a section boundary is dragged (preview-edit sets
    the class on the root element): arrow down when dragging down, arrow up when
    dragging up. !important because the cursor otherwise follows the element beneath. */
