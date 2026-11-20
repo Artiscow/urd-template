@@ -8,9 +8,13 @@
     {
       "id": "sec-82c3367e",
       "version": 1,
+      "phoneStacks": [
+        ["blk-7d311b04", "blk-fc4bf960", "blk-77137574"]
+      ],
       "preset": "lead-story",
       "size": {
-        "minHeight": "976px"
+        "minHeight": "976px",
+        "readableDesktop": false
       },
       "grid": null,
       "background": {
@@ -62,6 +66,9 @@
             "align": "left",
             "box": false
           },
+          "phoneProps": {
+            "html": "<h2>TRØNDER LØS I TRONDHEIM</h2><p>\"Uhørt\", sier General Major Kolonell Krumpfurt.</p>"
+          },
           "animation": null,
           "frames": {
             "desktop": {
@@ -78,7 +85,8 @@
           "sticky": {
             "offset": 16,
             "until": null,
-            "group": "stk-intro"
+            "group": "stk-intro",
+            "phone": true
           }
         },
         {
@@ -107,7 +115,8 @@
           "sticky": {
             "offset": 16,
             "until": null,
-            "group": "stk-intro"
+            "group": "stk-intro",
+            "phone": true
           }
         },
         {
@@ -131,7 +140,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 1, "cols": 4 }
           },
           "mobileOrder": 40.13
         },
@@ -154,7 +163,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 5, "cols": 4 }
           },
           "mobileOrder": 40.14
         },
@@ -179,7 +188,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 1, "cols": 4 }
           },
           "mobileOrder": 40.15
         },
@@ -202,7 +211,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 5, "cols": 4, "height": 96 }
           },
           "mobileOrder": 40.160000000000004
         }
@@ -217,9 +226,11 @@
     {
       "id": "sec-7b4bb5c4",
       "version": 1,
+      "phoneList": ["blk-128fc6d7", "blk-069283fa", "blk-dceb039b", "blk-3aa56414", "blk-1e0d96ee", "blk-7c1f20ab"],
       "preset": "faq",
       "size": {
-        "minHeight": "576px"
+        "minHeight": "576px",
+        "mobileGap": 32
       },
       "grid": null,
       "background": {
@@ -240,6 +251,7 @@
           "type": "text",
           "version": 1,
           "props": {
+            "words": "hyphenate",
             "html": "<h2>Ofte stilte spørsmål</h2>",
             "align": "center",
             "box": false

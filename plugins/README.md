@@ -76,6 +76,8 @@ Plugin blocks and section templates show up by themselves in «Plugins» section
 
 Blocks whose content decides their height (like the calendar, the form and the map in the core) set `autoGrow: true` on the block definition: the block then gets its natural height in the phone view's automatic stacking instead of the fixed desktop height, so taller content on a phone is never clipped. `autoGrow` can also be a function of the block's props, for a block that grows in some views and fills its frame in others (the core's gallery grows as a grid and keeps the frame's height as a strip). On desktop the engine's push pass owns the box's height (ADR-0024): a plugin block does not need to measure itself, and must never write a measured height into its frame.
 
+A block added from «+ New block» lands at the size its definition's frame gives; the core's blocks have their box fitted to what they draw as they are added. A plugin block asks for the same with `fitWhenAdded: true` on its definition: it is then drawn hidden, measured once its content holds still (two measures 120 ms apart that agree, and nothing in it marked `aria-busy="true"`), and shown at the narrowest width where its words wrap no more. Leave it out where the block draws a loading state before its content, unless that state is marked `aria-busy`.
+
 **Settings in Properties (the field contract)**: if your block has simple settings (text, number, on/off, choice, place), declare them as `fields` on the block definition instead of building a config panel of your own; the admin renders them straight in the Properties panel when the block is selected:
 
 ```js

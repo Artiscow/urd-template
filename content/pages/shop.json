@@ -154,6 +154,11 @@
       "size": {
         "minHeight": "544px"
       },
+      "blocksHover": {
+        "type": "hover-lift",
+        "version": 1,
+        "props": {}
+      },
       "grid": null,
       "background": {
         "version": 1,
@@ -178,6 +183,7 @@
             "box": false
           },
           "animation": null,
+          "hover": false,
           "frames": {
             "desktop": {
               "x": 6,
@@ -223,7 +229,8 @@
             "type": "hover-lift",
             "version": 1,
             "props": {}
-          }
+          },
+          "entranceMobile": false
         },
         {
           "id": "blk-40bc0fa0",

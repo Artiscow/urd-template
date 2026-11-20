@@ -74,6 +74,7 @@
     "snap": true
   },
   "theme": {
+    "words": "whole",
     "version": 1,
     "tokens": {
       "color": {
@@ -287,6 +288,9 @@
       },
       "sideSubs": "collapsed",
       "sideSubArrow": false,
+      "mobile": {
+        "press": "tint"
+      },
       "mobileMenu": "sheet",
       "sheetMotion": "right",
       "mobileSubs": "expanded",

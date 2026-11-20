@@ -94,6 +94,29 @@
           }
         },
         {
+          "id": "blk-5c1e0b7d",
+          "type": "text",
+          "version": 1,
+          "props": {
+            "html": "<p>Trykk på telefonnummeret for å ringe oss.</p>",
+            "align": "left",
+            "box": false
+          },
+          "animation": null,
+          "hideDesktop": true,
+          "frames": {
+            "desktop": {
+              "x": 9.99,
+              "y": 392,
+              "w": 36,
+              "h": 28,
+              "z": 1,
+              "rot": 0
+            },
+            "mobile": null
+          }
+        },
+        {
           "id": "blk-bf54c41b",
           "type": "button",
           "version": 1,
@@ -114,6 +137,9 @@
               "rot": 0
             },
             "mobile": null
+          },
+          "phonePlace": {
+            "after": "blk-5c1e0b7d"
           }
         }
       ],

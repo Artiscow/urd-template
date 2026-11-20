@@ -8,6 +8,7 @@
     {
       "id": "sec-ec0c9b36",
       "version": 1,
+      "phoneOrder": "left",
       "preset": "steps",
       "size": {
         "minHeight": "1344px"
@@ -76,7 +77,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 1, "cols": 4 }
           },
           "mobileOrder": 88,
           "hover": {
@@ -105,7 +106,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 1, "cols": 4 }
           },
           "mobileOrder": 88.01,
           "hover": {
@@ -134,7 +135,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 5, "cols": 4 }
           },
           "mobileOrder": 88.1,
           "hover": {
@@ -162,7 +163,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 5, "cols": 4 }
           },
           "mobileOrder": 88.11,
           "hover": {
@@ -191,7 +192,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 1, "cols": 4 }
           },
           "mobileOrder": 88.2,
           "hover": {
@@ -219,7 +220,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 1, "cols": 4 }
           },
           "mobileOrder": 88.21000000000001,
           "hover": {
@@ -248,7 +249,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 5, "cols": 4 }
           },
           "mobileOrder": 88.6
         },
@@ -271,7 +272,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 5, "cols": 4 }
           },
           "mobileOrder": 88.61
         },
@@ -295,7 +296,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 1, "cols": 4 }
           },
           "mobileOrder": 88.7
         },
@@ -318,7 +319,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 1, "cols": 4 }
           },
           "mobileOrder": 88.71000000000001
         },
@@ -342,7 +343,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 5, "cols": 4 }
           },
           "mobileOrder": 88.8
         },
@@ -365,7 +366,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 5, "cols": 4 }
           },
           "mobileOrder": 88.81
         },
@@ -389,7 +390,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 1, "cols": 4 }
           },
           "mobileOrder": 88.9
         },
@@ -412,7 +413,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 1, "cols": 4 }
           },
           "mobileOrder": 88.91000000000001
         },
@@ -436,7 +437,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 5, "cols": 4 }
           },
           "mobileOrder": 89
         },
@@ -459,7 +460,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 5, "cols": 4 }
           },
           "mobileOrder": 89.01
         },
@@ -483,7 +484,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 1, "cols": 4 }
           },
           "mobileOrder": 89.1
         },
@@ -506,7 +507,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "col": 1, "cols": 4 }
           },
           "mobileOrder": 89.11
         }
