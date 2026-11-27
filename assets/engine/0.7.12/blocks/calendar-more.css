@@ -1,0 +1,812 @@
+/*
+ * The ApeironLF and dark agenda designs' rules, loaded with blocks/calendar-more.js.
+ * Its reasoning stands in docs/STYLES.md, under blocks/calendar-more.css.
+ */
+.urd-cal-phone .urd-cal-apv {
+  padding: 1em 0.8em;
+}
+
+.urd-cal-phone :is(.urd-cal-apv-first, .urd-cal-apv-tile) {
+  flex-wrap: wrap;
+  gap: 0.5em;
+  padding: 0.9em;
+}
+
+.urd-cal-phone .urd-cal-apv-when {
+  display: flex;
+  gap: 0.5em;
+  align-items: baseline;
+  text-align: left;
+}
+
+.urd-cal-phone .urd-cal-apv-body {
+  flex-basis: 100%;
+}
+
+.urd-cal-phone .urd-cal-apv-title {
+  font-size: 1.25em;
+}
+
+.urd-cal-phone .urd-cal-aps {
+  gap: 1.4em;
+  padding: 1.4em 1.2em;
+}
+
+.urd-cal-phone .urd-cal-aps-title {
+  font-size: 1.8em;
+}
+
+/* A1 to A3 Coming up on cream */
+.urd-cal-apn {
+  display: grid;
+  overflow: hidden;
+  color: var(--urd-cal-s-text, #1c2340);
+  background: var(--urd-cal-s-card, #f3ecd8);
+  border: 1px solid var(--urd-cal-ap-gold);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgb(0 0 0 / 25%);
+}
+
+.urd-cal-apn-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 1em 1.5em;
+  font-size: 0.8em;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--urd-cal-ap-gold);
+  background: var(--urd-cal-s-head, #1c2340);
+}
+
+.urd-cal-apn-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--urd-cal-ap-gold);
+  border-radius: 50%;
+}
+
+.urd-cal-apn-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.8em 1.5em;
+  font-size: 1.05em;
+  font-weight: 600;
+  color: var(--urd-cal-s-alertText, #f3ecd8);
+  text-decoration: none;
+  background: var(--urd-cal-s-alert, #7a1a1a);
+}
+
+.urd-cal-apn-alert-icon {
+  display: block;
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.urd-cal-apn-alert-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.urd-cal-apn-next {
+  display: flex;
+  gap: 1.1em;
+  padding: 1.4em 1.5em;
+}
+
+.urd-cal-apn-next + .urd-cal-apn-next {
+  padding-top: 0;
+}
+
+.urd-cal-apn-badge {
+  display: flex;
+  flex: 0 0 3.8em;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 3.8em;
+  color: var(--urd-cal-ap-gold);
+  background: var(--urd-cal-s-head, #1c2340);
+  border-radius: 6px;
+}
+
+.urd-cal-apn-badge strong {
+  font-family: var(--urd-font-heading);
+  font-size: 1.6em;
+  line-height: 1;
+}
+
+.urd-cal-apn-badge span {
+  font-size: 0.62em;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--urd-cal-s-card, #f3ecd8);
+}
+
+.urd-cal-apn-body {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.urd-cal-apn-kicker,
+.urd-cal-apv-kicker {
+  font-size: 0.68em;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--urd-cal-ap-golddark);
+}
+
+.urd-cal-apn-title {
+  font-family: var(--urd-font-heading);
+  font-size: 1.5em;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.urd-cal-ap-line {
+  font-size: 0.9em;
+  line-height: 1.4;
+  opacity: 0.8;
+}
+
+.urd-cal-apn-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6em 1em;
+  margin-top: 6px;
+}
+
+.urd-cal-apn-in {
+  padding: 4px 12px;
+  font-size: 0.75em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--urd-cal-ap-golddark);
+  border: 1px solid var(--urd-cal-ap-gold);
+  border-radius: 999px;
+}
+
+.urd-cal-apn .urd-cal-signup {
+  margin: 0;
+  color: var(--urd-cal-ap-golddark);
+}
+
+.urd-cal-apn-later {
+  display: grid;
+  gap: 0.6em;
+  padding: 1em 1.5em 1.2em;
+  color: var(--urd-cal-s-panelText, inherit);
+  background: var(--urd-cal-s-panel, #eae1c7);
+}
+
+.urd-cal-apn-rail {
+  display: grid;
+}
+
+.urd-cal-apn-rail-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 14px 4.4em minmax(0, 1fr) auto;
+  column-gap: 12px;
+  align-items: center;
+  min-height: 2.7em;
+}
+
+.urd-cal-apn-rail-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--urd-cal-color, var(--urd-cal-ap-gold));
+  border-radius: 50%;
+}
+
+.urd-cal-apn-rail-row:not(:last-child)::before {
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 2px;
+  height: 100%;
+  content: '';
+  background: var(--urd-cal-ap-gold);
+  opacity: 0.6;
+}
+
+.urd-cal-apn-rail-row .urd-cal-f-date {
+  font-size: 0.8em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--urd-cal-ap-golddark);
+}
+
+.urd-cal-apn-rail-row .urd-cal-f-title {
+  font-size: 1.1em;
+}
+
+.urd-cal-apn-arrow,
+.urd-cal-aps-arrow {
+  font-size: 1.1em;
+  color: var(--urd-cal-ap-golddark);
+  text-decoration: none;
+}
+
+.urd-cal-apn-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 1.1em 1.5em 1.3em;
+  border-top: 1px solid color-mix(in srgb, var(--urd-cal-ap-gold) 45%, transparent);
+}
+
+.urd-cal-apn-notice-body {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+}
+
+.urd-cal-apn-notice-title {
+  font-family: var(--urd-font-heading);
+  font-size: 1.2em;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.urd-cal-apn-notice-text {
+  font-size: 0.9em;
+  line-height: 1.4;
+  opacity: 0.8;
+}
+
+.urd-cal-apn-notice .urd-cal-apn-arrow {
+  margin-top: 1.6em;
+}
+
+/* A4 Coming up on navy */
+.urd-cal-apv {
+  display: grid;
+  gap: 0.9em;
+  padding: 1.5em;
+  color: var(--urd-cal-s-text, #f3ecd8);
+  background: var(--urd-cal-s-ground, #1c2340);
+  border: 1px solid var(--urd-cal-ap-gold);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgb(0 0 0 / 35%);
+}
+
+.urd-cal-apv-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.urd-cal-apv-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8em;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--urd-cal-ap-gold);
+}
+
+.urd-cal-apv-count {
+  font-size: 0.75em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.urd-cal-apv-first,
+.urd-cal-apv-tile {
+  display: flex;
+  gap: 1.1em;
+  padding: 1.1em;
+  border-radius: 10px;
+}
+
+.urd-cal-apv-first {
+  color: var(--urd-cal-s-cardText, #1c2340);
+  background: var(--urd-cal-s-card, #f3ecd8);
+}
+
+.urd-cal-apv-tile {
+  align-items: center;
+  background: var(--urd-cal-s-tile, #262e4f);
+  border: 1px solid var(--urd-cal-ap-gold);
+}
+
+.urd-cal-apv-when {
+  flex: none;
+  min-width: 3.4em;
+  text-align: center;
+}
+
+.urd-cal-apv-when strong {
+  display: block;
+  font-family: var(--urd-font-heading);
+  font-size: 2.4em;
+  line-height: 0.95;
+  color: var(--urd-cal-ap-golddark);
+}
+
+.urd-cal-apv-tile .urd-cal-apv-when strong {
+  font-size: 2em;
+  color: var(--urd-cal-ap-gold);
+}
+
+.urd-cal-apv-when span {
+  font-size: 0.68em;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.urd-cal-apv-body {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  justify-items: start;
+  min-width: 0;
+}
+
+.urd-cal-apv-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.urd-cal-d-apNavy .urd-cal-chip {
+  font-size: 0.62em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--urd-cal-ap-golddark);
+  background: transparent;
+  border-color: var(--urd-cal-color, var(--urd-cal-ap-gold));
+}
+
+.urd-cal-apv-title {
+  font-family: var(--urd-font-heading);
+  font-size: 1.45em;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.urd-cal-apv-tile .urd-cal-apv-title {
+  font-size: 1.2em;
+}
+
+.urd-cal-apv-place {
+  font-size: 0.9em;
+  opacity: 0.8;
+  border-bottom: 1px solid var(--urd-cal-ap-gold);
+}
+
+.urd-cal-apv-more {
+  margin-top: 6px;
+  padding: 8px 14px;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--urd-cal-s-ground, #1c2340);
+  text-decoration: none;
+  background: var(--urd-cal-ap-gold);
+  border-radius: 4px;
+}
+
+.urd-cal-apv-arrow {
+  font-size: 1.2em;
+  color: var(--urd-cal-ap-gold);
+  text-decoration: none;
+}
+
+.urd-cal-apv-later {
+  display: grid;
+  gap: 8px;
+  padding-top: 0.9em;
+  border-top: 1px solid var(--urd-cal-s-line, #3a4366);
+}
+
+.urd-cal-apv-kicker {
+  color: var(--urd-cal-ap-gold);
+}
+
+.urd-cal-apv-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.urd-cal-apv-row > * {
+  min-width: 0;
+}
+
+.urd-cal-apv-row .urd-cal-f-date {
+  margin-right: 10px;
+  font-size: 0.75em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--urd-cal-ap-gold);
+}
+
+/* A8 Regular event */
+.urd-cal-aps {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr);
+  gap: 2em;
+  padding: 2em 2.2em;
+  color: var(--urd-cal-s-text, #1c2340);
+  background: var(--urd-cal-s-card, #f5efdd);
+  border: 1px solid var(--urd-cal-s-line, #d9cfae);
+  border-radius: 4px;
+}
+
+.urd-cal-aps:has(.urd-cal-aps-aside) {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+}
+
+.urd-cal-aps-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.9em;
+  justify-items: start;
+  min-width: 0;
+}
+
+.urd-cal-aps-kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.68em;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--urd-cal-ap-golddark);
+}
+
+.urd-cal-aps-kicker i {
+  width: 28px;
+  height: 1px;
+  background: var(--urd-cal-ap-gold);
+}
+
+.urd-cal-aps-title {
+  font-family: var(--urd-font-heading);
+  font-size: 2.5em;
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--urd-cal-s-title, #7a1a1a);
+}
+
+.urd-cal-aps-text {
+  margin: 0;
+  font-size: 1.05em;
+  line-height: 1.5;
+}
+
+.urd-cal-aps-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8em 1.8em;
+}
+
+.urd-cal-aps-fact {
+  display: block;
+  font-size: 0.62em;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--urd-cal-ap-golddark);
+}
+
+.urd-cal-aps-place {
+  border-bottom: 1px solid var(--urd-cal-ap-gold);
+}
+
+.urd-cal-aps .urd-cal-signup {
+  margin: 0;
+  color: var(--urd-cal-s-title, #7a1a1a);
+}
+
+.urd-cal-aps-fold {
+  justify-self: stretch;
+}
+
+.urd-cal-aps-fold summary {
+  width: fit-content;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--urd-cal-s-title, #7a1a1a);
+  cursor: pointer;
+}
+
+.urd-cal-aps-dates {
+  display: grid;
+  gap: 6px;
+  margin-top: 0.6em;
+}
+
+.urd-cal-aps-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3em 12px;
+  padding: 0.5em 0.8em;
+  font-size: 0.85em;
+  background: var(--urd-cal-s-row, #f9f5e8);
+  border: 1px solid var(--urd-cal-s-line, #d9cfae);
+  border-radius: 3px;
+}
+
+.urd-cal-aps-row > span:first-child {
+  font-weight: 600;
+  color: var(--urd-cal-s-title, #7a1a1a);
+}
+
+.urd-cal-aps-arrow {
+  margin-left: auto;
+}
+
+.urd-cal-aps-aside {
+  --urd-cal-notice-lines: 6;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.6em;
+  align-content: start;
+  align-self: start;
+  min-width: 0;
+  padding-left: 2em;
+  overflow-wrap: anywhere;
+  border-left: 1px solid var(--urd-cal-s-line, #d9cfae);
+}
+
+.urd-cal-aps-aside-title {
+  font-family: var(--urd-font-heading);
+  font-size: 2.4em;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--urd-cal-s-title, #7a1a1a);
+}
+
+.urd-cal-aps-aside-text {
+  margin: 0;
+  font-size: 0.95em;
+  font-style: italic;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+/* F5 Agenda, dark */
+.urd-cal-d-mobileAgenda {
+  --urd-color-text: var(--urd-cal-s-text, #f5f5f7);
+  --urd-color-bg: var(--urd-cal-s-ground, #121216);
+  --urd-color-surface: var(--urd-cal-s-card, #1c1c22);
+  --urd-cal-surface: var(--urd-cal-s-card, #1c1c22);
+  --urd-cal-line: var(--urd-cal-s-edge, #2a2a32);
+  padding: 1.1em 1em 1.2em;
+  color: var(--urd-cal-s-text, #f5f5f7);
+  background: var(--urd-cal-s-ground, #121216);
+  border-radius: 26px;
+}
+
+.urd-cal-magenda {
+  display: grid;
+  gap: 0.9em;
+}
+
+.urd-cal-magenda-month {
+  font-family: var(--urd-font-heading);
+  font-size: 1.15em;
+  text-transform: capitalize;
+}
+
+.urd-cal-magenda-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.urd-cal-magenda-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.urd-cal-magenda-chip,
+.urd-cal-magenda-pick {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 0.8em;
+  font-weight: 600;
+  color: inherit;
+  cursor: pointer;
+  background: var(--urd-cal-s-chip, #26262d);
+  border: 1px solid var(--urd-cal-s-edge, #2a2a32);
+  border-radius: 999px;
+}
+
+.urd-cal-magenda-caret {
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  transform: rotate(45deg);
+}
+
+.urd-cal-magenda-menu {
+  position: fixed;
+  inset: auto;
+  gap: 2px;
+  min-width: 160px;
+  padding: 6px;
+  margin: 0;
+  color: var(--urd-cal-s-text, #f5f5f7);
+  background: var(--urd-cal-s-card, #1c1c22);
+  border: 1px solid var(--urd-cal-s-edge, #2a2a32);
+  border-radius: 14px;
+  box-shadow: 0 14px 34px rgb(0 0 0 / 45%);
+}
+
+.urd-cal-magenda-menu:popover-open {
+  display: grid;
+}
+
+.urd-cal-magenda-menu .urd-cal-magenda-pick {
+  justify-content: flex-start;
+  font-size: 0.9em;
+  background: transparent;
+  border-color: transparent;
+  border-radius: 9px;
+}
+
+.urd-cal-magenda-menu .urd-cal-magenda-pick:hover,
+.urd-cal-magenda-pick[aria-current] {
+  background: var(--urd-cal-s-chip, #26262d);
+}
+
+.urd-cal-magenda-pick .urd-cal-magenda-dot {
+  width: 8px;
+  height: 8px;
+}
+
+.urd-cal-magenda-strip {
+  display: flex;
+  gap: 4px;
+}
+
+.urd-cal-magenda-day {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+  justify-items: center;
+  padding: 8px 0 7px;
+  font-size: 0.62em;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 12px;
+}
+
+.urd-cal-magenda-day .urd-cal-f-date {
+  opacity: 0.6;
+}
+
+.urd-cal-magenda-day strong {
+  font-family: var(--urd-font-heading);
+  font-size: 1.5em;
+}
+
+.urd-cal-magenda-today {
+  color: var(--urd-cal-accent-text);
+  background: var(--urd-cal-accent);
+}
+
+.urd-cal-magenda-today .urd-cal-f-date {
+  opacity: 1;
+}
+
+.urd-cal-magenda-dot {
+  width: 4px;
+  height: 4px;
+  background: var(--urd-cal-color, var(--urd-cal-accent));
+  border-radius: 50%;
+}
+
+.urd-cal-magenda-today .urd-cal-magenda-dot {
+  background: currentcolor;
+}
+
+.urd-cal-magenda-list {
+  display: grid;
+  gap: 8px;
+}
+
+.urd-cal-magenda-label {
+  margin-top: 6px;
+  font-size: 0.65em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.urd-cal-magenda-card {
+  display: flex;
+  gap: 12px;
+  padding: 0.8em 0.9em;
+  background: var(--urd-cal-s-card, #1c1c22);
+  border: 1px solid var(--urd-cal-s-edge, #2a2a32);
+  border-radius: 16px;
+}
+
+.urd-cal-magenda-time {
+  flex: 0 0 3.6em;
+  font-family: var(--urd-font-heading);
+  font-size: 0.78em;
+  font-weight: 600;
+  opacity: 0.6;
+}
+
+.urd-cal-magenda-body {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.urd-cal-stripes .urd-cal-magenda-body {
+  padding-left: 10px;
+}
+
+.urd-cal-magenda-place {
+  font-size: 0.85em;
+  opacity: 0.6;
+}
+
+.urd-cal-d-mobileAgenda .urd-cal-chipbtn,
+.urd-cal-d-mobileAgenda .urd-cal-sub-btn {
+  color: inherit;
+  background: var(--urd-cal-s-chip, #26262d);
+  border-color: var(--urd-cal-s-edge, #2a2a32);
+}
+
+@supports not (container-type: inline-size) {
+  @media (max-width: 600px) {
+    .urd-cal-aps:has(.urd-cal-aps-aside) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .urd-cal-aps-aside {
+      padding-top: 1.2em;
+      padding-left: 0;
+      border-top: 1px solid var(--urd-cal-s-line, #d9cfae);
+      border-left: 0;
+    }
+}
+}
+
+@container urd-block (max-width: 600px) {
+  .urd-cal-aps:has(.urd-cal-aps-aside) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .urd-cal-aps-aside {
+    padding-top: 1.2em;
+    padding-left: 0;
+    border-top: 1px solid var(--urd-cal-s-line, #d9cfae);
+    border-left: 0;
+  }
+}

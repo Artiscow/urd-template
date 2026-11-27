@@ -1,0 +1,14 @@
+/*
+ * The icon block's own rules (blocks/icon.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* The icon block */
+.urd-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  line-height: 1;
+  user-select: none;
+}

@@ -1,0 +1,96 @@
+/*
+ * The quote block's own rules (blocks/quote.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+.urd-block[data-urd-align="stretch"] > .urd-quote {
+  align-items: center;
+}
+
+.urd-block[data-urd-align="stretch"] > .urd-quote-large {
+  justify-content: center;
+}
+
+/* The quote */
+.urd-quote {
+  --urd-quote-glyph: var(--urd-quote-accent, var(--urd-color-accent));
+  margin: 0;
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+}
+
+.urd-quote-large {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.urd-quote-large .urd-quote-text {
+  font-size: 1.35em;
+  line-height: 1.45;
+  text-wrap: balance;
+}
+
+.urd-quote-large::before {
+  content: '\201C';
+  font-family: Georgia, serif;
+  font-size: 3em;
+  line-height: 0.55;
+  color: var(--urd-quote-glyph);
+}
+
+.urd-quote-short {
+  background: color-mix(in srgb, var(--urd-color-surface) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 12%, transparent);
+  border-radius: var(--urd-radius-md);
+  padding: 1rem 1.2rem;
+}
+
+.urd-quote-short .urd-quote-text {
+  font-size: 0.98em;
+}
+
+/* The portrait's round frame clips its picture */
+.urd-quote-portrait {
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  flex: none;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 2px solid var(--urd-quote-glyph);
+}
+
+.urd-quote-caption {
+  margin-top: 0.55rem;
+  font-size: 0.82em;
+  display: flex;
+  gap: 0.45em;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.urd-quote-large .urd-quote-caption {
+  justify-content: center;
+}
+
+.urd-quote-name {
+  font-weight: 650;
+  font-style: normal;
+}
+
+.urd-quote-role {
+  opacity: 0.65;
+  font-style: normal;
+}
+
+/* The large quote in a card */
+.urd-quote-card {
+  box-sizing: border-box;
+  padding: 1.7rem 1.5rem 1.3rem;
+  background: color-mix(in srgb, var(--urd-color-surface) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 12%, transparent);
+  border-top: 3px solid var(--urd-quote-glyph);
+  border-radius: var(--urd-radius-md);
+  box-shadow: 0 8px 22px rgb(0 0 0 / 8%);
+}

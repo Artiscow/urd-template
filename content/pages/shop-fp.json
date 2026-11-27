@@ -233,7 +233,8 @@
               "rot": 0
             },
             "mobile": null
-          }
+          },
+          "mobileHeight": 7301
         }
       ],
       "responsive": {

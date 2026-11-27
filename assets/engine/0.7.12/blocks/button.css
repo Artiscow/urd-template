@@ -1,0 +1,44 @@
+/*
+ * The button block's own rules (blocks/button.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* Buttons */
+.urd-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0.5em 1.2em;
+  border-radius: var(--urd-radius-sm);
+  font-family: var(--urd-font-heading);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* The owner's colours stand in --urd-btn-* */
+.urd-button-primary {
+  background: var(--urd-btn-bg, var(--urd-color-accent));
+  color: var(--urd-btn-text, var(--urd-color-accent-text, var(--urd-color-bg)));
+}
+
+/* A filled button has a line only where the owner gives it one */
+.urd-button-primary.urd-button-own-border {
+  border: 1px solid var(--urd-btn-border);
+}
+
+.urd-button-primary:hover {
+  filter: brightness(1.1);
+}
+
+.urd-button-secondary {
+  background: var(--urd-btn-bg, transparent);
+  border: 1px solid var(--urd-btn-border, var(--urd-color-accent));
+  color: var(--urd-btn-text, var(--urd-color-accent));
+}
+
+/* An own fill under the pointer replaces the design's lightening */
+.urd-button.urd-button-own-hover:hover {
+  background: var(--urd-btn-hover);
+  filter: none;
+}

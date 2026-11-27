@@ -1,11 +1,5 @@
 /**
- * The Vipps MobilePay webhook (ADR-0020, ADR-0028): takes the payment events a
- * registration sends here, checks that the delivery is signed with the
- * registration's secret, and acknowledges. The site is static and has no
- * order database, so nothing is stored; the orders are read in the Vipps
- * portal. The shop of v1.1 forwards the authorised event as a notice
- * (ADR-0027). Without the secret in the environment the endpoint takes
- * nothing, and Vipps retries until a secret is set or the registration lapses.
+ * POST /api/pay/vipps/webhook: checks that a delivery is signed with the registration's secret, and acknowledges it. Nothing is stored.
  */
 import { json } from '../../../_lib/order.js';
 import { vippsConfig, verifyWebhook } from '../../../_lib/vipps.js';

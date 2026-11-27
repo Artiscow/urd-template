@@ -1,0 +1,325 @@
+/*
+ * The menu launcher's own rules (nav-launcher.js), loaded with it after base.css in ENGINE_SHEETS order (sheets.js).
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* The link launcher */
+.urd-nav-launcher-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.urd-nav-launcher-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.35rem;
+  opacity: 0.85;
+}
+
+.urd-nav-launcher-btn:hover,
+.urd-nav-launcher-btn:focus-visible {
+  opacity: 1;
+  color: var(--urd-color-accent);
+}
+
+/* The icons from the library are drawn at 100 % of their parent */
+.urd-nav-launcher-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* The panel takes the submenu's surface */
+.urd-nav-launcher {
+  display: none;
+  width: var(--urd-launcher-w, calc(15rem * var(--urd-launcher-s, 1)));
+  max-width: calc(100vw - 2rem);
+  max-height: min(60vh, 26rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.6rem;
+  background: var(--urd-nav-sub-bg, color-mix(in srgb, var(--urd-color-surface) 92%, transparent));
+  backdrop-filter: var(--urd-nav-blur, blur(8px));
+  border-radius: var(--urd-radius-md);
+  box-shadow: 0 12px 24px rgb(0 0 0 / 18%);
+}
+
+/* The owner's own mark on the button, in place of the nine dots */
+.urd-nav-launcher-btn-img {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--urd-radius-sm);
+  object-fit: cover;
+}
+
+/* The disclosure branch */
+.urd-nav-launcher-wrap.open .urd-nav-launcher {
+  display: block;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 2;
+}
+
+/* A cluster at the start, and the left column */
+.urd-nav-tools-start .urd-nav-launcher-wrap.open .urd-nav-launcher,
+.urd-nav-side-host-left .urd-nav-launcher-wrap.open .urd-nav-launcher {
+  right: auto;
+  left: 0;
+}
+
+/* The popover branch */
+@supports (anchor-name: --a) {
+  .urd-nav-launcher[popover] {
+    display: block;
+    position: fixed;
+    inset: auto;
+    margin: 6px 0 0;
+    position-area: block-end span-inline-start;
+  }
+
+  .urd-nav-tools-start .urd-nav-launcher[popover],
+  .urd-nav-side-host-left .urd-nav-launcher[popover] {
+    position-area: block-end span-inline-end;
+  }
+
+  .urd-nav-launcher[popover]:not(:popover-open) {
+    display: none;
+  }
+
+  @supports (position-try-fallbacks: flip-block) {
+    .urd-nav-launcher[popover] {
+      position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    }
+}
+
+}
+
+/* The three designs share one markup */
+.urd-nav-launcher-grid {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.urd-nav-launcher-link {
+  display: flex;
+  align-items: center;
+  border-radius: var(--urd-radius-sm);
+  color: inherit;
+  text-decoration: none;
+  line-height: 1.25;
+}
+
+/* A shortcut whose target is not a usable link */
+.urd-nav-launcher-missing {
+  opacity: 0.55;
+}
+
+.urd-nav-launcher-link:hover,
+.urd-nav-launcher-link:focus-visible {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  color: var(--urd-color-accent);
+}
+
+.urd-nav-launcher-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+  color: var(--urd-color-accent);
+  background: color-mix(in srgb, var(--urd-color-accent) 14%, transparent);
+}
+
+.urd-nav-launcher-icon svg {
+  width: 60%;
+  height: 60%;
+}
+
+.urd-nav-launcher-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* A name never sets the panel's or a column's width */
+.urd-nav-launcher-name {
+  contain: inline-size;
+  min-width: 0;
+}
+
+.urd-nav-launcher-view-grid .urd-nav-launcher-name {
+  align-self: stretch;
+}
+
+.urd-nav-launcher-view-list .urd-nav-launcher-name {
+  flex: 1 1 auto;
+}
+
+.urd-nav-launcher-names-cut .urd-nav-launcher-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.urd-nav-launcher-names-wrap .urd-nav-launcher-name {
+  overflow-wrap: anywhere;
+}
+
+/* Grid */
+.urd-nav-launcher-view-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.urd-nav-launcher-view-grid .urd-nav-launcher-link {
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.7rem 0.4rem 0.6rem;
+  text-align: center;
+  font-size: var(--urd-launcher-text, calc(0.78rem * var(--urd-launcher-s, 1)));
+}
+
+.urd-nav-launcher-view-grid .urd-nav-launcher-icon {
+  width: var(--urd-launcher-icon, calc(2.6rem * var(--urd-launcher-s, 1)));
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: var(--urd-radius-md);
+}
+
+/* List */
+.urd-nav-launcher-view-list {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.1rem;
+}
+
+.urd-nav-launcher-view-list .urd-nav-launcher-link {
+  gap: 0.65rem;
+  padding: 0.5rem 0.55rem;
+  font-size: var(--urd-launcher-text, calc(0.9rem * var(--urd-launcher-s, 1)));
+}
+
+.urd-nav-launcher-view-list .urd-nav-launcher-icon {
+  width: var(--urd-launcher-icon, calc(1.9rem * var(--urd-launcher-s, 1)));
+  height: var(--urd-launcher-icon, calc(1.9rem * var(--urd-launcher-s, 1)));
+  border-radius: var(--urd-radius-sm);
+}
+
+/* Cover */
+.urd-nav-launcher-view-cover {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.urd-nav-launcher-view-cover .urd-nav-launcher-link {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  align-items: flex-end;
+  overflow: hidden;
+  border-radius: var(--urd-radius-md);
+  background: color-mix(in srgb, var(--urd-color-accent) 12%, transparent);
+  font-size: var(--urd-launcher-text, calc(0.8rem * var(--urd-launcher-s, 1)));
+  font-weight: 600;
+}
+
+.urd-nav-launcher-view-cover .urd-nav-launcher-icon {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  background: none;
+}
+
+.urd-nav-launcher-view-cover .urd-nav-launcher-icon svg {
+  width: var(--urd-launcher-icon, calc(28px * var(--urd-launcher-s, 1)));
+  height: var(--urd-launcher-icon, calc(28px * var(--urd-launcher-s, 1)));
+}
+
+.urd-nav-launcher-view-cover .urd-nav-launcher-name {
+  position: relative;
+  width: 100%;
+  padding: 1.1rem 0.55rem 0.45rem;
+  color: #fff;
+  background: linear-gradient(to top, rgb(0 0 0 / 72%), transparent);
+}
+
+/* Without an image there is no photo for white text to sit on */
+.urd-nav-launcher-view-cover .urd-nav-launcher-link:not(.urd-nav-launcher-photo) .urd-nav-launcher-name {
+  color: inherit;
+  background: linear-gradient(to top, color-mix(in srgb, var(--urd-color-surface) 80%, transparent), transparent);
+}
+
+/* The title above the grid in the mobile menu */
+.urd-nav-launcher-title {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* The link launcher in the mobile menu */
+.urd-nav-launcher-row {
+  display: none;
+}
+
+body.urd-mobile .urd-nav-launcher-wrap,
+.urd-nav-mobile .urd-nav-launcher-wrap {
+  display: none;
+}
+
+body.urd-mobile .urd-nav-launcher-row,
+.urd-nav-mobile .urd-nav-launcher-row {
+  display: block;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+
+body.urd-mobile .urd-nav-list .urd-nav-launcher-view-list .urd-nav-launcher-link,
+.urd-nav-mobile .urd-nav-list .urd-nav-launcher-view-list .urd-nav-launcher-link {
+  padding: 0.5rem 0.55rem;
+}
+
+/* Any number of shortcuts is allowed */
+.urd-nav-launcher-more {
+  margin-top: 0.25rem;
+}
+
+.urd-nav-launcher-more > summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem;
+  border-radius: var(--urd-radius-sm);
+  cursor: pointer;
+  font-size: 0.82rem;
+  opacity: 0.8;
+  list-style: none;
+}
+
+.urd-nav-launcher-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.urd-nav-launcher-more > summary:hover,
+.urd-nav-launcher-more > summary:focus-visible {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.urd-nav-launcher-more-shut,
+.urd-nav-launcher-more[open] .urd-nav-launcher-more-open {
+  display: none;
+}
+
+.urd-nav-launcher-more[open] .urd-nav-launcher-more-shut {
+  display: inline;
+}

@@ -1,0 +1,108 @@
+/*
+ * The privacy block's own rules (blocks/privacy.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+.urd-privacy .urd-doc-part > summary > h2 {
+  font-size: 1.1em;
+}
+
+.urd-privacy .urd-doc-answer {
+  padding: 0 0 0.4em;
+}
+
+/* The privacy block */
+.urd-privacy {
+  max-width: 68ch;
+  padding-bottom: 3.5rem;
+  font-family: var(--urd-doc-font, inherit);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--urd-color-text);
+}
+
+.urd-privacy[data-design="contents"] {
+  max-width: none;
+}
+
+/* The privacy page centred in its block */
+.urd-privacy[data-align="center"]:not([data-design="contents"]) {
+  margin-inline: auto;
+}
+
+.urd-privacy .urd-doc-body {
+  max-width: 68ch;
+}
+
+.urd-privacy-title {
+  margin: 0 0 0.5em;
+  font-size: 2.4em;
+  line-height: 1.1;
+}
+
+.urd-privacy-intro {
+  font-size: 1.15em;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.urd-privacy .urd-doc-part > h2 {
+  margin: 2.2em 0 0.6em;
+  font-size: 1.4em;
+  line-height: 1.2;
+}
+
+.urd-privacy[data-design="questions"] .urd-doc-part:first-of-type {
+  margin-top: 1.2em;
+}
+
+.urd-privacy a {
+  color: var(--urd-doc-accent, var(--urd-color-accent));
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+.urd-privacy :is(.urd-doc-toc, .urd-doc-fold) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.urd-privacy-choices {
+  margin-top: 0.4em;
+  padding: 1.1rem 1.3rem;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 14%, transparent);
+  border-radius: var(--urd-doc-radius, var(--urd-radius-md));
+  background: var(--urd-doc-card, var(--urd-color-surface));
+}
+
+.urd-privacy-choices > p:last-child,
+.urd-privacy-list {
+  margin-bottom: 0;
+}
+
+.urd-privacy-list {
+  list-style: none;
+  padding: 0;
+}
+
+.urd-privacy-takeback {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--urd-doc-accent, var(--urd-color-accent));
+  border-radius: var(--urd-radius-sm);
+  background: transparent;
+  color: var(--urd-doc-accent, var(--urd-color-accent));
+  font: inherit;
+  cursor: pointer;
+}
+
+.urd-privacy-takeback:hover,
+.urd-privacy-takeback:focus-visible {
+  background: var(--urd-doc-accent, var(--urd-color-accent));
+  color: var(--urd-color-bg);
+}
+
+.urd-privacy-said {
+  margin-top: 0.6em;
+  font-size: 0.9em;
+  opacity: 0.85;
+}

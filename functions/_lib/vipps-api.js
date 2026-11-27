@@ -1,8 +1,5 @@
 /**
- * The Vipps MobilePay network side of the payment layer (ADR-0020): the access token for the
- * sales unit, kept in the isolate until shortly before it expires, and one
- * call shape against the Vipps MobilePay API with the headers every call
- * carries and a timeout. The pure logic is in vipps.js.
+ * The Vipps MobilePay network side (ADR-0020): the sales unit's access token, cached in the isolate, and one call shape with the common headers and a timeout.
  */
 import { fetchWithin, tokenFromAnswer, tokenFresh } from './net.js';
 
@@ -19,8 +16,7 @@ function baseHeaders(config) {
 }
 
 /**
- * The access token for the sales unit, from the cache or from
- * POST {apiBase}/accesstoken/get with the client id and secret.
+ * The access token for the sales unit, from the cache or from POST {apiBase}/accesstoken/get with the client id and secret.
  * @returns {Promise<string|null>} null when Vipps could not be reached or refused the keys
  */
 export async function accessToken(config) {
@@ -45,9 +41,7 @@ export async function accessToken(config) {
 }
 
 /**
- * One call against the Vipps MobilePay API with the bearer token and the
- * common headers. The answer is sorted into the error codes the endpoints
- * hand the client (the admin dictionaries hold an api.<code> text for each).
+ * One call against the Vipps MobilePay API with the bearer token and the common headers, its failure sorted into the error codes the endpoints hand the client.
  * @param {object} config From vippsConfig
  * @param {string} path The path under the API base, such as /epayment/v1/payments
  * @param {{method?: string, body?: object, headers?: object}} [init]

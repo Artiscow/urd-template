@@ -1,0 +1,452 @@
+/*
+ * The gallery's rules (blocks/gallery.js), for it and the slideshow background, after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+.urd-gallery-tile {
+  display: block;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: default;
+}
+
+/* The grid views' tiles in .urd-gallery-tiles */
+.urd-gallery-grid,
+.urd-gallery-wall,
+.urd-gallery-cards {
+  height: auto;
+}
+
+.urd-gallery-tiles {
+  display: grid;
+  grid-template-columns: repeat(var(--urd-gallery-cols, 3), 1fr);
+  gap: var(--urd-gallery-gap, 12px);
+}
+
+.urd-gallery-grid .urd-gallery-tile {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+/* Mosaic */
+.urd-gallery-wall > .urd-gallery-tiles {
+  grid-auto-rows: var(--urd-gallery-row, 140px);
+}
+
+.urd-gallery-wall .urd-gallery-tile {
+  width: 100%;
+  height: 100%;
+  grid-column: var(--urd-tile-col, auto);
+  grid-row: var(--urd-tile-row, auto);
+}
+
+/* A narrow gallery */
+@container urd-block (max-width: 540px) {
+  .urd-gallery-tiles {
+    grid-template-columns: repeat(var(--urd-gallery-cols-narrow, var(--urd-gallery-cols, 3)), 1fr);
+  }
+
+  .urd-gallery-wall .urd-gallery-tile {
+    grid-column: var(--urd-tile-col-narrow, var(--urd-tile-col, auto));
+    grid-row: var(--urd-tile-row-narrow, var(--urd-tile-row, auto));
+  }
+
+}
+
+.urd-gallery-card {
+  position: relative;
+  margin: 0;
+  padding: 6% 6% 0;
+  background: var(--urd-polaroid-color, #fff);
+  border-radius: 2px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 22%);
+  rotate: var(--urd-card-tilt, 0deg);
+  color: #222;
+}
+
+.urd-gallery-cards-own .urd-gallery-card {
+  color: var(--urd-polaroid-ink, currentColor);
+}
+
+.urd-gallery-card .urd-gallery-tile {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+/* The foot */
+.urd-gallery-card-plain {
+  padding-bottom: 18%;
+}
+
+.urd-gallery-caption {
+  padding: 0.55em 0 0.7em;
+  font-size: 0.85rem;
+  line-height: 1.25;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* Under a real pointer the card straightens and lifts */
+@media (hover: hover) and (pointer: fine) {
+  .urd-gallery-card {
+    transition: rotate 0.25s ease, translate 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .urd-gallery-card:hover,
+  .urd-gallery-card:focus-within {
+    z-index: 1;
+    rotate: 0deg;
+    translate: 0 -4px;
+    box-shadow: 0 12px 26px rgb(0 0 0 / 28%);
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-gallery-card {
+    transition: none;
+  }
+
+}
+
+/* Carousel */
+.urd-gallery-track {
+  display: flex;
+  gap: var(--urd-gallery-gap, 12px);
+  height: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+
+.urd-gallery-track .urd-gallery-tile {
+  flex: 0 0 auto;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+  scroll-snap-align: start;
+}
+
+/* Slideshow */
+.urd-gallery-slides {
+  height: 100%;
+  overflow: hidden;
+}
+
+.urd-gallery-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.urd-gallery-slide .urd-gallery-tile {
+  width: 100%;
+  height: 100%;
+}
+
+.urd-gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--urd-color-bg) 65%, transparent);
+  color: var(--urd-color-text);
+  cursor: pointer;
+}
+
+.urd-gallery-nav:focus-visible {
+  outline: 2px solid var(--urd-color-accent);
+  outline-offset: 2px;
+}
+
+.urd-gallery-prev {
+  left: 10px;
+}
+
+.urd-gallery-next {
+  right: 10px;
+}
+
+/* The slideshow's pause */
+.urd-gallery-pause {
+  top: auto;
+  right: 10px;
+  bottom: 10px;
+  width: 30px;
+  height: 30px;
+  transform: none;
+}
+
+.urd-gallery-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 7px;
+}
+
+.urd-gallery-dot {
+  top: auto;
+  transform: none;
+  position: static;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--urd-color-text) 45%, transparent);
+}
+
+/* The gallery's ribbon view */
+.urd-gallery-ribbon {
+  display: grid;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: var(--urd-gallery-gap, 12px);
+  width: 100%;
+  contain: size;
+}
+
+.urd-gallery-ribbon .urd-ribbon-stripe,
+.urd-gallery-ribbon .urd-ribbon-track,
+.urd-gallery-ribbon .urd-ribbon-run {
+  height: 100%;
+}
+
+.urd-gallery-ribbon .urd-gallery-tile {
+  flex: 0 0 auto;
+  height: 100%;
+  width: auto;
+}
+
+
+/* The image gallery background layer */
+.urd-bg-slideshow {
+  overflow: hidden;
+  container-type: size;
+}
+
+.urd-bg-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--urd-bgg-fade, 1.5s) ease;
+}
+
+/* The shapes */
+.urd-gallery-shape-circle { --urd-shape: circle(50% at 50% 50%); }
+.urd-gallery-shape-oval { --urd-shape: ellipse(50% 50% at 50% 50%); }
+.urd-gallery-shape-pill { --urd-shape-radius: 999px; }
+.urd-gallery-shape-arch { --urd-shape-radius: 50% 50% 0 0 / 60% 60% 0 0; }
+.urd-gallery-shape-blob { --urd-shape-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+.urd-gallery-shape-leaf { --urd-shape-radius: 70% 0 70% 0; }
+.urd-gallery-shape-triangle { --urd-shape: polygon(50% 0%, 100% 100%, 0% 100%); --urd-shape-radius: 0px; }
+.urd-gallery-shape-diamond { --urd-shape: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); --urd-shape-radius: 0px; }
+.urd-gallery-shape-hexagon { --urd-shape: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0% 50%); --urd-shape-radius: 0px; }
+.urd-gallery-shape-octagon { --urd-shape: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%); --urd-shape-radius: 0px; }
+.urd-gallery-shape-star { --urd-shape: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); --urd-shape-radius: 0px; }
+.urd-gallery-shape-heart { --urd-shape: polygon(50% 100%, 12% 62%, 2% 42%, 4% 24%, 14% 10%, 28% 4%, 42% 8%, 50% 18%, 58% 8%, 72% 4%, 86% 10%, 96% 24%, 98% 42%, 88% 62%); --urd-shape-radius: 0px; }
+.urd-gallery-shape-slant { --urd-shape: polygon(12% 0%, 100% 0%, 88% 100%, 0% 100%); --urd-shape-radius: 0px; }
+
+/* The looks */
+.urd-gallery-look-shadow .urd-gallery-box { filter: drop-shadow(0 16px 20px rgb(0 0 0 / 0.45)); }
+.urd-gallery-look-glow .urd-gallery-box { filter: drop-shadow(0 0 14px var(--urd-frame-color, var(--urd-color-accent, #7c5cff))) drop-shadow(0 0 3px var(--urd-frame-color, var(--urd-color-accent, #7c5cff))); }
+
+/* A polaroid */
+.urd-gallery-look-polaroid .urd-gallery-box { filter: drop-shadow(0 14px 18px rgb(0 0 0 / 0.4)); }
+.urd-gallery-look-polaroid .urd-gallery-skin { background: var(--urd-frame-color, #fff); clip-path: none; border-radius: 2px; }
+.urd-gallery-look-polaroid .urd-gallery-face { inset: 6% 6% 16%; }
+
+/* The bordered looks draw with the frame colour the layer sets */
+.urd-gallery-look-border .urd-gallery-skin { background: var(--urd-frame-color, #fff); }
+.urd-gallery-look-border .urd-gallery-face { inset: 3px; }
+.urd-gallery-look-thick .urd-gallery-skin { background: var(--urd-frame-color, #fff); }
+.urd-gallery-look-thick .urd-gallery-face { inset: 10px; }
+.urd-gallery-look-dark .urd-gallery-skin { background: var(--urd-frame-color, #161616); }
+.urd-gallery-look-dark .urd-gallery-face { inset: 10px; }
+.urd-gallery-look-double .urd-gallery-skin { background: var(--urd-frame-color, #fff); }
+.urd-gallery-look-double .urd-gallery-face { inset: 8px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--urd-frame-color, #fff) 35%, #222); }
+
+/* Tape and a pin sit on the box, above the skin, and lean a touch */
+.urd-gallery-look-tape .urd-gallery-box::before,
+.urd-gallery-look-pin .urd-gallery-box::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  z-index: 1;
+}
+
+.urd-gallery-look-tape .urd-gallery-box::before {
+  top: -7px;
+  width: 42%;
+  height: 16px;
+  translate: -50% 0;
+  rotate: -4deg;
+  background: rgb(255 240 170 / 0.72);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.25);
+}
+
+.urd-gallery-look-pin .urd-gallery-box::before {
+  top: -5px;
+  width: 12px;
+  height: 12px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff8a80, #c62828 70%);
+  box-shadow: 0 2px 3px rgb(0 0 0 / 0.45);
+}
+
+/* A stamp */
+.urd-gallery-look-stamp .urd-gallery-skin { border: 4px dotted #fff; box-sizing: border-box; }
+.urd-gallery-look-stamp .urd-gallery-face { inset: 8px; box-shadow: 0 0 0 4px #fff; }
+
+/* Film */
+.urd-gallery-look-film .urd-gallery-skin { background: #111; }
+.urd-gallery-look-film .urd-gallery-face { inset: 12px 4px; }
+.urd-gallery-look-film .urd-gallery-skin::before,
+.urd-gallery-look-film .urd-gallery-skin::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: repeating-linear-gradient(90deg, transparent 0 5px, #e8e8e8 5px 11px, transparent 11px 14px);
+}
+
+.urd-gallery-look-film .urd-gallery-skin::before { top: 3px; }
+.urd-gallery-look-film .urd-gallery-skin::after { bottom: 3px; }
+
+/* A soft edge */
+.urd-gallery-look-soft .urd-gallery-face {
+  mask-image: radial-gradient(ellipse at center, #000 48%, transparent 76%);
+}
+
+/* The tones */
+.urd-gallery-tone-mono .urd-gallery-face, .urd-gallery-tone-mono .urd-bg-slide { filter: grayscale(1); }
+.urd-gallery-tone-sepia .urd-gallery-face, .urd-gallery-tone-sepia .urd-bg-slide { filter: sepia(0.8); }
+.urd-gallery-tone-vintage .urd-gallery-face, .urd-gallery-tone-vintage .urd-bg-slide { filter: sepia(0.45) contrast(1.05) saturate(0.9); box-shadow: inset 0 0 60px rgb(0 0 0 / 0.45); }
+.urd-gallery-tone-faded .urd-gallery-face, .urd-gallery-tone-faded .urd-bg-slide { filter: contrast(0.85) saturate(0.75) brightness(1.08); }
+.urd-gallery-tone-warm .urd-gallery-face, .urd-gallery-tone-warm .urd-bg-slide { filter: sepia(0.3) saturate(1.25); }
+.urd-gallery-tone-cool .urd-gallery-face, .urd-gallery-tone-cool .urd-bg-slide { filter: saturate(0.9) hue-rotate(-14deg) contrast(1.05); }
+.urd-gallery-tone-punchy .urd-gallery-face, .urd-gallery-tone-punchy .urd-bg-slide { filter: contrast(1.25) saturate(1.25); }
+.urd-gallery-tone-noir .urd-gallery-face, .urd-gallery-tone-noir .urd-bg-slide { filter: grayscale(1) contrast(1.45) brightness(0.9); }
+.urd-gallery-tone-dim .urd-gallery-face, .urd-gallery-tone-dim .urd-bg-slide { filter: brightness(0.55); }
+.urd-gallery-tone-pop .urd-gallery-face, .urd-gallery-tone-pop .urd-bg-slide { filter: saturate(1.9) contrast(1.1); }
+
+/* Duotone */
+.urd-gallery-tone-duotone .urd-gallery-face, .urd-gallery-tone-duotone .urd-bg-slide { filter: grayscale(1) contrast(1.1); }
+.urd-gallery-tone-duotone .urd-gallery-face::after, .urd-gallery-tone-duotone .urd-bg-slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--urd-color-accent, #7c5cff);
+  mix-blend-mode: color;
+  opacity: 0.85;
+}
+
+/* Travel */
+.urd-gallery-travel {
+  animation-name: urd-gallery-travel;
+}
+
+/* Breathing */
+.urd-gallery-kenburns {
+  animation-name: urd-gallery-kenburns;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+}
+
+/* The cross-fade */
+.urd-gallery-fade {
+  animation-name: urd-gallery-fade;
+  animation-timing-function: ease-in-out;
+}
+
+/* The bounce */
+.urd-gallery-bounce-x {
+  animation-name: urd-gallery-bounce-x;
+  animation-direction: alternate;
+}
+
+.urd-gallery-bounce-y {
+  animation-name: urd-gallery-bounce-y;
+  animation-direction: alternate;
+}
+
+/* Still under reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .urd-gallery-frame,
+  .urd-gallery-skin,
+  .urd-gallery-face,
+  .urd-gallery-tile {
+    animation: none;
+  }
+
+  .urd-gallery-slide,
+  .urd-bg-slide {
+    transition: none;
+  }
+
+}
+
+/* The band */
+.urd-gallery-band {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.urd-gallery-band-row {
+  flex: 0 0 var(--urd-band-h, 156px);
+  height: var(--urd-band-h, 156px);
+  overflow: hidden;
+  display: flex;
+}
+
+/* The height reaches the tiles through the track and the run */
+.urd-gallery-band .urd-ribbon-track,
+.urd-gallery-band .urd-ribbon-run {
+  height: 100%;
+}
+
+.urd-gallery-band .urd-ribbon-run {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.urd-gallery-band-tile {
+  position: relative;
+  flex: 0 0 auto;
+  height: 100%;
+  aspect-ratio: 1.35;
+  margin-right: 12px;
+}
+
+/* The mosaic */
+.urd-gallery-mosaic {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: var(--urd-mosaic-row, 140px);
+  grid-auto-flow: dense;
+  gap: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+  align-content: start;
+}
+
+@media (max-width: 760px) {
+  .urd-gallery-mosaic {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}

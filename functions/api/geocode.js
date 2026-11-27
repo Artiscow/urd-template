@@ -1,30 +1,21 @@
 /**
- * Address lookup for the map block: turns an ordinary address into coordinates
- * via OpenStreetMap's geocoder (Nominatim). It goes through the site's own
- * function (same origin), so the browser needs no connect-src extension, and we
- * can set an identifying User-Agent the way Nominatim's terms of use require.
- *
- * Used only in the editor (when the owner clicks Use), not on every page load:
- * the coordinates are stored in the block, so visitors load the map straight
- * from OSM.
- *
- * Requires a signed-in session (like latest.js): without that guard this is an
- * open proxy to Nominatim, and abuse can get the deployment IP banned.
+ * GET /api/geocode: the map block's address lookup, which turns an address into coordinates through OpenStreetMap's Nominatim, for a signed-in publisher.
  */
-import { readCookie } from '../_lib/cookies.js';
+import { requirePublisher } from '../_lib/auth.js';
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
     headers: {
       'content-type': 'application/json',
-      // Shared cache for an hour: the same address is not looked up again.
-      'cache-control': status === 200 ? 'public, max-age=300, s-maxage=3600' : 'no-store',
+      // Kept by the browser for an hour: the same address is not looked up again.
+      'cache-control': status === 200 ? 'private, max-age=3600' : 'no-store',
     },
   });
 
-export async function onRequestGet({ request }) {
-  if (!readCookie(request, 'urd_gh')) return json({ error: 'Not signed in', code: 'notLoggedIn' }, 401);
+export async function onRequestGet({ request, env }) {
+  const auth = await requirePublisher(request, env);
+  if (auth.response) return auth.response;
   const q = (new URL(request.url).searchParams.get('q') ?? '').trim();
   if (q.length < 3) return json({ error: 'Enter an address or a place', code: 'queryTooShort' }, 400);
 

@@ -1,0 +1,80 @@
+/*
+ * The faq block's own rules (blocks/faq.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* The FAQ accordion */
+.urd-faq {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Each question is a native <details> */
+.urd-faq-item {
+  padding: 0.75rem 1.25rem;
+}
+
+/* <summary> */
+.urd-faq-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.urd-faq-head::-webkit-details-marker {
+  display: none;
+}
+
+.urd-faq-q {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.urd-faq-toggle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: var(--urd-color-text);
+}
+
+/* The list variant */
+.urd-faq-list {
+  gap: 0;
+}
+
+.urd-faq-list .urd-faq-item:first-child {
+  border-top: 1px solid color-mix(in srgb, var(--urd-color-text) 16%, transparent);
+}
+
+/* Soft unfolding where ::details-content and interpolate-size work */
+@supports (interpolate-size: allow-keywords) {
+  .urd-faq {
+    interpolate-size: allow-keywords;
+  }
+
+  .urd-faq-item::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition: block-size 0.25s ease, content-visibility 0.25s allow-discrete;
+  }
+
+  .urd-faq-item[open]::details-content {
+    block-size: auto;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @supports (interpolate-size: allow-keywords) {
+    .urd-faq-item::details-content {
+      transition: none;
+    }
+}
+
+}

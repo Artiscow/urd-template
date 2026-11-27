@@ -1,0 +1,30 @@
+/*
+ * The collection block's own rules (blocks/collection.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * docs/STYLES.md holds nothing more for it.
+ */
+.urd-collection {
+  width: 100%;
+}
+
+.urd-collection-image {
+  width: calc(100% + 2rem);
+  margin: -1rem -1rem 0.35rem;
+  height: 150px;
+  border-radius: var(--urd-radius-md) var(--urd-radius-md) 0 0;
+}
+
+.urd-collection-thumb {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-collection-year {
+  margin: 1rem 0 0.5rem;
+  opacity: 0.85;
+}
+
+.urd-collection-archive .urd-collection-year:first-child {
+  margin-top: 0;
+}

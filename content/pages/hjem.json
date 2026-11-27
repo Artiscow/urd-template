@@ -12,8 +12,6 @@
     {
       "id": "sec-46b91629",
       "version": 1,
-      "phoneOrder": "left",
-      "phoneLoose": ["blk-1f8cc2e3"],
       "preset": "hero",
       "size": {
         "minHeight": "1264px"
@@ -219,6 +217,42 @@
             },
             "mobile": null
           }
+        },
+        {
+          "id": "blk-2ae2b785",
+          "type": "calendar",
+          "version": 1,
+          "decor": false,
+          "hideMobile": false,
+          "props": {
+            "sources": [
+              {
+                "calendar": "cal-5ed2f6ab"
+              }
+            ],
+            "view": "year",
+            "limit": 6,
+            "showCategories": false,
+            "showSubscribe": false,
+            "showSignup": false,
+            "design": "yearWheel",
+            "weekStart": "mon",
+            "texts": {}
+          },
+          "animation": null,
+          "frames": {
+            "desktop": {
+              "x": 15.24,
+              "y": 544,
+              "w": 75,
+              "h": 372,
+              "z": 6,
+              "rot": 0
+            },
+            "mobile": null
+          },
+          "mobileHeight": 750,
+          "size": 1.25
         }
       ],
       "responsive": {

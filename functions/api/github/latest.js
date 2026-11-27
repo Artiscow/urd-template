@@ -1,8 +1,5 @@
 /**
- * GET /api/github/latest[?base=<sha>]
- * Returns the HEAD commit on the publishing branch; with ?base it also lists
- * the files changed in base..HEAD. The editor uses this for conflict
- * detection: if someone else has published since load, the user is warned.
+ * GET /api/github/latest[?base=<sha>]: the publishing branch's HEAD and, with base, the files changed in base..HEAD, for the editor's conflict check.
  */
 import { cfg, gh } from '../../_lib/github.js';
 import { readCookie } from '../../_lib/cookies.js';
@@ -38,10 +35,7 @@ export async function onRequestGet({ request, env }) {
       .map((f) => f.filename)
       .filter((name) => name.startsWith(prefix))
       .map((name) => name.slice(prefix.length));
-    // GitHub truncates the file list at 300: site files CAN then be missing,
-    // and the conflict check must treat the diff as "may overlap". The flag
-    // is set from the length of the whole diff (truncation happens before our
-    // filter), but only once the limit is actually reached.
+    // GitHub cuts the file list at 300, so truncated is read from the whole diff's length, before the filter.
     return json({ head, changedFiles, truncated: allFiles.length >= 300 });
   } catch (err) {
     console.error('Urd latest:', err.message);

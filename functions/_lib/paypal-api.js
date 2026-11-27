@@ -1,8 +1,5 @@
 /**
- * The PayPal network side of the payment layer (ADR-0028): the OAuth access
- * token for the app, kept in the isolate until shortly before it expires,
- * and one call shape against PayPal's REST API with the bearer token, a JSON
- * body and a timeout. The pure logic is in paypal.js.
+ * The PayPal network side (ADR-0028): the app's OAuth token, cached in the isolate, and one call shape with the bearer token, a JSON body and a timeout.
  */
 import { fetchWithin, tokenFromAnswer, tokenFresh } from './net.js';
 
@@ -10,8 +7,7 @@ import { fetchWithin, tokenFromAnswer, tokenFresh } from './net.js';
 const tokens = new Map();
 
 /**
- * The access token for the app, from the cache or from
- * POST {apiBase}/v1/oauth2/token with the client id and secret.
+ * The access token for the app, from the cache or from POST {apiBase}/v1/oauth2/token with the client id and secret.
  * @returns {Promise<string|null>} null when PayPal could not be reached or refused the keys
  */
 export async function paypalToken(config) {
@@ -40,10 +36,7 @@ export async function paypalToken(config) {
 }
 
 /**
- * One call against PayPal's REST API. The answer is sorted into the error
- * codes the endpoints hand the client (the admin dictionaries hold an
- * api.<code> text for each); the whole order comes back on a write
- * (Prefer: return=representation).
+ * One call against PayPal's REST API, its failure sorted into the error codes the endpoints hand the client; a write answers with the whole order.
  * @param {object} config From paypalConfig
  * @param {string} path The path under the API base, such as /v2/checkout/orders
  * @param {{method?: string, body?: object, raw?: string, headers?: object}} [init] raw is a JSON body sent as given

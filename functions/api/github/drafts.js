@@ -1,14 +1,6 @@
 /**
- * /api/github/drafts: the saved drafts (ADR-0032), on their own branch `urd-drafts`, for an owner who may publish.
- *
- * GET                 { head, index }: the branch's head and its index, or head null and an empty index where nothing is saved yet.
- * GET ?parts=a,b      { head, parts: { a: text|null } }: the parts' file texts at the head, in one GraphQL call (a text GitHub cuts short is read as a blob).
- * POST { expect, writes: [{ name, keys, hash?, base?, title?, later?, note?, device? }], removes: [name], all? }
- *                     { head, index }: one commit on the branch with the index, each written part and each removed one (`all` removes every part).
- *                     `expect` is the head the editor last read (null for none); a head that moved since gives 409 `draftsRace` with the head as it stands.
- *
- * Every commit's message begins with the host's skip marker, so the branch is never built or deployed, and nothing here ever writes the site's branch.
- * The branch's paths are its own (the index and parts/), never under GITHUB_ROOT_DIR.
+ * GET and POST /api/github/drafts: the saved drafts on the branch urd-drafts.
+ * GET reads its head and index, or ?parts= texts; POST commits writes and removals.
  */
 import { gh, ghGraphql, cleanBase64, commitTree } from '../../_lib/github.js';
 import { requirePublisher } from '../../_lib/auth.js';

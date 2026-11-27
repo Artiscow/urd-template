@@ -11,6 +11,9 @@
 # the host here (see ADR-0006; a plugin manifest declares the need and admin
 # shows the exact line).
 
+# Strict-Transport-Security has the browser reach the site over HTTPS alone for a year.
+# includeSubDomains and preload are the site owner's to add, on this same line, for an own domain.
+
 # Speculation Rules are delivered as a SEPARATE file via a header (not inline):
 # an inline <script type="speculationrules"> would require
 # 'inline-speculation-rules' in script-src, the project's first script-src
@@ -22,6 +25,7 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000
   Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; frame-src 'self' https://www.youtube-nocookie.com https://player.vimeo.com https://www.openstreetmap.org; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'
   Speculation-Rules: "/speculation-rules.json"
 

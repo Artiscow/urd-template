@@ -1,10 +1,21 @@
 # Plugins
 
-An Urd plugin is a folder here with a manifest (`plugin.json`) and an ES module (`index.js`) that exports `register(Urd)`. Plugins use the same define APIs as the core (blocks, section presets, backgrounds, animations, templates) and are bound by the same migration contract: a plugin update can never break existing content.
+An Urd plugin is a folder here with a manifest (`plugin.json`) and an ES module (`index.js`) that exports `register(Urd)`. Plugins use the same define APIs as the core (blocks, section presets, backgrounds, animations, templates) and are bound by the same migration contract: a plugin update can never break existing content. The core's ids are the engine's own, so a plugin cannot define one; and since a visitor's page loads only the core types it holds, a plugin cannot count on reading a core type's definition through `get`.
 
 The active plugins are listed in [`plugins.json`](plugins.json) (static hosts cannot list folders, hence an index file). The admin handles the list for you: the Plugins panel shows the folders here automatically (through the publishing layer, or the last known list), and switching a plugin on or off is published as an ordinary change.
 
 Urd ships one plugin: the Swedish language pack [`lang-sv/`](lang-sv/), which is the example of a language pack (see below). Calendar, form, map and visitor measurement were reference plugins up to and including 0.7.3, and are core blocks and a site setting from milestone 0.7.18 (24 September 2026); the patterns they showed are described below, with the core's code to read.
+
+## A plugin is trusted code
+
+A plugin is not sandboxed: its module runs as the site's own code, with every right the site has.
+
+- On a visitor's page it runs beside the engine, so it can read and change what the page shows and what the page keeps in the visitor's browser.
+- In the editor's canvas, and on any page of the site the owner opens while signed in, it runs on the site's own address, so it can do what the owner can: read and change the drafts, and publish to the repository with the owner's sign-in, which the browser sends with its requests.
+- A language pack is code too: its dictionaries are JavaScript modules, run wherever its language is shown, the editor itself included.
+- The CSP's list of hosts (ADR-0006) limits what a page may load and connect to; it stops neither a navigation that carries data in its address nor anything a plugin does with the owner's rights.
+
+Install a plugin as you would install a program: from a source you trust, having read its code, and switch it on only then.
 
 ## Developing a plugin locally
 
@@ -13,7 +24,7 @@ Urd ships one plugin: the Swedish language pack [`lang-sv/`](lang-sv/), which is
 3. Switch it on in the Plugins panel (type the folder name if the panel cannot list folders locally). The preview loads the plugin from the DRAFT, so you see your blocks live without publishing.
 4. Manifest errors, engine version requirements and `provides` mismatches are logged in the browser console and shown in the panel.
 
-Manifest requirements: `requiresEngine` (a semver range against the engine version in urd.json; a bound with more than three numbers is read by engines from 0.7.7), `provides` (what the plugin defines), and optionally `csp` (the external origins the plugin needs; see ADR-0006: `_headers` is never changed automatically, and the admin shows the owner what has to be added). `entry` and `provides` are optional for pure language packs, which have no code (see below).
+Manifest requirements: `requiresEngine` (a semver range against the engine version in urd.json; a bound with more than three numbers is read by engines from 0.7.7), `provides` (what the plugin defines), and optionally `csp` (the external origins the plugin needs; see ADR-0006: Urd never adds a host to `_headers`, the admin shows the owner what has to be added, and the updater keeps it through later updates). `entry` and `provides` are optional for pure language packs, which have no entry module of their own (see below).
 
 **Sharing the plugin:** put it in a public GitHub repo of its own and give it the GitHub topic `urd-plugin`, so it can be found by topic search (templates shared as a repo use `urd-template`). Users install it by copying the folder into `plugins/` and switching it on in the Plugins panel.
 

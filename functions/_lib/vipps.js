@@ -1,10 +1,5 @@
 /**
- * The Vipps MobilePay part of the optional payment layer (ADR-0020,
- * ADR-0028): reading the configuration, the payment body for epayment/v1
- * (the app or a card), the receipt lines, the reading of a payment's state,
- * and the webhook signature check. The order logic
- * every provider shares is in order.js; no fetch here, the endpoints under
- * api/pay/vipps/ handle the network. Tested in tests/vipps.test.mjs.
+ * Vipps MobilePay in the payment layer (ADR-0028): the configuration, the epayment/v1 body, the receipt lines, a payment's state and the webhook signature check.
  */
 import { orderLineItems, orderDescription, returnUrl } from './order.js';
 import { sameText, hostOf } from './net.js';
@@ -36,10 +31,7 @@ export const PROFILE_SCOPE = 'name email phoneNumber';
 export const VIPPS_METHODS = ['wallet', 'card'];
 
 /**
- * The order lines for the receipt in the buyer's app, in the minor unit,
- * with the tax fields at zero: the receipt is sent only for a seller who is
- * not registered for VAT (the endpoint leaves it out otherwise), and the VAT
- * lines come with the shop of v1.1 (ADR-0027).
+ * The order lines for the receipt in the buyer's app, in the minor unit, with the tax fields at zero.
  * @param {Array<{id: string, qty: number, variant?: string}>} order Cleaned order
  * @param {Array<{kind?: string, entries?: Array}>} catalogs The collection files
  * @returns {Array<object>|null} null when a line has no priced product
@@ -59,14 +51,7 @@ export function receiptLines(order, catalogs) {
 }
 
 /**
- * The body for POST {apiBase}/epayment/v1/payments: a payment through the
- * web redirect in the app (WALLET) or on Vipps's card page (CARD), reserved
- * now and captured by the seller when the goods ship. The order lines and
- * the typed contact fields ride along as the description, so the order can
- * be read in the Vipps portal; the receipt carries the lines into the
- * buyer's app when the seller sends one; the profile scope asks the app for
- * the contact details, which the card page cannot give. The site stores
- * nothing itself (ADR-0020).
+ * The body for POST {apiBase}/epayment/v1/payments: a web-redirect payment in the app (WALLET) or on Vipps's card page (CARD), captured at shipping.
  * @param {object} args
  * @param {'wallet'|'card'} [args.method]
  * @param {Array<object>|null} [args.receipt] The lines from receiptLines, or null for no receipt
@@ -91,10 +76,7 @@ export function buildPayment({ amountMinor, currency = 'NOK', reference, order, 
 export const OPEN_STATES = ['CREATED'];
 
 /**
- * Reads what the checkout page needs from GET {apiBase}/epayment/v1/payments/{reference}:
- * whether the money is reserved, the state word, and the buyer's shared
- * contact details for the receipt on the page. The state arrives as a word,
- * or as a list whose first entry is the current one.
+ * Reads what the checkout page needs from an epayment/v1 payment: whether the money is reserved, its state and the buyer's shared contact details.
  * @returns {{paid: boolean, open: boolean, state: string, buyer: {name: string, email: string, phone: string}}|null} null for an answer without a state
  */
 export function paymentSummary(payment) {
@@ -122,9 +104,7 @@ function base64(bytes) {
 }
 
 /**
- * The signature a webhook delivery must carry (the Webhooks API's request
- * authentication): base64 of HMAC-SHA256 over «POST\n<path and query>\n<date>;<host>;<body hash>»,
- * keyed with the registration's secret, where the body hash is base64 of SHA-256 over the body.
+ * The signature a webhook delivery must carry: base64 of HMAC-SHA256 over the method, path, date, host and body hash, keyed with the registration's secret.
  * @param {{method?: string, pathAndQuery: string, date: string, host: string, body: string}} delivery
  * @param {string} secret
  * @returns {Promise<{contentHash: string, signature: string}>}
@@ -147,10 +127,7 @@ export function signatureOf(authorization) {
 export const DATE_TOLERANCE = 300;
 
 /**
- * Whether a webhook delivery is signed by the registration's secret and
- * recent: the body hash in x-ms-content-sha256 must be the body's, the
- * signature in the Authorization header must be the one webhookSignature
- * computes, and the signed date must stand within the tolerance of now.
+ * Whether a webhook delivery is signed by the registration's secret and recent: its body hash and signature match, and its date is within the tolerance.
  * @param {{method: string, pathAndQuery: string, host: string, headers: {get(name: string): string|null}, body: string, now?: number}} delivery now in Unix seconds
  * @param {string} secret
  * @returns {Promise<boolean>}

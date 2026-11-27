@@ -1,11 +1,5 @@
 /**
- * The PayPal webhook (ADR-0028): takes the events of a webhook the owner adds
- * to the PayPal app, asks PayPal whether the delivery carries its signature
- * for that webhook (the verify-webhook-signature call, with the event sent
- * back exactly as it arrived), and acknowledges. The site is static and has
- * no order database, so nothing is stored; the orders are read in the
- * PayPal account. Without the webhook's id in the environment the endpoint
- * takes nothing.
+ * POST /api/pay/paypal/webhook: asks PayPal to verify a delivery for PAYPAL_WEBHOOK_ID, the event sent back as it came, and acknowledges it. Nothing is stored.
  */
 import { json } from '../../../_lib/order.js';
 import { paypalConfig, verificationBody } from '../../../_lib/paypal.js';

@@ -1,11 +1,5 @@
 /**
- * The Stripe webhook (ADR-0028): takes the events of a destination the owner
- * registers in the Stripe dashboard, checks that the delivery is signed with
- * the destination's secret and recent, and acknowledges. The site is static
- * and has no order database, so nothing is stored; the orders are read in
- * the Stripe dashboard. The shop of v1.1 forwards the completed session as a
- * notice (ADR-0027). Without the secret in the environment the endpoint
- * takes nothing, and Stripe retries until a secret is set.
+ * POST /api/pay/stripe/webhook: checks that a delivery is recent and signed with the destination's secret, and acknowledges it. Nothing is stored.
  */
 import { json } from '../../../_lib/order.js';
 import { stripeConfig, verifyStripeWebhook } from '../../../_lib/stripe.js';

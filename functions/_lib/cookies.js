@@ -1,25 +1,21 @@
 /**
- * Cookie helpers for the OAuth token.
- *
- * The token is stored in an httpOnly + Secure + SameSite=Lax cookie
- * ('urd_gh') and NEVER reaches browser JS. A short-lived 'urd_state' cookie
- * protects the OAuth flow against CSRF.
+ * Cookie helpers for the GitHub sign-in: the token ('urd_gh'), its renewal ('urd_ghr') and the sign-in's 'urd_state', all HttpOnly, Secure and SameSite=Lax.
  */
 
 /**
  * @param {string} name
  * @param {string} value
- * @param {{maxAge?: number}} [opts] maxAge in seconds (default 30 days)
+ * @param {{maxAge?: number, path?: string}} [opts] maxAge in seconds (default 30 days); path (default /)
  * @returns {string} Value for a Set-Cookie header
  */
 export function serializeCookie(name, value, opts = {}) {
   const maxAge = opts.maxAge ?? 60 * 60 * 24 * 30;
-  return `${name}=${value}; Max-Age=${maxAge}; Path=/; HttpOnly; Secure; SameSite=Lax`;
+  return `${name}=${value}; Max-Age=${maxAge}; Path=${opts.path ?? '/'}; HttpOnly; Secure; SameSite=Lax`;
 }
 
-/** Set-Cookie value that deletes the cookie. */
-export function expireCookie(name) {
-  return `${name}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax`;
+/** Set-Cookie value that deletes the cookie set at `path`. */
+export function expireCookie(name, path = '/') {
+  return `${name}=; Max-Age=0; Path=${path}; HttpOnly; Secure; SameSite=Lax`;
 }
 
 /**

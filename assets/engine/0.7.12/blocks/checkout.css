@@ -1,0 +1,235 @@
+/*
+ * The checkout block's own rules (blocks/checkout.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* Checkout */
+.urd-checkout {
+  display: grid;
+  gap: 16px;
+  width: 100%;
+}
+
+.urd-checkout-lines {
+  margin: 0;
+  padding: 0 0 0 1.2em;
+  display: grid;
+  gap: 4px;
+  font-size: 0.9em;
+}
+
+.urd-checkout-total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--urd-color-text) 20%, transparent);
+}
+
+.urd-checkout-empty {
+  margin: 0;
+  opacity: 0.7;
+}
+
+.urd-checkout-form {
+  display: grid;
+  gap: 10px;
+}
+
+.urd-checkout-field {
+  display: grid;
+  gap: 4px;
+  font-size: 0.85em;
+}
+
+.urd-checkout-input {
+  padding: 9px 10px;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 25%, transparent);
+  border-radius: var(--urd-radius-sm, 6px);
+  background: var(--urd-color-surface);
+  color: inherit;
+  font: inherit;
+  font-size: 0.95em;
+}
+
+/* Honeypot */
+.urd-checkout-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.urd-checkout-vipps {
+  margin: 0;
+  font-size: 0.88em;
+  opacity: 0.85;
+}
+
+/* The buyer's choice among the payment instructions */
+.urd-checkout-paychoice {
+  display: grid;
+  gap: 6px;
+  font-size: 0.88em;
+}
+
+.urd-checkout-paychoice .urd-form-check {
+  align-items: flex-start;
+}
+
+.urd-checkout-paychoice-text {
+  display: block;
+  opacity: 0.85;
+}
+
+/* The summary right above the order buttons */
+.urd-checkout-recap {
+  display: grid;
+  gap: 4px;
+  font-size: 0.9em;
+}
+
+.urd-checkout-recap-lines {
+  margin: 0;
+}
+
+.urd-checkout-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Pay with Vipps */
+.urd-checkout-vippspay {
+  padding: 10px 18px;
+  border: none;
+  border-radius: var(--urd-radius-sm, 6px);
+  background: #ff5b24;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.urd-checkout-send {
+  padding: 10px 18px;
+  border: none;
+  border-radius: var(--urd-radius-sm, 6px);
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text, var(--urd-color-bg));
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.urd-checkout-status {
+  margin: 0;
+  font-size: 0.88em;
+}
+
+.urd-checkout-error {
+  color: #c0392b;
+}
+
+/* The printable order confirmation */
+.urd-checkout-confirmation {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 25%, transparent);
+  border-radius: var(--urd-radius-sm, 6px);
+  background: var(--urd-color-surface);
+  font-size: 0.9em;
+}
+
+.urd-checkout-confirmation-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.urd-checkout-print {
+  padding: 6px 12px;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 30%, transparent);
+  border-radius: var(--urd-radius-sm, 6px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.urd-checkout-confirmation-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2em 1em;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.urd-checkout-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  margin: 0;
+}
+
+.urd-checkout-withdrawal {
+  display: grid;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--urd-color-text) 20%, transparent);
+}
+
+.urd-checkout-wform {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 35%, transparent);
+  border-radius: var(--urd-radius-sm, 6px);
+}
+
+.urd-checkout-wform-note {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.urd-checkout-wform-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2em 0.5em;
+}
+
+.urd-checkout-wform-value {
+  opacity: 0.85;
+}
+
+/* The line a checkout shows while a provider runs on its test keys */
+.urd-checkout-testmode {
+  margin: 0 0 0.8em;
+  padding: 0.45em 0.75em;
+  border: 1px dashed currentColor;
+  border-radius: var(--urd-radius-sm);
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+
+/* The seller under the order buttons */
+.urd-checkout-seller {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2em 0.9em;
+  font-size: 0.8em;
+  font-style: normal;
+  opacity: 0.8;
+}
+.urd-checkout-seller-label {
+  font-weight: 600;
+}
+
+/* The shop's terms of sale under the seller */
+.urd-checkout-terms {
+  margin: 0;
+  font-size: 0.8em;
+  opacity: 0.8;
+}

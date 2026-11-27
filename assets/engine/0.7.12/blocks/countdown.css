@@ -1,0 +1,47 @@
+/*
+ * The countdown block's own rules (blocks/countdown.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+.urd-block[data-urd-align="stretch"] > .urd-countdown .urd-countdown-unit {
+  align-content: center;
+}
+
+/* The countdown */
+.urd-countdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.urd-countdown-unit {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  min-width: 64px;
+  padding: 10px 12px;
+  border-radius: var(--urd-radius-md, 12px);
+  background: color-mix(in srgb, var(--urd-color-text) 7%, transparent);
+}
+
+.urd-countdown-number {
+  font-family: var(--urd-font-heading);
+  font-size: 1.9em;
+  font-weight: 750;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--urd-color-accent);
+}
+
+.urd-countdown-name {
+  font-size: 0.72em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.urd-countdown-done {
+  font-family: var(--urd-font-heading);
+  font-size: 1.3em;
+  font-weight: 650;
+}

@@ -42,7 +42,8 @@
               "rot": 0
             },
             "mobile": null
-          }
+          },
+          "mobileHeight": 3108
         }
       ],
       "responsive": {

@@ -1,7 +1,5 @@
 /**
- * Sets the site icon in the admin tab as early as possible.
- * Without this the default Urd mark shows until the editor bundle has loaded and read site.json, which looks like an icon flash on every load.
- * Runs as its own small file (the CSP does not allow inline scripts) before the editor bundle; the editor takes over the syncing afterwards.
+ * Sets the site icon in the admin tab from site.json before the editor bundle loads; the editor keeps it in sync after.
  */
 fetch('/content/site.json')
   .then((response) => response.json())

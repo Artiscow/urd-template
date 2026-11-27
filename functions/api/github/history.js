@@ -1,10 +1,5 @@
 /**
- * GET /api/github/history
- * The most recent publishes: commits on the publishing branch that touch the
- * site content (content/ under GITHUB_ROOT_DIR). That way PUBLISHES are
- * listed, not every repo commit - in a monorepo (such as Urd's own) the list
- * would otherwise be full of development commits. Read endpoint: requires
- * only a sign-in (same level as latest.js).
+ * GET /api/github/history: the most recent publishes, the commits on the publishing branch that touch the site's content/, for a signed-in user.
  */
 import { cfg, gh } from '../../_lib/github.js';
 import { readCookie } from '../../_lib/cookies.js';

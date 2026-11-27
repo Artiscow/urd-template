@@ -1,0 +1,57 @@
+/*
+ * The share block's own rules (blocks/share.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* Share buttons */
+.urd-share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Nothing to draw yet */
+.urd-share-empty {
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.urd-share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: var(--urd-share-size, 38px);
+  height: var(--urd-share-size, 38px);
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: var(--urd-color-accent-text, var(--urd-color-bg));
+  background: var(--urd-share-color, var(--urd-color-accent));
+  text-decoration: none;
+  font: inherit;
+}
+
+.urd-share-button:hover {
+  filter: brightness(1.12);
+}
+
+.urd-share-icon {
+  display: block;
+  width: 55%;
+  height: 55%;
+}
+
+/* Icons only by default */
+.urd-share-name {
+  display: none;
+  font-size: 0.85em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.urd-share-labels .urd-share-icon {
+  width: calc(var(--urd-share-size, 38px) * 0.5);
+  height: calc(var(--urd-share-size, 38px) * 0.5);
+}

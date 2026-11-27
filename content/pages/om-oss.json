@@ -109,7 +109,7 @@
               "z": 1,
               "rot": 0
             },
-            "mobile": null
+            "mobile": { "space": 8 }
           },
           "mobileOrder": 40.02,
           "sticky": {

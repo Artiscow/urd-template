@@ -1,0 +1,416 @@
+/*
+ * The footer's own rules (footer.js), loaded with it after base.css in ENGINE_SHEETS order (sheets.js).
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* Shared footer */
+#urd-footer .urd-footer {
+  padding: 2rem clamp(1rem, 4vw, 2.5rem);
+  background: var(--urd-color-surface);
+  color: color-mix(in srgb, var(--urd-color-text) 75%, transparent);
+  font-size: 0.9rem;
+  display: grid;
+  gap: 0.3rem;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Turned on but empty footer */
+#urd-footer .urd-footer-empty {
+  min-height: 4rem;
+}
+
+.urd-footer-center {
+  text-align: center;
+}
+
+.urd-footer-right {
+  text-align: right;
+}
+
+/* Rich footer */
+#urd-footer .urd-footer-rich {
+  display: block;
+  padding: 0;
+  color: color-mix(in srgb, var(--urd-color-text) 72%, transparent);
+}
+.urd-footer-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2.6rem clamp(1rem, 4vw, 2.5rem) 1.4rem;
+}
+/* Brand + link columns in ONE grid */
+.urd-footer-top {
+  display: grid;
+  grid-template-columns: 1.7fr repeat(var(--n, 3), minmax(0, 1fr));
+  gap: 1.7rem 2.5rem;
+  align-items: start;
+}
+.urd-footer-brand {
+  min-width: 0;
+}
+.urd-footer-col {
+  min-width: 0;
+}
+/* Wide column */
+.urd-footer-col-wide {
+  grid-column: span 2;
+}
+.urd-footer-col-wide ul {
+  display: block;
+  columns: 2;
+  column-gap: 2.2rem;
+}
+.urd-footer-col-wide ul li {
+  break-inside: avoid;
+  margin-bottom: 0.55rem;
+}
+/* The chapters design */
+.urd-footer-design-chapters .urd-footer-top {
+  grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr));
+  counter-reset: urd-chapter;
+}
+
+.urd-footer-design-chapters .urd-footer-top > .urd-footer-brand {
+  grid-column: 1 / -1;
+}
+
+.urd-footer-design-chapters .urd-footer-col {
+  padding-top: 0.9rem;
+  border-top: 1px solid color-mix(in srgb, var(--urd-color-text) 22%, transparent);
+  counter-increment: urd-chapter;
+}
+
+.urd-footer-design-chapters .urd-footer-col::before {
+  content: counter(urd-chapter, decimal-leading-zero);
+  display: block;
+  margin-bottom: 0.45rem;
+  font-family: var(--urd-font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--urd-color-accent);
+}
+
+/* The split design */
+.urd-footer-design-split .urd-footer-top {
+  grid-template-columns: calc(50% - 1.25rem) repeat(var(--n, 2), minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.urd-footer-design-split .urd-footer-brand {
+  padding: 1.5rem 1.6rem;
+  background: color-mix(in srgb, var(--urd-color-accent) 14%, transparent);
+  border-radius: var(--urd-radius-md);
+}
+
+.urd-footer-design-split .urd-footer-col {
+  padding-top: 1.5rem;
+}
+
+@media (max-width: 780px) {
+  .urd-footer-design-chapters .urd-footer-top,
+  .urd-footer-design-split .urd-footer-top {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .urd-footer-design-split .urd-footer-top > .urd-footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .urd-footer-design-split .urd-footer-col {
+    padding-top: 0;
+  }
+
+}
+
+/* "Centered" column alignment */
+.urd-footer-cols-center .urd-footer-col-wide h4 {
+  text-align: center;
+}
+.urd-footer-rich.urd-footer-center .urd-footer-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.urd-footer-rich.urd-footer-center .urd-footer-brand {
+  max-width: 34rem;
+}
+@media (max-width: 780px) {
+  .urd-footer-top {
+    grid-template-columns: 1fr 1fr;
+  }
+  .urd-footer-top > .urd-footer-brand {
+    grid-column: 1 / -1;
+  }
+  .urd-footer-col-wide {
+    grid-column: auto;
+  }
+  .urd-footer-col-wide ul {
+    columns: 1;
+  }
+
+}
+@media (max-width: 480px) {
+  .urd-footer-top,
+  .urd-footer-design-chapters .urd-footer-top,
+  .urd-footer-design-split .urd-footer-top {
+    grid-template-columns: 1fr;
+  }
+
+}
+/* The brand */
+.urd-footer-brand-id {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.urd-footer-rich.urd-footer-center .urd-footer-brand-id {
+  justify-content: center;
+}
+.urd-footer-logo {
+  height: var(--urd-footer-logo-h, 40px);
+  width: auto;
+  max-width: 100%;
+  display: block;
+}
+.urd-footer-brand-top {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.4rem;
+}
+.urd-footer-brand-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--urd-color-text);
+}
+.urd-footer-tagline {
+  margin: 0.5rem 0 0;
+  max-width: 32ch;
+  line-height: 1.5;
+}
+.urd-footer-col h4 {
+  margin: 0 0 0.7rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--urd-color-text) 58%, transparent);
+}
+.urd-footer-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+.urd-footer-rich a {
+  color: inherit;
+  text-decoration: none;
+}
+.urd-footer-rich a:hover {
+  color: var(--urd-color-text);
+  text-decoration: underline;
+}
+.urd-footer-social {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+.urd-footer-rich.urd-footer-center .urd-footer-social {
+  justify-content: center;
+}
+.urd-footer-soc {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 18%, transparent);
+  display: grid;
+  place-items: center;
+  color: color-mix(in srgb, var(--urd-color-text) 70%, transparent);
+}
+
+.urd-footer-soc:hover {
+  color: var(--urd-color-text);
+  border-color: color-mix(in srgb, var(--urd-color-text) 40%, transparent);
+}
+.urd-footer-soc svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  display: block;
+}
+.urd-footer-baseline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.8rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid color-mix(in srgb, var(--urd-color-text) 12%, transparent);
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--urd-color-text) 55%, transparent);
+}
+.urd-footer-rich.urd-footer-center .urd-footer-baseline {
+  justify-content: center;
+}
+@media (max-width: 640px) {
+  .urd-footer-baseline {
+    justify-content: center;
+    text-align: center;
+  }
+
+}
+
+/* The bottom line */
+.urd-footer-baseline-text {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1rem;
+}
+.urd-footer-baseline-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+}
+
+/* The privacy page's link in the simple footer */
+.urd-footer-privacy {
+  margin-top: 0.4rem;
+  font-size: 0.85em;
+}
+.urd-footer-address {
+  display: grid;
+  gap: 0.55rem;
+}
+.urd-footer-address-lines {
+  white-space: pre-line;
+  line-height: 1.45;
+}
+.urd-footer-contact-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.2rem;
+}
+.urd-footer-center .urd-footer-contact-inline {
+  justify-content: center;
+}
+.urd-footer-right .urd-footer-contact-inline {
+  justify-content: flex-end;
+}
+.urd-footer-contact-inline a {
+  color: inherit;
+}
+.urd-footer-wrap > .urd-footer-contact-inline {
+  margin-top: 1.2rem;
+}
+
+/* The doormat link row */
+.urd-footer-linkrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.6rem;
+  justify-content: center;
+  margin-top: 1.4rem;
+}
+.urd-footer-social-center {
+  justify-content: center;
+}
+
+/* Call to action */
+.urd-footer-cta {
+  margin-top: 1.1rem;
+  max-width: 22rem;
+}
+.urd-footer-rich.urd-footer-center .urd-footer-cta {
+  margin-inline: auto;
+}
+.urd-footer-cta-h {
+  font-weight: 650;
+  color: var(--urd-color-text);
+  margin-bottom: 0.5rem;
+}
+.urd-footer-cta-sub {
+  margin: 0.3rem 0 0;
+  line-height: 1.5;
+}
+.urd-footer-cta-btn {
+  display: inline-block;
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text, #fff);
+  font: inherit;
+  font-weight: 600;
+  padding: 0.55rem 1.1rem;
+  border: none;
+  border-radius: 0.55rem;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.urd-footer-cta-btn:hover {
+  text-decoration: none;
+  filter: brightness(1.06);
+}
+/* Large centered CTA */
+.urd-footer-bigcta {
+  max-width: 40rem;
+  margin: 0 auto;
+  text-align: center;
+}
+.urd-footer-bigcta .urd-footer-cta-h {
+  font-size: clamp(1.4rem, 3.5vw, 2rem);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+.urd-footer-bigcta .urd-footer-cta-sub {
+  font-size: 1rem;
+  margin-top: 0.7rem;
+}
+.urd-footer-bigcta .urd-footer-cta-btn {
+  margin-top: 1.1rem;
+  padding: 0.7rem 1.4rem;
+}
+/* Newsletter form */
+.urd-footer-nl {
+  margin-top: 0.7rem;
+}
+.urd-footer-nl-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.urd-footer-rich.urd-footer-center .urd-footer-nl-row {
+  justify-content: center;
+}
+.urd-footer-nl-email {
+  flex: 1 1 12rem;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 22%, transparent);
+  border-radius: 0.55rem;
+  padding: 0.55rem 0.8rem;
+  background: color-mix(in srgb, var(--urd-color-text) 4%, transparent);
+  color: var(--urd-color-text);
+  font: inherit;
+}
+.urd-footer-nl-status {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  min-height: 1.1em;
+}
+.urd-footer-nl-status.ok {
+  color: var(--urd-color-accent);
+}
+.urd-footer-nl-status.error {
+  color: #e5484d;
+}
+/* Honeypot */
+.urd-footer-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}

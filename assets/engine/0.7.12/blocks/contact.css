@@ -1,0 +1,588 @@
+/*
+ * The contact block's own rules (blocks/contact.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* The contact block */
+.urd-contact {
+  container-type: inline-size;
+  font-style: normal;
+  line-height: 1.5;
+}
+.urd-contact-in {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+}
+.urd-contact a {
+  color: inherit;
+}
+.urd-contact-link {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+.urd-contact-address {
+  white-space: pre-line;
+}
+.urd-contact-legal {
+  font-size: 0.85em;
+  opacity: 0.75;
+}
+.urd-contact-quiet {
+  opacity: 0.75;
+}
+.urd-contact-empty {
+  opacity: 0.6;
+}
+.urd-contact-label {
+  font-size: 0.75em;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--urd-color-accent);
+}
+.urd-contact-icon {
+  display: inline-flex;
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+}
+.urd-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  text-decoration: none;
+}
+a.urd-contact-row > span:last-child {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+.urd-contact-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+}
+.urd-contact-side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  min-width: 0;
+}
+
+/* Icon rows */
+.urd-contact-icons .urd-contact-in {
+  gap: 0.5em;
+}
+.urd-contact-icons .urd-contact-name {
+  margin-bottom: 0.2em;
+}
+.urd-contact-icons .urd-contact-row {
+  align-items: flex-start;
+  gap: 0.85em;
+  min-height: 2.75em;
+}
+.urd-contact-icons .urd-contact-row > :last-child {
+  padding-top: 0.4em;
+}
+.urd-contact-icons .urd-contact-icon {
+  box-sizing: border-box;
+  width: 2.3em;
+  height: 2.3em;
+  padding: 0.55em;
+  border-radius: 50%;
+  color: var(--urd-color-accent);
+  background: rgb(127 127 127 / 12%);
+  background: color-mix(in srgb, var(--urd-color-accent) 14%, transparent);
+}
+
+/* The card */
+.urd-contact-card .urd-contact-in {
+  gap: 1.1em;
+  padding: 1.6em;
+  border-radius: var(--urd-radius-md, 14px);
+  background: var(--urd-color-surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 6%), 0 12px 32px rgb(0 0 0 / 8%);
+  overflow: hidden;
+}
+.urd-contact-card .urd-contact-name {
+  font-size: 1.3em;
+  line-height: 1.25;
+}
+.urd-contact-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1em 1.6em;
+}
+.urd-contact-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+}
+.urd-contact-col .urd-contact-label {
+  color: inherit;
+  opacity: 0.7;
+}
+.urd-contact-card .urd-contact-foot {
+  margin: 0 -1.6em -1.6em;
+  padding: 0.9em 1.6em;
+  border-top: 1px solid rgb(127 127 127 / 20%);
+  border-top-color: color-mix(in srgb, currentColor 12%, transparent);
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+@container (max-width: 30rem) {
+  .urd-contact-cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .urd-contact-card .urd-contact-in {
+    padding: 1.4em 1.3em;
+  }
+  .urd-contact-card .urd-contact-foot {
+    margin: 0 -1.3em -1.4em;
+    padding-inline: 1.3em;
+  }
+
+}
+
+/* Three tiles */
+.urd-contact-tiles .urd-contact-in {
+  gap: 0.9em;
+}
+.urd-contact-tilegrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13em, 1fr));
+  gap: 0.9em;
+}
+.urd-contact-tile {
+  display: flex;
+  gap: 0.9em;
+  padding: 1.2em;
+  border-radius: var(--urd-radius-md, 14px);
+  background: var(--urd-color-surface);
+  border: 1px solid rgb(127 127 127 / 18%);
+  border-color: color-mix(in srgb, currentColor 10%, transparent);
+  text-decoration: none;
+}
+.urd-contact-tile .urd-contact-icon {
+  width: 1.5em;
+  height: 1.5em;
+  color: var(--urd-color-accent);
+}
+.urd-contact-tiletext {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  min-width: 0;
+}
+.urd-contact-tile .urd-contact-label {
+  color: inherit;
+  opacity: 0.7;
+}
+.urd-contact-tile .urd-contact-value {
+  overflow-wrap: anywhere;
+}
+a.urd-contact-tile .urd-contact-value {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* The fact list */
+.urd-contact-facts .urd-contact-in {
+  gap: 0.8em;
+}
+.urd-contact-factlist {
+  display: grid;
+  grid-template-columns: minmax(6em, max-content) minmax(0, 1fr);
+  margin: 0;
+  border-top: 1px solid rgb(127 127 127 / 25%);
+  border-top-color: color-mix(in srgb, currentColor 15%, transparent);
+}
+.urd-contact-factlist dt {
+  padding-right: 1.4em;
+  opacity: 0.7;
+}
+@container (max-width: 20rem) {
+  .urd-contact-factlist {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .urd-contact-factlist dt {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+  .urd-contact-factlist dd {
+    padding-top: 0.1em;
+  }
+
+}
+
+/* Action buttons and the save button: round, the first in the accent */
+.urd-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6em;
+  margin: 0.9em 0 0.5em;
+}
+.urd-contact-btn,
+.urd-contact-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  box-sizing: border-box;
+  min-height: 2.9em;
+  padding: 0 1.3em;
+  border: 1.5px solid rgb(127 127 127 / 40%);
+  border-color: color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.urd-contact .urd-contact-actions > .urd-contact-btn:first-child {
+  border-color: var(--urd-color-accent);
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text);
+}
+.urd-contact-save {
+  align-self: flex-start;
+  margin-top: 0.6em;
+  border-color: var(--urd-color-accent);
+  color: var(--urd-color-accent);
+}
+.urd-contact-actions .urd-contact-save {
+  margin-top: 0;
+}
+.urd-contact-poster .urd-contact-save {
+  border-color: currentColor;
+  color: inherit;
+}
+@container (max-width: 26rem) {
+  .urd-contact-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .urd-contact-actions > :first-child {
+    grid-column: 1 / -1;
+  }
+  .urd-contact-btn,
+  .urd-contact-save {
+    min-height: 3.2em;
+    padding-inline: 0.8em;
+  }
+  .urd-contact-save {
+    align-self: stretch;
+  }
+
+}
+
+/* Beside a map */
+.urd-contact-map .urd-contact-in {
+  display: grid;
+  grid-template-columns: minmax(14em, 2fr) minmax(0, 3fr);
+  gap: 2em;
+  align-items: stretch;
+}
+.urd-contact-map .urd-contact-side {
+  justify-content: center;
+}
+.urd-contact .urd-contact-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  align-self: flex-start;
+  min-height: 2.75em;
+  font-weight: 600;
+  color: var(--urd-color-accent);
+}
+.urd-contact-mapbox {
+  position: relative;
+  min-height: 16em;
+  border: 1px solid rgb(127 127 127 / 20%);
+  border-color: color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: var(--urd-radius-md, 14px);
+  overflow: hidden;
+  background-color: rgb(127 127 127 / 10%);
+  background-image: linear-gradient(90deg, rgb(127 127 127 / 14%) 1px, transparent 1px), linear-gradient(rgb(127 127 127 / 14%) 1px, transparent 1px);
+  background-size: 2.4em 2.4em;
+}
+.urd-contact-mapcover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8em;
+  padding: 1.2em;
+  text-align: center;
+}
+.urd-contact-mapempty {
+  opacity: 0.7;
+}
+/* The site's cover over the contact map */
+.urd-contact-mapbox > .urd-cover {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: 0;
+}
+.urd-contact-mapframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+@container (max-width: 40rem) {
+  .urd-contact-map .urd-contact-in {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4em;
+  }
+  .urd-contact-mapbox {
+    min-height: 18em;
+  }
+
+}
+
+/* The strip */
+.urd-contact-strip .urd-contact-in {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em 1.6em;
+}
+.urd-contact-band .urd-contact-in {
+  padding: 1.1em 1.6em;
+  border-radius: var(--urd-radius-sm, 8px);
+  background: var(--urd-color-text);
+  color: var(--urd-color-bg);
+}
+.urd-contact-strip .urd-contact-icon {
+  opacity: 0.75;
+}
+.urd-contact-strip .urd-contact-legal {
+  flex-basis: 100%;
+}
+@container (max-width: 40rem) {
+  .urd-contact-strip .urd-contact-in {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1em;
+  }
+  .urd-contact-band .urd-contact-in {
+    padding: 1.1em 1.2em;
+  }
+  .urd-contact-strip .urd-contact-name {
+    margin-bottom: 0.3em;
+  }
+  .urd-contact-strip .urd-contact-row {
+    min-height: 2.75em;
+  }
+
+}
+
+/* The poster */
+.urd-contact-poster .urd-contact-in {
+  gap: 1.6em;
+  padding: 2em 2.2em;
+  border-radius: var(--urd-radius-md, 14px);
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text);
+}
+.urd-contact-poster .urd-contact-label {
+  color: inherit;
+  opacity: 0.8;
+}
+.urd-contact-big {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  font-family: var(--urd-font-heading, inherit);
+  font-size: 2.2em;
+  font-size: clamp(1.25em, 7cqi, 3.4em);
+  font-weight: 650;
+  line-height: 1.15;
+}
+.urd-contact-big .urd-contact-link {
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.15em;
+}
+.urd-contact-poster .urd-contact-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.5em 1.5em;
+}
+.urd-contact-poster .urd-contact-legal {
+  opacity: 0.8;
+}
+@container (max-width: 30rem) {
+  .urd-contact-poster .urd-contact-in {
+    padding: 1.6em 1.4em;
+  }
+  .urd-contact-poster .urd-contact-foot {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+}
+
+/* By role */
+.urd-contact-roles .urd-contact-in {
+  gap: 1.1em;
+}
+.urd-contact-roles .urd-contact-head {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.2em 1.4em;
+}
+.urd-contact-roles .urd-contact-name {
+  font-size: 1.2em;
+}
+.urd-contact-rolelist {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15em, 1fr));
+  gap: 0.8em;
+  margin: 0;
+}
+.urd-contact-role {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  padding: 1.1em 1.25em;
+  border: 1px solid rgb(127 127 127 / 18%);
+  border-color: color-mix(in srgb, currentColor 10%, transparent);
+  border-radius: var(--urd-radius-md, 12px);
+  background: var(--urd-color-surface);
+}
+@container (max-width: 30rem) {
+  .urd-contact-roles .urd-contact-head {
+    flex-direction: column;
+  }
+  .urd-contact-rolelist {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    border-top: 1px solid rgb(127 127 127 / 25%);
+    border-top-color: color-mix(in srgb, currentColor 15%, transparent);
+  }
+  .urd-contact-role {
+    padding: 0.8em 0 0.4em;
+    border: 0;
+    border-bottom: 1px solid rgb(127 127 127 / 25%);
+    border-bottom-color: color-mix(in srgb, currentColor 15%, transparent);
+    border-radius: 0;
+    background: none;
+  }
+  .urd-contact-role .urd-contact-link {
+    display: flex;
+    align-items: center;
+    min-height: 2.75em;
+  }
+
+}
+
+/* Beside a QR code */
+.urd-contact-qr .urd-contact-in {
+  display: grid;
+  grid-template-columns: 12em minmax(0, 1fr);
+  gap: 2em;
+  align-items: center;
+}
+.urd-contact-qrfig {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6em;
+  margin: 0;
+  font-size: 0.85em;
+  text-align: center;
+}
+.urd-contact-qrcode {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0.5em;
+  border: 1px solid rgb(127 127 127 / 18%);
+  border-radius: var(--urd-radius-md, 14px);
+  background: #fff;
+}
+@container (max-width: 30rem) {
+  .urd-contact-qr .urd-contact-in {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4em;
+  }
+  .urd-contact-qrfig {
+    order: 1;
+    flex-direction: row;
+    gap: 1em;
+    padding: 0.8em;
+    border-radius: var(--urd-radius-md, 14px);
+    background: var(--urd-color-surface);
+    text-align: start;
+  }
+  .urd-contact-qrcode {
+    flex: none;
+    width: 8.5em;
+    padding: 0.3em;
+  }
+
+}
+
+/* The bar docked to the bottom of a phone's screen */
+.urd-contact-dock {
+  position: fixed;
+  inset: auto 0.75rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  z-index: 900;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 0.4rem;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0.4rem;
+  overflow: visible;
+  border: 1px solid rgb(127 127 127 / 20%);
+  border-radius: 1.25rem;
+  background: var(--urd-color-bg);
+  color: var(--urd-color-text);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%), 0 12px 32px rgb(0 0 0 / 18%);
+}
+/* The bar is hidden until it stands in the top layer */
+.urd-contact-dock[popover]:not(:popover-open) {
+  display: none;
+}
+.urd-contact-dockbtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 3.6rem;
+  border-radius: 0.9rem;
+  color: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.urd-contact-dockbtn .urd-contact-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--urd-color-accent);
+}
+.urd-contact-dockbtn:first-child {
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text);
+}
+.urd-contact-dockbtn:first-child .urd-contact-icon {
+  color: inherit;
+}

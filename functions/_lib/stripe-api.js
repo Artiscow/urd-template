@@ -1,14 +1,10 @@
 /**
- * The Stripe network side of the payment layer (ADR-0028): one call shape
- * against the Stripe API with the secret key, a form-encoded body and a
- * timeout. The pure logic is in stripe.js.
+ * The Stripe network side (ADR-0028): one call shape with the secret key, a form-encoded body and a timeout.
  */
 import { fetchWithin } from './net.js';
 
 /**
- * One call against the Stripe API. The answer is sorted into the error
- * codes the endpoints hand the client (the admin dictionaries hold an
- * api.<code> text for each).
+ * One call against the Stripe API, its failure sorted into the error codes the endpoints hand the client.
  * @param {object} config From stripeConfig
  * @param {string} path The path under the API base, such as /v1/checkout/sessions
  * @param {{method?: string, form?: Array<[string, string]>, headers?: object}} [init]

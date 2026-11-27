@@ -1,25 +1,26 @@
 /**
- * Pure planning for the updater (ADR-0014): tree listings in, change set out.
- * No network and no side effects, so the logic can be unit-tested exhaustively
- * in tests/update-plan.test.mjs.
- *
- * The checksum model: git blob SHAs are compared between the user's tree, the
- * template repo's tree at the BASELINE (the tag v<engine> for the version the
- * user has) and the template repo's tree at the TARGET VERSION. Equal SHA means
- * identical content, so "hand-edited" can be decided without downloading a
- * single file.
+ * Pure planning for the updater (ADR-0014): the git blob SHAs of the user's tree, the baseline tag v<engine> and the target version in, the change set out.
  */
 import { isUserPath, isPageIndexCopy } from './guard.js';
 
-/**
- * A version tag: v and three numbers or more (v0.7.7, v0.7.7.1, v0.7.7.0.2), none with a leading zero, and a last number after the third that is not 0.
- * Two different tags thus never rank equal.
- */
+/** A version tag: v and three numbers or more, none with a leading zero, and a last number after the third that is not 0, so no two tags rank equal. */
 export const VERSION_TAG_RE = /^v(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*)){2}(?:(?:\.(?:0|[1-9]\d*))*\.[1-9]\d*)?$/;
 
 /** The numbers of a version tag, or null for any other name. */
 export function versionTagParts(name) {
   return typeof name === 'string' && VERSION_TAG_RE.test(name) ? name.slice(1).split('.').map(Number) : null;
+}
+
+/**
+ * Whether version tag `a` is older than version tag `b` (v0.7.10 before v0.7.11, v0.7.11 before v0.7.11.1); false where either is no version tag.
+ * @param {string} a
+ * @param {string} b
+ * @returns {boolean}
+ */
+export function isOlderTag(a, b) {
+  const pa = versionTagParts(a);
+  const pb = versionTagParts(b);
+  return Boolean(pa && pb) && compareParts(pa, pb) < 0;
 }
 
 /** Compares two lists of version numbers number by number, a missing number counting as 0. */
@@ -46,16 +47,7 @@ export function highestVersionTag(names) {
   return best;
 }
 
-/**
- * The engine atom group (ADR-0014): files that MUST be swapped together, or the
- * site is orphaned. The HTML shells point at the versioned engine folder, the
- * admin bundle bundles engine modules, the shells in assets/urd/ point into the
- * version, base.css is referenced with a content stamp from the shells, and
- * urd.json.engine IS the folder-name invariant. The slug copies belong here too
- * (the copy refresh duty, ADR-0013): a withheld copy would point at a deleted
- * engine folder. Only functions/** and loose root files (e.g.
- * speculation-rules.json) can be withheld per file.
- */
+/** The engine atom group (ADR-0014): the files an update swaps together. Only functions/** and loose root files can be withheld one by one. */
 export function isAtomPath(path) {
   return path === 'index.html'
     || path === 'urd.json'
@@ -65,25 +57,11 @@ export function isAtomPath(path) {
 }
 
 /**
- * Computes the change set for an update.
- *
+ * Computes the change set for an update, with a conflict on each file the user has edited; user-owned paths stay outside it, and `_headers` has a plan of its own.
  * @param {Record<string, string>} baselineTree The template's tree at v<engine>: path → blob SHA
  * @param {Record<string, string>} targetTree The template's tree at the target version: path → blob SHA
  * @param {Record<string, string>} userTree The user's tree (rootDir stripped): path → blob SHA
  * @returns {{changes: Array<{path: string, action: 'write'|'delete', atom: boolean, conflict: 'edited'|'created'|'editedDelete'|null}>, upToDate: boolean}}
- *
- * The rules per path in the template's trees (user-owned paths and `_headers`
- * are outside them, cf. ADR-0006: it is shown as a diff instruction and never
- * written):
- *  - changed upstream + untouched locally    → write
- *  - changed upstream + hand-edited locally  → write with conflict: 'edited'
- *  - unchanged upstream                      → never touched (local changes survive silently)
- *  - new upstream + missing locally          → write
- *  - new upstream + present locally          → write with conflict: 'created'
- *  - removed upstream + untouched locally    → delete
- *  - removed upstream + hand-edited locally  → delete with conflict: 'editedDelete'
- *  - removed upstream + already gone locally → nothing
- *  - missing locally but unchanged upstream  → write (restored)
  */
 export function planUpdate(baselineTree, targetTree, userTree) {
   const changes = [];
@@ -101,8 +79,7 @@ export function planUpdate(baselineTree, targetTree, userTree) {
         // New file upstream; a local file at the same path is the user's own.
         changes.push({ path, action: 'write', atom, conflict: user !== undefined ? 'created' : null });
       } else if (base === target) {
-        // Unchanged upstream: never touched, except when it is missing locally
-        // (deleted by accident); then it is restored.
+        // Unchanged upstream: never touched, except when it is missing locally (deleted by accident); then it is restored.
         if (user === undefined) changes.push({ path, action: 'write', atom, conflict: null });
       } else {
         changes.push({
@@ -120,23 +97,24 @@ export function planUpdate(baselineTree, targetTree, userTree) {
   return { changes, upToDate: changes.length === 0 };
 }
 
-/** Splits tree entries into groups for chained base_tree calls (one commit
- *  either way). The limit is entries per call, well under GitHub's payload cap. */
+/**
+ * Splits tree entries into groups for chained base_tree calls (one commit either way).
+ * The limit is entries per call, well under GitHub's payload cap.
+ */
 export function chunkEntries(entries, size = 300) {
   const chunks = [];
   for (let i = 0; i < entries.length; i += size) chunks.push(entries.slice(i, i + size));
   return chunks;
 }
 
-/** The template files one update call copies at most as blobs of their own: two subrequests each, which with the call's other requests keeps it under the cap of 50 on the free plan (ADR-0014 decision 6). */
+/** The template files one update call copies at most as blobs of their own, two subrequests each, under the free plan's cap of 50 (ADR-0014 decision 6). */
 export const BLOB_BATCH = 18;
 
-/** The files a call copies and still commits in: two subrequests each beside the committing call's own (about 13). */
+/** The files a call copies and still commits in: two subrequests each beside the committing call's own (about 16). */
 export const BLOB_ROOM = 10;
 
 /**
- * Whether a target file travels as a blob of its own rather than inline in the tree, from the template's blob as GraphQL describes it (`isBinary`, `isTruncated`), or null when the reply has none.
- * Only a blob GraphQL calls text and gives whole travels inline; one whose encoding it cannot tell (`isBinary` null) is copied as it is.
+ * Whether a target file travels as a blob of its own rather than inline in the tree: all but a blob GraphQL calls text (`isBinary` false) and gives whole.
  * @param {{isBinary?: boolean|null, isTruncated?: boolean}|null|undefined} blob
  * @returns {boolean}
  */
@@ -145,14 +123,12 @@ export function travelsAsBlob(blob) {
 }
 
 /**
- * The next files to copy as blobs of their own (binary, or text too long to travel inline in the tree): the ones the site's repository does not hold yet, in plan order.
- * With at most `room` of them left, the call copies them all and commits (`commit`); otherwise it copies `size` of them and is repeated.
- * `copied` is how many the repository holds once the batch is copied, out of `total`.
+ * The next files to copy as blobs of their own, those the site's repository lacks in plan order: all of them with the commit once at most `room` are left.
  * @param {string[]} paths The paths written as blobs of their own
  * @param {Set<string>} present The paths whose blob the site's repository already holds
  * @param {number} [size]
  * @param {number} [room]
- * @returns {{batch: string[], copied: number, total: number, commit: boolean}}
+ * @returns {{batch: string[], copied: number, total: number, commit: boolean}} `copied` counts what the repository holds once the batch is copied, out of `total`
  */
 export function blobBatch(paths, present, size = BLOB_BATCH, room = BLOB_ROOM) {
   const missing = paths.filter((path) => !present.has(path));

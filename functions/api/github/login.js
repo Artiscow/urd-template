@@ -1,10 +1,9 @@
 /**
- * GET /api/github/login
- * Starts GitHub OAuth: sets a random state cookie (CSRF protection) and
- * redirects to GitHub's authorization page.
+ * GET /api/github/login: starts GitHub's OAuth with a random state cookie, asking for offline_access beside the site's own scope.
  */
 import { cfg } from '../../_lib/github.js';
 import { serializeCookie } from '../../_lib/cookies.js';
+import { loginScope } from '../../_lib/session.js';
 
 export async function onRequestGet({ request, env }) {
   let config;
@@ -18,7 +17,7 @@ export async function onRequestGet({ request, env }) {
   const authorize = new URL('https://github.com/login/oauth/authorize');
   authorize.searchParams.set('client_id', config.clientId);
   authorize.searchParams.set('redirect_uri', `${new URL(request.url).origin}/api/github/callback`);
-  authorize.searchParams.set('scope', config.scope);
+  authorize.searchParams.set('scope', loginScope(config.scope));
   authorize.searchParams.set('state', state);
 
   return new Response(null, {

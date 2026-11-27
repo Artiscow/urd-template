@@ -1,16 +1,5 @@
 /**
- * The PayPal part of the optional payment layer (ADR-0028): reading the
- * configuration, the amount in PayPal's decimal form, the body of an order
- * on the Orders v2 API with PayPal's own approval page, the approval
- * address in the answer, the reading of a finished order, and the body of
- * the webhook check PayPal performs for the site. The order logic every
- * provider shares is in order.js; no fetch here, the endpoints under
- * api/pay/paypal/ handle the network. Tested in tests/paypal.test.mjs.
- *
- * PayPal takes the money when the buyer returns from approving (intent
- * CAPTURE): an authorisation is honoured for 3 days only, and PayPal
- * documents capturing one later through the merchant's own server code,
- * which the static site does not run (ADR-0028 decision 4).
+ * PayPal in the payment layer (ADR-0028): the configuration, an Orders v2 order captured on the buyer's return, its approval link and the webhook check's body.
  */
 import { orderLineItems, orderDescription, returnUrl, cancelUrl, currencyExponent } from './order.js';
 import { hostOf } from './net.js';
@@ -37,11 +26,7 @@ export const PAYPAL_CURRENCIES = ['AUD', 'BRL', 'CAD', 'CNY', 'CZK', 'DKK', 'EUR
 /** The currencies PayPal refuses decimals in. */
 const NO_DECIMALS = new Set(['HUF', 'JPY', 'TWD']);
 
-/**
- * An amount in the currency's minor unit as PayPal's decimal string
- * («700.00», «350» for yen), or null when PayPal cannot take it: a currency
- * it lacks, or a fraction in a currency it takes whole only.
- */
+/** An amount in the currency's minor unit as PayPal's decimal string, or null for a currency PayPal lacks or a fraction where it takes whole units only. */
 export function paypalValue(minor, currency) {
   const code = String(currency ?? '').toUpperCase();
   if (!PAYPAL_CURRENCIES.includes(code) || !Number.isInteger(minor) || minor < 0) return null;
@@ -54,13 +39,7 @@ export function paypalValue(minor, currency) {
 }
 
 /**
- * The body for POST {apiBase}/v2/checkout/orders: one purchase unit with the
- * order lines as items in the site's currency, the reference as the unit's
- * reference, custom id and invoice id (unique per order, so the order is
- * found by it in PayPal), the order in one line as the description, and
- * PayPal's own page with «Pay now», no shipping address asked, the return to
- * the checkout page with the reference and the provider, and the cancel back
- * to the plain checkout page.
+ * The body for POST {apiBase}/v2/checkout/orders: one purchase unit with the lines as items and the reference as its ids, on PayPal's own page.
  * @param {object} args
  * @param {string} [args.brand] The site's name on PayPal's page
  * @returns {object|null} null when a line has no priced product or PayPal cannot take an amount
@@ -115,10 +94,7 @@ export function isOrderId(value) {
 }
 
 /**
- * Reads what the checkout page needs from an order (GET {apiBase}/v2/checkout/orders/{id},
- * or the answer of its capture): whether it is captured, whether the buyer may
- * still be approving, whether it waits to be captured, and who paid. A
- * capture that PayPal holds for review (PENDING) is not confirmed here.
+ * Reads what the checkout page needs from an order or its capture's answer: captured (never a capture held for review), open, approved, and who paid.
  * @returns {{paid: boolean, open: boolean, approved: boolean, state: string, buyer: {name: string, email: string, phone: string}, reference: string}|null} null for an answer without a status
  */
 export function orderSummary(order) {
@@ -149,14 +125,11 @@ export const WEBHOOK_HEADERS = {
 };
 
 /**
- * The body for POST {apiBase}/v1/notifications/verify-webhook-signature,
- * written as text so the event goes back to PayPal exactly as it arrived
- * (PayPal asks for the event unchanged; a parsed and re-serialised event may
- * differ). Null when a header is missing or the body is no JSON object.
+ * The body for POST {apiBase}/v1/notifications/verify-webhook-signature, as text with the event exactly as it arrived.
  * @param {{get(name: string): string|null}} headers
  * @param {string} rawBody The delivery's body as received
  * @param {string} webhookId
- * @returns {string|null}
+ * @returns {string|null} null when a header is missing or the body is no JSON object
  */
 export function verificationBody(headers, rawBody, webhookId) {
   if (!webhookId) return null;

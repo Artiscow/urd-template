@@ -1,0 +1,62 @@
+/*
+ * The text block's document designs' rules (blocks/text.js), loaded with them after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+.urd-text-doc .urd-text > :first-child {
+  margin-top: 0;
+}
+
+.urd-text-doc [data-urd-form] > :first-child {
+  margin-top: 0;
+}
+
+.urd-text-doc [data-urd-form] > :last-child {
+  margin-bottom: 0;
+}
+
+.urd-text-doc[data-design="glance"] .urd-text > ul:not(h2 ~ ul, ul ~ ul) > li > strong:first-child + br {
+  display: none;
+}
+
+/* Numbered clauses */
+.urd-text-doc[data-design="clauses"] .urd-text {
+  counter-reset: urd-clause;
+}
+
+.urd-text-doc[data-design="clauses"] .urd-text > h2 {
+  counter-increment: urd-clause;
+  counter-reset: urd-sub;
+}
+
+/* The clause's number as an inline badge before the heading */
+.urd-text-doc[data-design="clauses"] .urd-text > h2::before {
+  content: counter(urd-clause);
+  display: inline-block;
+  margin-right: 0.6em;
+  vertical-align: 0.12em;
+  min-width: 1.6em;
+  height: 1.6em;
+  padding: 0 0.3em;
+  box-sizing: border-box;
+  border-radius: min(var(--urd-doc-radius, var(--urd-radius-md)), 0.8em);
+  background: var(--urd-doc-accent, var(--urd-color-accent));
+  color: var(--urd-color-accent-text, var(--urd-color-bg));
+  font-size: 0.8em;
+  line-height: 1.6em;
+  text-align: center;
+}
+
+.urd-text-doc[data-design="clauses"] .urd-text > h2 ~ p {
+  position: relative;
+  padding-left: 2.8em;
+  counter-increment: urd-sub;
+}
+
+.urd-text-doc[data-design="clauses"] .urd-text > h2 ~ p::before {
+  content: counter(urd-clause) '.' counter(urd-sub);
+  position: absolute;
+  left: 0;
+  font-family: var(--urd-doc-heading-font, var(--urd-font-heading));
+  font-weight: 700;
+  opacity: 0.6;
+}

@@ -1,12 +1,7 @@
 /**
- * Optional payment layer (ADR-0028): whether a Stripe Checkout Session was
- * paid or its payment held. The checkout page asks here on its return from
- * Stripe with the reference and the session's id it kept when it sent the
- * buyer there, and empties the basket only for a confirmed payment; the
- * name, email and phone Stripe collected come along for the receipt on the
- * page. The site stores no order; the answer is read from Stripe each time.
+ * GET and POST /api/pay/stripe/session: whether the reference's Stripe Checkout Session was paid or its payment held, read from Stripe on the buyer's return.
  */
-import { isReference, json } from '../../../_lib/order.js';
+import { isReference, hasBuyerKey, sessionAnswer, majorAmount, json } from '../../../_lib/order.js';
 import { stripeConfig, isSessionId, sessionSummary } from '../../../_lib/stripe.js';
 import { callStripe } from '../../../_lib/stripe-api.js';
 
@@ -24,7 +19,8 @@ export async function onRequestGet({ request, env }) {
   if (!summary) return json({ error: 'Unexpected response from Stripe', code: 'payUnexpected', provider: 'Stripe' }, 502);
   // The session must be the one this checkout made for the reference, so another session's id confirms nothing.
   if (summary.reference !== reference) return json({ error: 'Invalid reference', code: 'orderInvalid' }, 400);
-  return json({ paid: summary.paid, open: summary.open, state: summary.state, buyer: summary.buyer });
+  const amount = majorAmount(answer.data?.amount_total, answer.data?.currency);
+  return json(sessionAnswer({ ...summary, amount }, await hasBuyerKey(request, config.secretKey, reference)));
 }
 
 /** The checkout page asks every provider with a POST (PayPal's ask may capture); the answer is the same read. */

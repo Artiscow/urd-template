@@ -24,11 +24,11 @@ Dette repoet ER nettsiden din: en avhengighetsfri, statisk side der `/admin` er 
 2. **Koble repoet til en host** (Cloudflare Pages anbefales) og sett opp publisering: følg [oppsettsguiden](https://github.com/Artiscow/Urd/blob/main/docs/languages/setup-publication/SETUP-nb.md) ([English](https://github.com/Artiscow/Urd/blob/main/docs/languages/setup-publication/SETUP-en-GB.md)).
 3. **Åpne `/admin`** på den deployerte siden og logg inn med GitHub: oppsettsveiviseren hjelper deg med navn og farger, og alt du publiserer committes i ditt eget repo.
 
-Lokal titt uten host: kjør `python3 dev-server.py` fra denne mappen og åpne `http://localhost:8000/`. Den serverer siden uten caching, så en vanlig oppdatering viser alltid de nyeste filene; en vanlig statisk server (`python3 -m http.server`) lar nettleseren beholde gamle motor- og plugin-filer til cachen tømmes. Publisering krever host-funksjonene, men editoren og forhåndsvisningen virker lokalt.
+Lokal titt uten host: kjør `python3 dev-server.py` fra denne mappen og åpne `http://localhost:8000/` (bare denne datamaskinen; `python3 dev-server.py --lan` deler den på nettverket ditt, for en telefon på samme Wi-Fi). Den serverer siden uten caching, så en vanlig oppdatering viser alltid de nyeste filene; en vanlig statisk server (`python3 -m http.server`) lar nettleseren beholde gamle motor- og plugin-filer til cachen tømmes. Publisering krever host-funksjonene, men editoren og forhåndsvisningen virker lokalt.
 
 ## Oppdatere Urd
 
-Åpne **Oppdatering**-panelet i admin: det sjekker mot malrepoet, viser hva som endres (håndredigerte filer varsles), og skriver den nye versjonen som én samlet commit. `_headers` oppdateres aldri automatisk; panelet viser hva som eventuelt skal føres inn for hånd.
+Åpne **Oppdatering**-panelet i admin: det sjekker mot malrepoet, viser hva som endres (håndredigerte filer varsles), og skriver den nye versjonen som én samlet commit. `_headers` oppdateres også der du ikke har endret den, og det du har lagt til i reglene, som en vert, beholdes; har du endret den på andre måter, viser panelet hva som skal føres inn for hånd.
 
 ## Innhold og struktur
 

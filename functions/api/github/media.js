@@ -1,7 +1,6 @@
 /**
- * GET /api/github/media
- * The files in media/ as the repository holds them, each with its path (relative to the site), its size and its blob sha: the listing the Site panel's
- * «Tidy the media folder» works from, and the media library to come reads. The tree is read recursively; a tree GitHub truncates says so (`truncated`).
+ * GET /api/github/media: the files in media/ as the repository holds them, each with its site path, size and blob sha.
+ * A tree GitHub cuts short says so.
  */
 import { cfg, gh } from '../../_lib/github.js';
 import { readCookie } from '../../_lib/cookies.js';

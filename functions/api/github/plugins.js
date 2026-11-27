@@ -1,10 +1,5 @@
 /**
- * GET /api/github/plugins
- * Lists the plugin folders in the repo's plugins/ directory (static hosting
- * cannot list folders itself). Read endpoint WITHOUT a sign-in requirement:
- * when signed out, public repos are read anonymously (lower rate limit at
- * GitHub); the Plugins panel uses it to show plugins that are in the repo but
- * not yet listed in plugins.json, and caches the response locally.
+ * GET /api/github/plugins: the plugin folders in the repository's plugins/, read with the sign-in where there is one and anonymously where there is none.
  */
 import { cfg, gh } from '../../_lib/github.js';
 import { readCookie } from '../../_lib/cookies.js';

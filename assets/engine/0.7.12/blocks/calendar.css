@@ -1,0 +1,3099 @@
+/*
+ * The rules every calendar draws with, loaded by blocks/calendar-load.js.
+ * Its reasoning stands in docs/STYLES.md, under blocks/calendar.css.
+ */
+.urd-block[data-urd-align="stretch"] > .urd-cal {
+  display: flex;
+  flex-direction: column;
+}
+
+.urd-block[data-urd-align="stretch"] > .urd-cal > .urd-collection-list,
+.urd-block[data-urd-align="stretch"] > .urd-cal > .urd-collection-cards {
+  flex: 1;
+}
+
+/* The calendar block, its colour slots and a phone view's own variables */
+.urd-cal,
+.urd-cal-pd {
+  --urd-cal-accent: var(--urd-cal-s-accent, var(--urd-color-accent));
+  --urd-cal-accent-text: var(--urd-color-accent-text);
+  --urd-cal-surface: var(--urd-cal-s-surface, var(--urd-color-surface));
+  --urd-cal-line: var(--urd-cal-s-line, color-mix(in srgb, var(--urd-color-text) 12%, transparent));
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+/* While the feeds are on the way: the design drawn with sample events */
+.urd-block > .urd-cal.urd-cal-wait,
+.urd-block > .urd-cal[data-cal-copy] {
+  height: auto;
+}
+
+.urd-cal-wait {
+  align-content: start;
+}
+
+/* Each part keeps its layers to itself, so the note stands over it */
+.urd-cal-wait > :not(.urd-cal-wait-note) {
+  -webkit-text-fill-color: transparent;
+  isolation: isolate;
+}
+
+@supports not (-webkit-text-fill-color: transparent) {
+  .urd-cal-wait > :not(.urd-cal-wait-note) {
+    visibility: hidden;
+  }
+}
+
+.urd-cal-wait img {
+  visibility: hidden;
+}
+
+.urd-cal-wait-note {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  translate: -50% -50%;
+  margin: 0;
+  padding: 0.45em 1em;
+  border: var(--urd-cal-set-frame);
+  border-radius: var(--urd-cal-set-chip-radius);
+  background: var(--urd-cal-set-bg);
+  color: var(--urd-cal-set-ink);
+  font-family: var(--urd-cal-set-font);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .urd-cal-wait-note {
+    animation: urd-cal-wait 1.4s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes urd-cal-wait {
+  to {
+    opacity: 0.55;
+  }
+}
+
+/* The colour sets: the variables a set's parts are drawn from */
+.urd-cal,
+.urd-cal-dialog,
+.urd-cal-pd {
+  --urd-cal-set-bg: var(--urd-cal-s-surface, var(--urd-color-surface));
+  --urd-cal-set-surface: var(--urd-color-bg);
+  --urd-cal-set-ink: var(--urd-color-text);
+  --urd-cal-set-muted: color-mix(in srgb, var(--urd-color-text) 65%, transparent);
+  --urd-cal-set-line: var(--urd-cal-s-line, color-mix(in srgb, var(--urd-color-text) 14%, transparent));
+  --urd-cal-set-accent: var(--urd-cal-s-accent, var(--urd-color-accent));
+  --urd-cal-set-accent-text: var(--urd-cal-accent-text, var(--urd-color-accent-text));
+  --urd-cal-set-label: var(--urd-cal-s-accent, var(--urd-color-accent));
+  --urd-cal-set-radius: var(--urd-radius-md);
+  --urd-cal-set-chip-radius: 999px;
+  --urd-cal-set-frame: 1px solid var(--urd-cal-set-line);
+  --urd-cal-set-shadow: 0 24px 60px rgb(0 0 0 / 35%);
+  --urd-cal-set-blur: none;
+  --urd-cal-set-font: var(--urd-font-body);
+  --urd-cal-set-title-font: var(--urd-font-heading);
+  --urd-cal-set-title-weight: 700;
+  --urd-cal-set-label-case: none;
+  --urd-cal-set-label-spacing: 0;
+}
+
+.urd-cal-set-apCream {
+  --urd-cal-set-bg: var(--urd-cal-s-card, #f3ecd8);
+  --urd-cal-set-surface: var(--urd-cal-s-panel, #eae1c7);
+  --urd-cal-set-ink: var(--urd-cal-s-text, #1c2340);
+  --urd-cal-set-muted: #4e5368;
+  --urd-cal-set-line: var(--urd-cal-s-line, #d9cfae);
+  --urd-cal-set-accent: var(--urd-cal-s-head, #1c2340);
+  --urd-cal-set-accent-text: var(--urd-cal-s-gold, #d0a74a);
+  --urd-cal-set-label: var(--urd-cal-s-goldDark, #8f6a1e);
+  --urd-cal-set-radius: 14px;
+  --urd-cal-set-frame: 1px solid var(--urd-cal-s-gold, #d0a74a);
+  --urd-cal-set-title-weight: 500;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.2em;
+}
+
+.urd-cal-set-apNavy {
+  --urd-cal-set-bg: var(--urd-cal-s-ground, #1c2340);
+  --urd-cal-set-surface: var(--urd-cal-s-tile, #262e4f);
+  --urd-cal-set-ink: var(--urd-cal-s-text, #f3ecd8);
+  --urd-cal-set-muted: #9aa0b8;
+  --urd-cal-set-line: var(--urd-cal-s-line, #3a4366);
+  --urd-cal-set-accent: var(--urd-cal-s-gold, #d0a74a);
+  --urd-cal-set-accent-text: var(--urd-cal-s-ground, #1c2340);
+  --urd-cal-set-label: var(--urd-cal-s-gold, #d0a74a);
+  --urd-cal-set-radius: 14px;
+  --urd-cal-set-frame: 1px solid var(--urd-cal-s-gold, #d0a74a);
+  --urd-cal-set-title-weight: 500;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.2em;
+}
+
+.urd-cal-set-agendaDark {
+  --urd-cal-set-bg: var(--urd-cal-s-ground, #121216);
+  --urd-cal-set-surface: var(--urd-cal-s-card, #1c1c22);
+  --urd-cal-set-ink: var(--urd-cal-s-text, #f5f5f7);
+  --urd-cal-set-muted: #8d8d98;
+  --urd-cal-set-line: var(--urd-cal-s-edge, #2a2a32);
+  --urd-cal-set-accent: var(--urd-cal-s-accent, #ff6b4a);
+  --urd-cal-set-accent-text: #ffffff;
+  --urd-cal-set-label: var(--urd-cal-s-accent, #ff6b4a);
+  --urd-cal-set-radius: 22px;
+  --urd-cal-set-chip-radius: 12px;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.1em;
+}
+
+.urd-cal-set-board {
+  --urd-cal-set-bg: var(--urd-cal-s-bg, #17201d);
+  --urd-cal-set-surface: var(--urd-cal-s-tile, #233530);
+  --urd-cal-set-ink: var(--urd-cal-s-text, #f6f5f1);
+  --urd-cal-set-muted: #a9b6b1;
+  --urd-cal-set-line: var(--urd-cal-s-tile, #2d443d);
+  --urd-cal-set-accent: var(--urd-cal-s-label, #5fd3bd);
+  --urd-cal-set-accent-text: var(--urd-cal-s-bg, #0f1a17);
+  --urd-cal-set-label: var(--urd-cal-s-label, #5fd3bd);
+  --urd-cal-set-radius: 12px;
+  --urd-cal-set-chip-radius: 8px;
+  --urd-cal-set-frame: none;
+  --urd-cal-set-title-weight: 800;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.14em;
+}
+
+.urd-cal-set-darkGlass {
+  --urd-cal-set-bg: var(--urd-cal-s-ground, #121216);
+  --urd-cal-set-surface: var(--urd-cal-s-glass, rgb(255 255 255 / 7%));
+  --urd-cal-set-ink: var(--urd-cal-s-text, #f5f5f7);
+  --urd-cal-set-muted: #a0a0aa;
+  --urd-cal-set-line: var(--urd-cal-s-edge, rgb(255 255 255 / 14%));
+  --urd-cal-set-accent: var(--urd-cal-s-button, #f5f5f7);
+  --urd-cal-set-accent-text: var(--urd-cal-s-buttonText, #121216);
+  --urd-cal-set-label: var(--urd-cal-s-label, #ff8a65);
+  --urd-cal-set-radius: 16px;
+  --urd-cal-set-frame: 1px solid var(--urd-cal-s-edge, rgb(255 255 255 / 14%));
+  --urd-cal-set-blur: blur(20px);
+  --urd-cal-set-title-weight: 600;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.12em;
+}
+
+.urd-cal-set-cork {
+  --urd-cal-set-bg: var(--urd-cal-s-note, #fff7cc);
+  --urd-cal-set-surface: var(--urd-cal-s-board, #8a5a3c);
+  --urd-cal-set-ink: var(--urd-cal-s-noteText, #17201d);
+  --urd-cal-set-muted: #6b6250;
+  --urd-cal-set-line: color-mix(in srgb, var(--urd-cal-s-noteText, #17201d) 18%, transparent);
+  --urd-cal-set-accent: var(--urd-cal-s-button, #2b2a1f);
+  --urd-cal-set-accent-text: var(--urd-cal-s-buttonText, #fff7cc);
+  --urd-cal-set-label: var(--urd-cal-s-noteLabel, #b7791f);
+  --urd-cal-set-radius: 0;
+  --urd-cal-set-chip-radius: 0;
+  --urd-cal-set-frame: none;
+  --urd-cal-set-shadow: 0 18px 40px rgb(0 0 0 / 35%);
+  --urd-cal-set-title-weight: 800;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.12em;
+}
+
+.urd-cal-set-poster {
+  --urd-cal-set-bg: var(--urd-cal-s-surface, var(--urd-color-surface));
+  --urd-cal-set-surface: var(--urd-color-bg);
+  --urd-cal-set-ink: var(--urd-color-text);
+  --urd-cal-set-muted: color-mix(in srgb, var(--urd-color-text) 65%, transparent);
+  --urd-cal-set-line: var(--urd-cal-s-line, color-mix(in srgb, var(--urd-color-text) 22%, transparent));
+  --urd-cal-set-accent: var(--urd-color-text);
+  --urd-cal-set-accent-text: var(--urd-color-bg);
+  --urd-cal-set-label: var(--urd-cal-s-accent, var(--urd-color-accent));
+  --urd-cal-set-radius: 0;
+  --urd-cal-set-chip-radius: 0;
+  --urd-cal-set-frame: 2px solid var(--urd-color-text);
+  --urd-cal-set-title-weight: 800;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.14em;
+}
+
+.urd-cal-set-bento {
+  --urd-cal-set-bg: var(--urd-cal-s-tile, var(--urd-color-surface));
+  --urd-cal-set-surface: var(--urd-cal-s-soft, color-mix(in srgb, var(--urd-cal-s-accent, var(--urd-color-accent)) 18%, var(--urd-color-surface)));
+  --urd-cal-set-ink: var(--urd-color-text);
+  --urd-cal-set-muted: color-mix(in srgb, var(--urd-color-text) 60%, transparent);
+  --urd-cal-set-line: var(--urd-cal-s-line, color-mix(in srgb, var(--urd-color-text) 10%, transparent));
+  --urd-cal-set-accent: var(--urd-cal-s-accent, var(--urd-color-accent));
+  --urd-cal-set-accent-text: var(--urd-cal-s-accentText, var(--urd-cal-accent-text, var(--urd-color-accent-text)));
+  --urd-cal-set-label: color-mix(in srgb, var(--urd-color-text) 60%, transparent);
+  --urd-cal-set-radius: 22px;
+  --urd-cal-set-chip-radius: 999px;
+  --urd-cal-set-title-weight: 600;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.08em;
+}
+
+.urd-cal-set-lightGlass {
+  --urd-cal-set-bg: var(--urd-cal-s-ground, #f6f3ef);
+  --urd-cal-set-surface: var(--urd-cal-s-glass, rgb(255 255 255 / 55%));
+  --urd-cal-set-ink: var(--urd-cal-s-text, #17161a);
+  --urd-cal-set-muted: #5a5960;
+  --urd-cal-set-line: var(--urd-cal-s-glassLine, rgb(255 255 255 / 80%));
+  --urd-cal-set-accent: var(--urd-cal-s-text, #17161a);
+  --urd-cal-set-accent-text: var(--urd-cal-s-ground, #f6f3ef);
+  --urd-cal-set-label: #5a5960;
+  --urd-cal-set-radius: 18px;
+  --urd-cal-set-frame: 1px solid var(--urd-cal-s-glassLine, rgb(255 255 255 / 80%));
+  --urd-cal-set-blur: blur(18px);
+  --urd-cal-set-title-weight: 600;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.1em;
+}
+
+/* The retro sets, each drawn from its own design's slots */
+.urd-cal-set-pad {
+  --urd-cal-set-bg: var(--urd-cal-s-paper, #fbf7ee);
+  --urd-cal-set-surface: color-mix(in srgb, var(--urd-cal-s-paper, #fbf7ee) 90%, var(--urd-cal-s-ink, #1d1b18));
+  --urd-cal-set-ink: var(--urd-cal-s-ink, #1d1b18);
+  --urd-cal-set-muted: color-mix(in srgb, var(--urd-cal-s-ink, #1d1b18) 65%, transparent);
+  --urd-cal-set-line: var(--urd-cal-s-rule, #cfc6b3);
+  --urd-cal-set-accent: var(--urd-cal-s-head, #c4302b);
+  --urd-cal-set-accent-text: var(--urd-cal-s-paper, #fbf7ee);
+  --urd-cal-set-label: var(--urd-cal-s-head, #c4302b);
+  --urd-cal-set-radius: 4px;
+  --urd-cal-set-chip-radius: 0;
+  --urd-cal-set-frame: none;
+  --urd-cal-set-shadow: 0 18px 40px rgb(0 0 0 / 45%);
+  --urd-cal-set-font: 'Libre Baskerville', Baskerville, Georgia, 'Times New Roman', serif;
+  --urd-cal-set-title-font: Oswald, 'Roboto Condensed', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
+  --urd-cal-set-title-weight: 700;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.1em;
+}
+
+.urd-cal-set-index {
+  --urd-cal-set-bg: var(--urd-cal-s-card, #fdfbf3);
+  --urd-cal-set-surface: color-mix(in srgb, var(--urd-cal-s-card, #fdfbf3) 92%, var(--urd-cal-s-ink, #2a2622));
+  --urd-cal-set-ink: var(--urd-cal-s-ink, #2a2622);
+  --urd-cal-set-muted: color-mix(in srgb, var(--urd-cal-s-ink, #2a2622) 65%, transparent);
+  --urd-cal-set-line: var(--urd-cal-s-line, #b9d2e8);
+  --urd-cal-set-accent: var(--urd-cal-s-rule, #c9483b);
+  --urd-cal-set-accent-text: var(--urd-cal-s-card, #fdfbf3);
+  --urd-cal-set-label: var(--urd-cal-s-rule, #c9483b);
+  --urd-cal-set-radius: 0 4px 4px 4px;
+  --urd-cal-set-chip-radius: 0;
+  --urd-cal-set-frame: none;
+  --urd-cal-set-shadow: 0 24px 60px rgb(0 0 0 / 45%);
+  --urd-cal-set-font: 'Special Elite', 'Courier Prime', 'Courier New', Courier, monospace;
+  --urd-cal-set-title-font: 'Special Elite', 'Courier Prime', 'Courier New', Courier, monospace;
+  --urd-cal-set-title-weight: 400;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.14em;
+}
+
+.urd-cal-set-departures {
+  --urd-cal-set-bg: var(--urd-cal-s-board, #111315);
+  --urd-cal-set-surface: var(--urd-cal-s-flap, #23272c);
+  --urd-cal-set-ink: var(--urd-cal-s-text, #f4f1e6);
+  --urd-cal-set-muted: color-mix(in srgb, var(--urd-cal-s-text, #f4f1e6) 65%, transparent);
+  --urd-cal-set-line: var(--urd-cal-s-flap, #23272c);
+  --urd-cal-set-accent: var(--urd-cal-s-amber, #ffb000);
+  --urd-cal-set-accent-text: var(--urd-cal-s-board, #111315);
+  --urd-cal-set-label: var(--urd-cal-s-amber, #ffb000);
+  --urd-cal-set-radius: 10px;
+  --urd-cal-set-chip-radius: 4px;
+  --urd-cal-set-frame: 3px solid var(--urd-cal-s-flap, #23272c);
+  --urd-cal-set-shadow: 0 18px 40px rgb(0 0 0 / 45%);
+  --urd-cal-set-font: 'Share Tech Mono', ui-monospace, 'Courier New', monospace;
+  --urd-cal-set-title-font: Oswald, 'Roboto Condensed', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
+  --urd-cal-set-title-weight: 700;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.1em;
+}
+
+.urd-cal-set-marquee {
+  --urd-cal-set-bg: var(--urd-cal-s-board, #f6f1e4);
+  --urd-cal-set-surface: color-mix(in srgb, var(--urd-cal-s-board, #f6f1e4) 88%, var(--urd-cal-s-frame, #7a1420));
+  --urd-cal-set-ink: var(--urd-cal-s-ink, #17120f);
+  --urd-cal-set-muted: color-mix(in srgb, var(--urd-cal-s-ink, #17120f) 65%, transparent);
+  --urd-cal-set-line: color-mix(in srgb, var(--urd-cal-s-ink, #17120f) 25%, transparent);
+  --urd-cal-set-accent: var(--urd-cal-s-frame, #7a1420);
+  --urd-cal-set-accent-text: var(--urd-cal-s-board, #f6f1e4);
+  --urd-cal-set-label: var(--urd-cal-s-frame, #7a1420);
+  --urd-cal-set-radius: 4px;
+  --urd-cal-set-chip-radius: 0;
+  --urd-cal-set-frame: 8px solid var(--urd-cal-s-frame, #7a1420);
+  --urd-cal-set-shadow: 0 18px 40px rgb(0 0 0 / 45%);
+  --urd-cal-set-font: Georgia, 'Times New Roman', serif;
+  --urd-cal-set-title-font: 'Bebas Neue', Oswald, 'League Gothic', 'Arial Narrow', Impact, sans-serif;
+  --urd-cal-set-title-weight: 400;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.1em;
+}
+
+.urd-cal-set-receipt {
+  --urd-cal-set-bg: var(--urd-cal-s-paper, #fbfaf6);
+  --urd-cal-set-surface: color-mix(in srgb, var(--urd-cal-s-paper, #fbfaf6) 92%, var(--urd-cal-s-ink, #1b1b1b));
+  --urd-cal-set-ink: var(--urd-cal-s-ink, #1b1b1b);
+  --urd-cal-set-muted: color-mix(in srgb, var(--urd-cal-s-ink, #1b1b1b) 65%, transparent);
+  --urd-cal-set-line: color-mix(in srgb, var(--urd-cal-s-ink, #1b1b1b) 30%, transparent);
+  --urd-cal-set-accent: var(--urd-cal-s-ink, #1b1b1b);
+  --urd-cal-set-accent-text: var(--urd-cal-s-paper, #fbfaf6);
+  --urd-cal-set-label: var(--urd-cal-s-ink, #1b1b1b);
+  --urd-cal-set-radius: 0;
+  --urd-cal-set-chip-radius: 0;
+  --urd-cal-set-frame: none;
+  --urd-cal-set-shadow: 0 18px 40px rgb(0 0 0 / 45%);
+  --urd-cal-set-font: VT323, 'Share Tech Mono', ui-monospace, 'Courier New', monospace;
+  --urd-cal-set-title-font: VT323, 'Share Tech Mono', ui-monospace, 'Courier New', monospace;
+  --urd-cal-set-title-weight: 400;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.08em;
+}
+
+.urd-cal-set-seventies {
+  --urd-cal-set-bg: var(--urd-cal-s-cream, #f6e7c8);
+  --urd-cal-set-surface: color-mix(in srgb, var(--urd-cal-s-cream, #f6e7c8) 78%, var(--urd-cal-s-mustard, #e0aa2a));
+  --urd-cal-set-ink: var(--urd-cal-s-brown, #5a3320);
+  --urd-cal-set-muted: color-mix(in srgb, var(--urd-cal-s-brown, #5a3320) 65%, transparent);
+  --urd-cal-set-line: color-mix(in srgb, var(--urd-cal-s-brown, #5a3320) 25%, transparent);
+  --urd-cal-set-accent: var(--urd-cal-s-brown, #5a3320);
+  --urd-cal-set-accent-text: var(--urd-cal-s-cream, #f6e7c8);
+  --urd-cal-set-label: var(--urd-cal-s-orange, #e2711d);
+  --urd-cal-set-radius: 10px;
+  --urd-cal-set-chip-radius: 999px;
+  --urd-cal-set-frame: none;
+  --urd-cal-set-shadow: 0 24px 60px rgb(0 0 0 / 50%);
+  --urd-cal-set-font: 'DM Sans', system-ui, sans-serif;
+  --urd-cal-set-title-font: Righteous, 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif;
+  --urd-cal-set-title-weight: 400;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.12em;
+}
+
+.urd-cal-set-deco {
+  --urd-cal-set-bg: var(--urd-cal-s-bg, #0e0e10);
+  --urd-cal-set-surface: color-mix(in srgb, var(--urd-cal-s-bg, #0e0e10) 88%, var(--urd-cal-s-gold, #d4af6a));
+  --urd-cal-set-ink: var(--urd-cal-s-cream, #f3ead3);
+  --urd-cal-set-muted: color-mix(in srgb, var(--urd-cal-s-cream, #f3ead3) 70%, transparent);
+  --urd-cal-set-line: color-mix(in srgb, var(--urd-cal-s-gold, #d4af6a) 50%, transparent);
+  --urd-cal-set-accent: var(--urd-cal-s-gold, #d4af6a);
+  --urd-cal-set-accent-text: var(--urd-cal-s-bg, #0e0e10);
+  --urd-cal-set-label: var(--urd-cal-s-gold, #d4af6a);
+  --urd-cal-set-radius: 0;
+  --urd-cal-set-chip-radius: 0;
+  --urd-cal-set-frame: 1px solid var(--urd-cal-s-gold, #d4af6a);
+  --urd-cal-set-shadow: 0 24px 60px rgb(0 0 0 / 60%);
+  --urd-cal-set-font: 'Josefin Sans', Futura, 'Century Gothic', 'URW Gothic', 'Avenir Next', system-ui, sans-serif;
+  --urd-cal-set-title-font: 'Poiret One', 'Josefin Sans', Futura, 'Century Gothic', 'URW Gothic', 'Avenir Next', sans-serif;
+  --urd-cal-set-title-weight: 400;
+  --urd-cal-set-label-case: uppercase;
+  --urd-cal-set-label-spacing: 0.2em;
+}
+
+.urd-cal .urd-collection-card {
+  background: var(--urd-cal-surface);
+  border-color: var(--urd-cal-line);
+}
+
+/* The view switcher: one pill of pressed buttons */
+.urd-cal-switch {
+  display: inline-flex;
+  justify-self: start;
+  gap: 2px;
+  padding: 4px;
+  background: var(--urd-cal-set-surface);
+  border: var(--urd-cal-set-frame);
+  border-radius: var(--urd-cal-set-chip-radius);
+}
+
+.urd-cal-switch-btn {
+  padding: 6px 14px;
+  font: inherit;
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: var(--urd-cal-set-label-spacing);
+  color: var(--urd-cal-set-ink);
+  text-transform: var(--urd-cal-set-label-case);
+  background: transparent;
+  border: 0;
+  border-radius: var(--urd-cal-set-chip-radius);
+  cursor: pointer;
+}
+
+.urd-cal-switch-btn[aria-pressed="true"] {
+  color: var(--urd-cal-set-accent-text);
+  background: var(--urd-cal-set-accent);
+}
+
+/* The sets whose tools have a form of their own */
+.urd-cal-set-apCream .urd-cal-switch,
+.urd-cal-set-apNavy .urd-cal-switch {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.urd-cal-set-apCream .urd-cal-switch-btn + .urd-cal-switch-btn,
+.urd-cal-set-apNavy .urd-cal-switch-btn + .urd-cal-switch-btn {
+  border-left: var(--urd-cal-set-frame);
+}
+
+.urd-cal-set-apCream .urd-cal-switch-btn,
+.urd-cal-set-apNavy .urd-cal-switch-btn {
+  border-radius: 0;
+}
+
+.urd-cal-set-poster .urd-cal-switch {
+  gap: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.urd-cal-set-poster .urd-cal-switch-btn + .urd-cal-switch-btn {
+  border-left: var(--urd-cal-set-frame);
+}
+
+.urd-cal-set-board .urd-cal-switch {
+  gap: 4px;
+  border-radius: var(--urd-cal-set-radius);
+}
+
+.urd-cal-set-cork .urd-cal-switch {
+  gap: 6px;
+  padding: 0;
+  background: transparent;
+}
+
+.urd-cal-set-cork .urd-cal-switch-btn {
+  padding: 8px 14px;
+  color: var(--urd-cal-set-ink);
+  background: var(--urd-cal-set-bg);
+  box-shadow: 0 4px 10px rgb(0 0 0 / 18%);
+  transform: rotate(-1deg);
+}
+
+.urd-cal-set-cork .urd-cal-switch-btn:nth-child(2n) {
+  transform: rotate(0.8deg);
+}
+
+.urd-cal-set-cork .urd-cal-switch-btn[aria-pressed="true"] {
+  color: var(--urd-cal-s-noteAltText, #4a1f1a);
+  background: var(--urd-cal-s-noteAlt, #ffd9d4);
+}
+
+.urd-cal-set-darkGlass .urd-cal-switch,
+.urd-cal-set-lightGlass .urd-cal-switch {
+  backdrop-filter: var(--urd-cal-set-blur);
+}
+
+/* The edge stripe on the design's boxes */
+.urd-cal-stripes .urd-collection-row,
+.urd-cal-stripes .urd-collection-card,
+.urd-cal-stripes .urd-cal-next-row,
+.urd-cal-stripes .urd-cal-agenda-row,
+.urd-cal-stripes .urd-cal-tl-body,
+.urd-cal-stripes .urd-cal-table td:first-child,
+.urd-cal-stripes .urd-cal-booklet-row,
+.urd-cal-stripes .urd-cal-numbered-row,
+.urd-cal-stripes .urd-cal-ap-row,
+.urd-cal-stripes .urd-cal-glass-card,
+.urd-cal-stripes .urd-cal-poster,
+.urd-cal-stripes .urd-cal-ticket,
+.urd-cal-stripes .urd-cal-daycard,
+.urd-cal-stripes .urd-cal-photo,
+.urd-cal-stripes .urd-cal-apcard,
+.urd-cal-stripes .urd-cal-bento-tile,
+.urd-cal-stripes .urd-cal-wstrip-day,
+.urd-cal-stripes .urd-cal-plan-event,
+.urd-cal-stripes .urd-cal-wplan-pill,
+.urd-cal-stripes .urd-cal-dplan-pill,
+.urd-cal-stripes .urd-cal-layers-bar,
+.urd-cal-stripes .urd-cal-side-card,
+.urd-cal-stripes .urd-cal-wheel-card,
+.urd-cal-stripes .urd-cal-bb,
+.urd-cal-stripes .urd-cal-stack-card,
+.urd-cal-stripes .urd-cal-nb-note,
+.urd-cal-stripes .urd-cal-split,
+.urd-cal-stripes .urd-cal-line-row,
+.urd-cal-stripes .urd-cal-ring,
+.urd-cal-stripes .urd-cal-dg-inner,
+.urd-cal-stripes .urd-cal-nbento-tile,
+.urd-cal-stripes .urd-cal-apn-next,
+.urd-cal-stripes .urd-cal-apv-first,
+.urd-cal-stripes .urd-cal-apv-tile,
+.urd-cal-stripes .urd-cal-aps-row,
+.urd-cal-stripes .urd-cal-pa-row,
+.urd-cal-stripes .urd-cal-magenda-body {
+  padding-left: 10px;
+  border-left: 3px solid var(--urd-cal-stripe, var(--urd-cal-color, var(--urd-cal-accent)));
+}
+
+.urd-cal-stripes .urd-collection-card {
+  padding-left: 1rem;
+}
+
+/* A design's words, edited in place in the preview */
+.urd-cal .urd-cal-tx {
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-tx[contenteditable] {
+  min-width: 1ch;
+  cursor: text;
+}
+
+.urd-cal-tx[contenteditable]:focus {
+  outline: 1px dashed var(--urd-cal-accent);
+  outline-offset: 2px;
+}
+
+.urd-cal-titlerow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.urd-cal-meta {
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.urd-cal-chip {
+  padding: 2px 8px;
+  font-size: 0.72em;
+  background: var(--urd-cal-s-chip, color-mix(in srgb, var(--urd-cal-chip-color, var(--urd-cal-color, var(--urd-cal-accent))) 18%, transparent));
+  border: 1px solid color-mix(in srgb, var(--urd-cal-chip-color, var(--urd-cal-color, var(--urd-cal-accent))) 45%, transparent);
+  border-radius: 999px;
+}
+
+.urd-cal-signup {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--urd-cal-accent);
+  text-decoration: none;
+}
+
+.urd-cal-signup:hover {
+  text-decoration: underline;
+}
+
+/* A place's map link and a description's links, in the words' colour */
+.urd-cal-place-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.urd-cal-place-link:hover {
+  text-decoration: underline;
+}
+
+.urd-cal .urd-cal-f-description a {
+  color: inherit;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+
+/* An event's box opens the event in full. */
+.urd-cal-event {
+  cursor: pointer;
+}
+
+.urd-cal-event:focus-visible {
+  outline: 2px solid var(--urd-cal-accent, var(--urd-color-accent));
+  outline-offset: 2px;
+}
+
+/* The announcement's text, cut after a few lines */
+.urd-cal .urd-cal-clamp {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--urd-cal-notice-lines, 4);
+}
+
+/* While its words are written, the whole text stands. */
+.urd-cal .urd-cal-clamp:focus-within {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: none;
+}
+
+.urd-cal-notice-more {
+  display: block;
+  width: fit-content;
+  font-size: 0.85em;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.urd-cal-notice-more[hidden] {
+  display: none;
+}
+
+/* The event in full: a native dialog in its calendar's set */
+.urd-cal-dialog {
+  --dlg-text: var(--urd-cal-set-ink);
+  --dlg-accent: var(--urd-cal-set-accent);
+  position: absolute;
+  inset: auto;
+  box-sizing: border-box;
+  width: min(28rem, calc(100vw - 1rem));
+  padding: 1.2rem 1.3rem 1.1rem;
+  margin: 0;
+  font-size: 0.92rem;
+  overflow: visible;
+  font-family: var(--urd-cal-set-font);
+  line-height: 1.5;
+  color: var(--dlg-text);
+  background-color: var(--urd-cal-set-bg);
+  border: var(--urd-cal-set-frame);
+  border-radius: var(--urd-cal-set-radius);
+  box-shadow: var(--urd-cal-set-shadow);
+  backdrop-filter: var(--urd-cal-set-blur);
+}
+
+/* The card over its calendar, under the navigation bar */
+.urd-cal-dialog {
+  z-index: 4000;
+}
+
+/* R1 Tear-off pad's card: a pad page with perforation holes */
+.urd-cal-dlg-pad {
+  padding-top: 0;
+}
+
+.urd-cal-dlg-pad .urd-cal-dialog-date {
+  margin: 0.4rem -1.3rem 0.9rem;
+  padding: 0.55rem 3.4rem 0.55rem 1.3rem;
+  font-family: var(--urd-cal-set-title-font);
+  font-stretch: condensed;
+  font-size: 0.95em;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: var(--urd-cal-set-accent-text);
+  background: var(--urd-cal-set-accent);
+}
+
+.urd-cal-dlg-pad .urd-cal-dialog-title {
+  font-stretch: condensed;
+  font-size: 1.6em;
+  line-height: 1.1;
+}
+
+/* R2 Index cards' card: a typewritten card with a punched hole */
+.urd-cal-dlg-index {
+  padding-top: 1.7rem;
+  line-height: 26px;
+}
+
+.urd-cal-dlg-index .urd-cal-dialog-date {
+  padding-bottom: 2px;
+  font-weight: 400;
+  color: var(--urd-cal-set-ink);
+  border-bottom: 2px solid var(--urd-cal-set-accent);
+}
+
+.urd-cal-dlg-index .urd-cal-dialog-title {
+  margin-top: 0.4rem;
+  font-size: 1.45em;
+  line-height: 26px;
+}
+
+.urd-cal-dlg-departures a.urd-cal-dialog-primary {
+  font-family: var(--urd-cal-set-title-font);
+  font-stretch: condensed;
+  text-transform: uppercase;
+  border-radius: 8px;
+}
+
+.urd-cal-dialog-close {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  font-size: 1.05rem;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--dlg-text) 30%, transparent);
+  border-radius: 50%;
+}
+
+.urd-cal-dialog-close svg {
+  width: 1em;
+  height: 1em;
+}
+
+.urd-cal-dialog-date {
+  display: block;
+  padding-right: 3rem;
+  font-size: 0.85em;
+  font-weight: 600;
+  letter-spacing: var(--urd-cal-set-label-spacing);
+  color: var(--urd-cal-set-label);
+  text-transform: var(--urd-cal-set-label-case);
+}
+
+.urd-cal-dialog-date::first-letter {
+  text-transform: uppercase;
+}
+
+.urd-cal-dialog-title {
+  margin: 0.2rem 3rem 0.9rem 0;
+  font-family: var(--urd-cal-set-title-font);
+  font-size: 1.35em;
+  font-weight: var(--urd-cal-set-title-weight);
+  line-height: 1.15;
+}
+
+.urd-cal-dialog-title.urd-cal-cancelled {
+  text-decoration: line-through;
+}
+
+.urd-cal-dialog-facts {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.25rem 1rem;
+  margin: 0 0 0.9rem;
+}
+
+.urd-cal-dialog-facts dt {
+  opacity: 0.65;
+}
+
+.urd-cal-dialog-facts dd {
+  margin: 0;
+}
+
+.urd-cal-dialog a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.urd-cal-dialog-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+/* The calendar's own words and page, under the description */
+.urd-cal-dialog-source {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0 0 0.9rem;
+  font-size: 0.92em;
+}
+
+.urd-cal-dialog-source-text {
+  margin: 0;
+  opacity: 0.8;
+}
+
+.urd-cal-dialog-meta .urd-cal-chip,
+.urd-cal-dialog-meta .urd-cal-rec {
+  color: inherit;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--dlg-text) 45%, transparent);
+}
+
+.urd-cal-dialog-img {
+  display: block;
+  width: 100%;
+  height: 8.5rem;
+  margin-bottom: 0.9rem;
+  object-fit: cover;
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-dialog-text {
+  margin-bottom: 1.1rem;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  align-items: center;
+}
+
+/* «Add to calendar»: the ways to do it, folded under the words. */
+.urd-cal-dialog-add {
+  flex: 1 1 100%;
+}
+
+.urd-cal-dialog-add summary {
+  width: fit-content;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.urd-cal-dialog-choices {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: start;
+  padding: 0.6rem 0 0 0.2rem;
+}
+
+.urd-cal-dialog-choice-label {
+  margin-top: 0.3rem;
+  font-size: 0.8em;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.urd-cal-dialog-address {
+  display: grid;
+  gap: 0.2rem;
+  width: 100%;
+  font-size: 0.85em;
+}
+
+.urd-cal-dialog-address input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--dlg-text) 30%, transparent);
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-dialog a.urd-cal-dialog-primary {
+  padding: 0.55rem 1rem;
+  font-weight: 600;
+  color: var(--urd-cal-set-accent-text);
+  text-decoration: none;
+  background: var(--dlg-accent);
+  border-radius: var(--urd-cal-set-chip-radius);
+}
+
+/* The sets whose card has a form of its own */
+.urd-cal-set-cork.urd-cal-dialog {
+  transform: rotate(-0.8deg);
+}
+
+.urd-cal-set-cork.urd-cal-dialog::before {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  content: '';
+  background: var(--urd-cal-s-pin, #d33a2c);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 35%);
+}
+
+.urd-cal-set-poster.urd-cal-dialog {
+  box-shadow: 8px 8px 0 var(--urd-cal-set-ink);
+}
+
+.urd-cal-set-darkGlass.urd-cal-dialog,
+.urd-cal-set-lightGlass.urd-cal-dialog {
+  background-color: color-mix(in srgb, var(--urd-cal-set-bg) 85%, transparent);
+}
+
+.urd-cal-set-bento.urd-cal-dialog .urd-cal-dialog-date {
+  display: inline-block;
+  padding: 4px 10px;
+  color: var(--urd-cal-set-accent-text);
+  background: var(--urd-cal-set-accent);
+  border-radius: 999px;
+}
+
+/* The sets whose ground is not the page's draw their tools on it */
+.urd-cal-set-apNavy:has(> .urd-cal-tools, > .urd-cal-chips, > .urd-cal-nomatch, > .urd-cal-earlier),
+.urd-cal-set-board:has(> .urd-cal-tools, > .urd-cal-chips, > .urd-cal-nomatch, > .urd-cal-earlier),
+.urd-cal-set-darkGlass:has(> .urd-cal-tools, > .urd-cal-chips, > .urd-cal-nomatch, > .urd-cal-earlier),
+.urd-cal-set-cork:has(> .urd-cal-tools, > .urd-cal-chips, > .urd-cal-nomatch, > .urd-cal-earlier) {
+  padding: 1em;
+  color: var(--urd-cal-set-ink);
+  background: var(--urd-cal-set-bg);
+  border-radius: var(--urd-cal-set-radius);
+}
+
+.urd-cal-set-cork:has(> .urd-cal-tools, > .urd-cal-chips, > .urd-cal-nomatch, > .urd-cal-earlier) {
+  color: var(--urd-cal-s-boardText, #cfe3dc);
+  background: var(--urd-cal-set-surface);
+  border-radius: 14px;
+}
+
+.urd-cal-swview .urd-cal-wstrip-label strong {
+  font-size: 1em;
+}
+
+/* The tools' size (toolsSize), small or large */
+.urd-cal-tools-s .urd-cal-tools,
+.urd-cal-tools-s .urd-cal-chips,
+.urd-cal-tools-s .urd-cal-swview .urd-cal-month-head,
+.urd-cal-tools-s .urd-cal-swview .urd-cal-wstrip-head {
+  font-size: 0.82em;
+}
+
+.urd-cal-tools-s .urd-cal-switch-btn {
+  padding: 4px 10px;
+}
+
+.urd-cal-tools-s .urd-cal-nav,
+.urd-cal-tools-s .urd-cal-searchbtn {
+  width: 32px;
+  height: 32px;
+}
+
+.urd-cal-tools-l .urd-cal-tools,
+.urd-cal-tools-l .urd-cal-chips,
+.urd-cal-tools-l .urd-cal-swview .urd-cal-month-head,
+.urd-cal-tools-l .urd-cal-swview .urd-cal-wstrip-head {
+  font-size: 1.2em;
+}
+
+.urd-cal-tools-l .urd-cal-switch-btn {
+  padding: 9px 18px;
+}
+
+.urd-cal-tools-l .urd-cal-nav,
+.urd-cal-tools-l .urd-cal-searchbtn {
+  width: 48px;
+  height: 48px;
+}
+
+/* A cancelled event: its title struck and the box dimmed, in every design. */
+.urd-cal-cancelled .urd-cal-f-title,
+.urd-cal-cancelled.urd-cal-f-title {
+  text-decoration: line-through;
+}
+
+.urd-cal-cancelled {
+  opacity: 0.6;
+}
+
+/* The line that names the time zone the times are shown in. */
+.urd-cal-zone {
+  margin: 0;
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+/* The fold for the events beyond the max count, in every list design. */
+.urd-cal-fold {
+  margin-top: 12px;
+}
+
+.urd-cal-fold-summary {
+  width: fit-content;
+  padding: 6px 2px;
+  font-size: 0.9em;
+  font-weight: 600;
+  letter-spacing: var(--urd-cal-set-label-spacing);
+  color: var(--urd-cal-set-label);
+  text-transform: var(--urd-cal-set-label-case);
+  cursor: pointer;
+}
+
+.urd-cal-set-apCream .urd-cal-earlier > .urd-cal-fold-summary,
+.urd-cal-set-apNavy .urd-cal-earlier > .urd-cal-fold-summary,
+.urd-cal-set-poster .urd-cal-earlier > .urd-cal-fold-summary {
+  width: auto;
+  font-size: 0.78em;
+  border-bottom: var(--urd-cal-set-frame);
+}
+
+.urd-cal-fold-body {
+  margin-top: 12px;
+}
+
+.urd-cal-fold .urd-cal-table thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* The mark on an event that repeats (List on navy, Grid on cream). */
+.urd-cal-rec {
+  padding: 2px 8px;
+  font-size: 0.65em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--urd-cal-s-rec, var(--urd-cal-accent));
+  border: 1px dashed var(--urd-cal-s-rec, var(--urd-cal-accent));
+  border-radius: 999px;
+}
+
+/* The whole programme's link, and an event's words without a sign-up */
+.urd-cal-program {
+  font-weight: 600;
+  color: var(--urd-cal-accent);
+  text-decoration: none;
+}
+
+.urd-cal-program:hover {
+  text-decoration: underline;
+}
+
+.urd-cal-open {
+  flex: none;
+  font-size: 0.85em;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.urd-cal-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.urd-cal-chipbtn {
+  padding: 3px 10px;
+  font: inherit;
+  font-size: 0.78em;
+  color: var(--urd-cal-set-ink);
+  background: var(--urd-cal-set-surface);
+  border: 1px solid var(--urd-cal-set-line);
+  border-radius: var(--urd-cal-set-chip-radius);
+  cursor: pointer;
+}
+
+.urd-cal-chipbtn.selected {
+  color: var(--urd-cal-color-text, var(--urd-cal-set-accent-text));
+  background: var(--urd-cal-chip-color, var(--urd-cal-color, var(--urd-cal-set-accent)));
+  border-color: var(--urd-cal-chip-color, var(--urd-cal-color, var(--urd-cal-set-accent)));
+}
+
+.urd-cal-set-apCream .urd-cal-chipbtn,
+.urd-cal-set-apNavy .urd-cal-chipbtn,
+.urd-cal-set-poster .urd-cal-chipbtn {
+  background: transparent;
+  border: var(--urd-cal-set-frame);
+}
+
+.urd-cal-set-apCream .urd-cal-chipbtn.selected,
+.urd-cal-set-apNavy .urd-cal-chipbtn.selected,
+.urd-cal-set-poster .urd-cal-chipbtn.selected {
+  background: var(--urd-cal-color, var(--urd-cal-set-accent));
+  border-color: var(--urd-cal-color, var(--urd-cal-set-accent));
+}
+
+.urd-cal-set-cork .urd-cal-chipbtn {
+  color: var(--urd-cal-set-ink);
+  background: var(--urd-cal-set-bg);
+  border: 0;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 18%);
+}
+
+.urd-cal-set-cork .urd-cal-chipbtn.selected {
+  color: var(--urd-cal-s-noteAltText, #4a1f1a);
+  background: var(--urd-cal-s-noteAlt, #ffd9d4);
+}
+
+.urd-cal-set-board .urd-cal-chipbtn {
+  border: 0;
+}
+
+/* The switcher and the search on one row */
+.urd-cal-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.urd-cal-searchrow {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.urd-cal-searchbtn {
+  display: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--urd-cal-set-ink);
+  cursor: pointer;
+  background: var(--urd-cal-set-surface);
+  border: 1px solid var(--urd-cal-set-line);
+  border-radius: var(--urd-cal-set-chip-radius);
+}
+
+.urd-cal-searchbtn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* The search, the «nothing matches» line and the «Earlier» fold */
+.urd-cal-search {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: min(22em, 100%);
+  margin-left: auto;
+  padding: 0.45em 0.9em;
+  font: inherit;
+  font-size: 0.9em;
+  color: var(--urd-cal-set-ink);
+  background: var(--urd-cal-set-surface);
+  border: 1px solid var(--urd-cal-set-line);
+  border-radius: var(--urd-cal-set-chip-radius);
+}
+
+.urd-cal-search::placeholder {
+  color: var(--urd-cal-set-muted);
+}
+
+.urd-cal-set-apCream .urd-cal-search,
+.urd-cal-set-apNavy .urd-cal-search,
+.urd-cal-set-poster .urd-cal-search {
+  padding-right: 0;
+  padding-left: 0;
+  background: transparent;
+  border-width: 0 0 var(--urd-cal-set-frame-width, 1px);
+  border-image: none;
+  border-radius: 0;
+}
+
+.urd-cal-set-apCream .urd-cal-search,
+.urd-cal-set-apNavy .urd-cal-search {
+  font-style: italic;
+  border-bottom: 1px solid var(--urd-cal-s-gold, #d0a74a);
+}
+
+.urd-cal-set-poster .urd-cal-search {
+  font-weight: 700;
+  border-bottom: 2px solid var(--urd-cal-set-ink);
+}
+
+.urd-cal-set-cork .urd-cal-search {
+  color: var(--urd-cal-s-stripText, #e6efeb);
+  background: var(--urd-cal-s-strip, #1f2d29);
+  border: 0;
+  border-radius: 8px;
+}
+
+.urd-cal-nomatch {
+  padding: 1em 0;
+  margin: 0;
+  color: var(--urd-cal-set-muted);
+}
+
+.urd-cal-set-apCream .urd-cal-nomatch,
+.urd-cal-set-apNavy .urd-cal-nomatch {
+  font-style: italic;
+  border-top: 1px solid var(--urd-cal-set-line);
+  border-bottom: 1px solid var(--urd-cal-set-line);
+}
+
+.urd-cal-set-poster .urd-cal-nomatch {
+  font-family: var(--urd-cal-set-title-font);
+  font-size: 1.4em;
+  font-weight: 600;
+  border-top: 1px solid var(--urd-cal-set-line);
+  border-bottom: 1px solid var(--urd-cal-set-line);
+}
+
+.urd-cal-set-cork .urd-cal-nomatch,
+.urd-cal-set-board .urd-cal-nomatch,
+.urd-cal-set-darkGlass .urd-cal-nomatch,
+.urd-cal-set-bento .urd-cal-nomatch,
+.urd-cal-set-agendaDark .urd-cal-nomatch {
+  padding: 1em 1.1em;
+  color: var(--urd-cal-set-ink);
+  background: var(--urd-cal-set-surface);
+  border: 1px dashed var(--urd-cal-set-line);
+  border-radius: var(--urd-cal-set-radius);
+}
+
+.urd-cal-set-cork .urd-cal-nomatch {
+  background: var(--urd-cal-set-bg);
+  border: 0;
+  box-shadow: 0 8px 18px rgb(0 0 0 / 18%);
+  transform: rotate(0.6deg);
+}
+
+.urd-cal-earlier-rows {
+  display: grid;
+  gap: 4px;
+  padding-top: 8px;
+}
+
+.urd-cal-earlier-row {
+  display: grid;
+  grid-template-columns: 4.5em minmax(0, 1fr);
+  gap: 2px 10px;
+  padding: 6px 8px;
+  color: var(--urd-cal-set-ink);
+  background: var(--urd-cal-set-surface);
+  border: 1px solid var(--urd-cal-set-line);
+  border-radius: var(--urd-cal-set-chip-radius);
+  opacity: 0.8;
+}
+
+.urd-cal-earlier-row .urd-cal-earlier-date {
+  letter-spacing: var(--urd-cal-set-label-spacing);
+  color: var(--urd-cal-set-label);
+  text-transform: var(--urd-cal-set-label-case);
+}
+
+.urd-cal-set-apCream .urd-cal-earlier-row,
+.urd-cal-set-apNavy .urd-cal-earlier-row,
+.urd-cal-set-poster .urd-cal-earlier-row {
+  background: transparent;
+  border-width: 0 0 1px;
+  border-radius: 0;
+}
+
+.urd-cal-set-cork .urd-cal-earlier-rows {
+  padding: 10px 12px;
+  color: var(--urd-cal-s-stripText, #e6efeb);
+  background: var(--urd-cal-s-strip, #1f2d29);
+  border-radius: 8px;
+}
+
+.urd-cal-set-cork .urd-cal-earlier-row {
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+
+.urd-cal-earlier-date,
+.urd-cal-earlier-place {
+  font-size: 0.85em;
+}
+
+.urd-cal-earlier-place {
+  grid-column: 2;
+  opacity: 0.8;
+}
+
+/* A named calendar's colour tints its chips and date badges */
+.urd-cal .urd-collection-badge {
+  border-color: color-mix(in srgb, var(--urd-cal-color, var(--urd-color-text)) 35%, transparent);
+}
+
+.urd-cal .urd-collection-badge strong {
+  color: var(--urd-cal-color, inherit);
+}
+
+.urd-cal-subscribe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.urd-cal-sub-btn {
+  padding: 5px 12px;
+  font-size: 0.82em;
+  color: inherit;
+  text-decoration: none;
+  background: var(--urd-cal-surface);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 25%, transparent);
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-sub-btn:hover {
+  border-color: var(--urd-cal-accent);
+}
+
+.urd-cal-next {
+  padding: 16px;
+  background: var(--urd-cal-surface);
+  border: 1px solid var(--urd-cal-line);
+  border-radius: var(--urd-radius-md);
+}
+
+.urd-cal-next-label {
+  margin-bottom: 10px;
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.urd-cal-next-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.urd-cal-next-title {
+  font-family: var(--urd-font-heading);
+  font-size: 1.15em;
+}
+
+.urd-cal-next-count {
+  margin-top: 4px;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--urd-cal-accent);
+}
+
+/* A day of a month on the phone is a button */
+.urd-cal-pday {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.urd-cal-month {
+  display: grid;
+  gap: 8px;
+}
+
+.urd-cal-month-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.urd-cal-nav {
+  width: 30px;
+  height: 30px;
+  font: inherit;
+  color: var(--urd-cal-set-ink);
+  background: var(--urd-cal-set-surface);
+  border: 1px solid var(--urd-cal-set-line);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.urd-cal-nav:hover {
+  border-color: var(--urd-cal-set-accent);
+}
+
+.urd-cal-set-apCream .urd-cal-nav,
+.urd-cal-set-apNavy .urd-cal-nav {
+  color: var(--urd-cal-s-gold, #d0a74a);
+  background: transparent;
+  border-color: var(--urd-cal-s-gold, #d0a74a);
+}
+
+.urd-cal-set-poster .urd-cal-nav {
+  border: var(--urd-cal-set-frame);
+  border-radius: 0;
+}
+
+.urd-cal-set-board .urd-cal-nav,
+.urd-cal-set-darkGlass .urd-cal-nav,
+.urd-cal-set-bento .urd-cal-nav {
+  border-radius: var(--urd-cal-set-chip-radius);
+}
+
+/* The switcher's month and week in the block's set */
+.urd-cal-swview .urd-cal-month-head strong,
+.urd-cal-swview .urd-cal-wstrip-label strong {
+  letter-spacing: var(--urd-cal-set-label-spacing);
+  color: var(--urd-cal-set-label);
+  text-transform: var(--urd-cal-set-label-case);
+}
+
+.urd-cal-swview .urd-cal-dow,
+.urd-cal-swview .urd-cal-wstrip-wd {
+  letter-spacing: var(--urd-cal-set-label-spacing);
+  color: var(--urd-cal-set-label);
+  opacity: 1;
+}
+
+.urd-cal-swview .urd-cal-day,
+.urd-cal-swview .urd-cal-wstrip-day {
+  color: var(--urd-cal-set-ink);
+  background: var(--urd-cal-set-surface);
+  border-color: var(--urd-cal-set-line);
+  border-radius: var(--urd-cal-set-chip-radius);
+}
+
+.urd-cal-set-apCream .urd-cal-swview .urd-cal-day,
+.urd-cal-set-apCream .urd-cal-swview .urd-cal-wstrip-day,
+.urd-cal-set-apNavy .urd-cal-swview .urd-cal-day,
+.urd-cal-set-apNavy .urd-cal-swview .urd-cal-wstrip-day {
+  background: var(--urd-cal-set-bg);
+  border-radius: 0;
+}
+
+.urd-cal-set-apCream .urd-cal-swview .urd-cal-today,
+.urd-cal-set-apCream .urd-cal-swview .urd-cal-wstrip-today {
+  background: var(--urd-cal-set-surface);
+  box-shadow: inset 0 0 0 2px var(--urd-cal-s-gold, #d0a74a);
+}
+
+.urd-cal-set-apNavy .urd-cal-swview .urd-cal-today,
+.urd-cal-set-apNavy .urd-cal-swview .urd-cal-wstrip-today {
+  color: var(--urd-cal-s-ground, #1c2340);
+  background: var(--urd-cal-s-text, #f3ecd8);
+}
+
+.urd-cal-set-cork .urd-cal-swview .urd-cal-day,
+.urd-cal-set-cork .urd-cal-swview .urd-cal-wstrip-day {
+  background: var(--urd-cal-set-bg);
+  border: 0;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 18%);
+}
+
+.urd-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.urd-cal-dow {
+  padding: 2px 0;
+  font-size: 0.7em;
+  text-align: center;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.urd-cal-day {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  min-height: 64px;
+  padding: 4px;
+  background: color-mix(in srgb, var(--urd-cal-surface) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 8%, transparent);
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-day-empty {
+  background: transparent;
+  border-color: transparent;
+}
+
+.urd-cal-today {
+  border-color: var(--urd-cal-accent);
+}
+
+.urd-cal-daynum {
+  font-size: 0.72em;
+  opacity: 0.6;
+}
+
+.urd-cal-pill {
+  padding: 2px 5px;
+  font-size: 0.68em;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: color-mix(in srgb, var(--urd-cal-accent) 22%, transparent);
+  border-radius: 4px;
+}
+
+.urd-cal-more {
+  font-size: 0.66em;
+  opacity: 0.6;
+}
+
+/* The empty state: an icon over a line of text */
+.urd-cal-empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 1.4rem 1rem;
+  text-align: center;
+  color: color-mix(in srgb, var(--urd-color-text) 70%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 22%, transparent);
+  border-radius: var(--urd-radius-md);
+}
+
+.urd-cal-empty-icon {
+  display: block;
+  width: 2.2rem;
+  height: 2.2rem;
+  color: var(--urd-cal-accent);
+}
+
+.urd-cal-empty-text {
+  margin: 0;
+  font-size: 0.9em;
+}
+
+/* Several events in the «next» card, a rule between them */
+.urd-cal-next-row + .urd-cal-next-row {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--urd-cal-line);
+}
+
+/* «Later»: one line per event under the featured ones. */
+.urd-cal-later-label {
+  margin: 16px 0 6px;
+}
+
+.urd-cal-later {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9em;
+}
+
+.urd-cal-later li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+}
+
+.urd-cal-later-when {
+  flex: none;
+  opacity: 0.7;
+}
+
+.urd-cal-later-title {
+  font-weight: 600;
+}
+
+/* The agenda: compact rows under their month. */
+.urd-cal-agenda {
+  display: grid;
+  gap: 4px;
+}
+
+.urd-cal-agenda-month {
+  margin: 10px 0 2px;
+  font-family: var(--urd-font-heading);
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--urd-cal-accent);
+}
+
+.urd-cal-agenda-month:first-child {
+  margin-top: 0;
+}
+
+.urd-cal-agenda-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.urd-cal-agenda-row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 8px 0;
+  border-top: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-agenda-day {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  width: 4.2em;
+  font-variant-numeric: tabular-nums;
+}
+
+.urd-cal-agenda-day strong {
+  font-size: 1.15em;
+}
+
+.urd-cal-agenda-day span {
+  font-size: 0.78em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.urd-cal-agenda-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.urd-cal-tl-when {
+  padding: 2px 0 1.6em;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.urd-cal-tl-when strong {
+  display: block;
+  font-family: var(--urd-font-heading);
+  font-size: 1.35em;
+  line-height: 1;
+}
+
+.urd-cal-tl-when span {
+  font-size: 0.78em;
+  opacity: 0.7;
+}
+
+.urd-cal-tl-body {
+  padding: 0 0 1.6em;
+}
+
+.urd-cal-tl > :nth-last-child(-n + 3) {
+  padding-bottom: 0;
+}
+
+.urd-cal-d-timeline .urd-cal-signup {
+  margin: 0;
+  padding: 5px 12px;
+  color: var(--urd-cal-accent-text);
+  background: var(--urd-cal-accent);
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-table th {
+  padding: 0.6em 0.8em;
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-align: left;
+  text-transform: uppercase;
+  color: var(--urd-cal-s-headText, var(--urd-cal-accent-text));
+  background: var(--urd-cal-s-head, var(--urd-cal-accent));
+}
+
+.urd-cal-table th:first-child {
+  border-radius: var(--urd-radius-sm) 0 0 var(--urd-radius-sm);
+}
+
+.urd-cal-table th:last-child {
+  border-radius: 0 var(--urd-radius-sm) var(--urd-radius-sm) 0;
+}
+
+.urd-cal-table .urd-cal-signup {
+  margin: 0;
+}
+
+/* 07 Programme booklet */
+.urd-cal-booklet {
+  padding: 1.6em 2em 1.8em;
+  background: var(--urd-cal-surface);
+  border-radius: var(--urd-radius-sm);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 12%);
+}
+
+.urd-cal-numbered-row {
+  display: grid;
+  grid-template-columns: 3.6em minmax(0, 1fr) auto;
+  column-gap: 1.2em;
+  align-items: baseline;
+  padding: 1.1em 0;
+  border-top: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-numbered .urd-cal-signup {
+  margin: 0;
+}
+
+/* A5 List on navy (ApeironLF): rows on navy, the day in gold */
+.urd-cal-d-apList {
+  --urd-cal-ap-gold: var(--urd-cal-s-gold, #d0a74a);
+  --urd-cal-ap-line: var(--urd-cal-s-line, color-mix(in srgb, var(--urd-cal-s-gold, #d0a74a) 35%, transparent));
+}
+
+.urd-cal-ap-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.4em;
+  padding: 1em 1.4em;
+  background: var(--urd-cal-s-row, #1c2340);
+  border: 1px solid var(--urd-cal-ap-line);
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-ap-when strong {
+  display: block;
+  font-family: var(--urd-font-heading);
+  font-size: 2em;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--urd-cal-ap-gold);
+}
+
+.urd-cal-ap-when span {
+  font-size: 0.65em;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.urd-cal-d-apList .urd-cal-signup {
+  flex: none;
+  margin: 0;
+  color: var(--urd-cal-ap-gold);
+}
+
+/* M2 Glass: frosted cards over soft colour blobs */
+.urd-cal-d-glass {
+  --urd-cal-glass: var(--urd-cal-s-glass, rgb(255 255 255 / 55%));
+  --urd-cal-glass-line: var(--urd-cal-s-glassLine, rgb(255 255 255 / 80%));
+  position: relative;
+  isolation: isolate;
+  padding: 1.4em;
+  overflow: hidden;
+  color: var(--urd-cal-s-text, inherit);
+  background: var(--urd-cal-s-ground, transparent);
+  border-radius: 26px;
+}
+
+.urd-cal-glass-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6em 1em;
+  padding: 1em 1.1em;
+  background: var(--urd-cal-glass);
+  border: 1px solid var(--urd-cal-glass-line);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 8%);
+  backdrop-filter: blur(18px);
+}
+
+.urd-cal-glass-when strong {
+  display: block;
+  font-family: var(--urd-font-heading);
+  font-size: 1.6em;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.urd-cal-glass-when span {
+  font-size: 0.7em;
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.urd-cal-d-glass .urd-cal-signup {
+  margin: 0;
+  padding: 9px 14px;
+  color: var(--urd-color-bg);
+  background: var(--urd-color-text);
+  border-radius: 999px;
+}
+
+.urd-cal-poster {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.6em;
+  padding: 1.1em;
+  background: var(--urd-cal-surface);
+  border: 1px solid var(--urd-cal-line);
+  border-radius: var(--urd-radius-md);
+}
+
+.urd-cal-poster-when strong {
+  display: block;
+  font-family: var(--urd-font-heading);
+  font-size: 3.4em;
+  font-weight: 800;
+  line-height: 0.95;
+}
+
+.urd-cal-poster-big .urd-cal-poster-when strong {
+  font-size: 5.5em;
+  line-height: 0.9;
+}
+
+.urd-cal-poster-plain .urd-cal-poster-when strong {
+  color: var(--urd-cal-accent);
+}
+
+.urd-cal-poster-when span {
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.urd-cal-poster .urd-cal-signup {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.urd-cal-ticket-stub {
+  display: flex;
+  flex: 0 0 7.5em;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1em;
+  text-align: center;
+  color: var(--urd-cal-color-text, var(--urd-cal-s-stubText, var(--urd-cal-accent-text)));
+  background: var(--urd-cal-color, var(--urd-cal-s-stub, var(--urd-cal-accent)));
+  border-right: 2px dashed var(--urd-color-bg);
+}
+
+.urd-cal-ticket-stub strong {
+  font-family: var(--urd-font-heading);
+  font-size: 2.4em;
+  line-height: 1;
+}
+
+.urd-cal-ticket-stub .urd-cal-f-date {
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.urd-cal-ticket-body {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6em 1em;
+  min-width: 0;
+  padding: 1em 1.3em;
+}
+
+.urd-cal-ticket .urd-cal-signup {
+  flex: none;
+  margin: 0;
+  padding: 9px 16px;
+  color: var(--urd-cal-accent-text);
+  background: var(--urd-cal-accent);
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-carousel-dot {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+.urd-cal-daycard {
+  display: flex;
+  flex: 0 0 220px;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 280px;
+  padding: 1.2em;
+  scroll-snap-align: start;
+  background: var(--urd-cal-surface);
+  border: 1px solid var(--urd-cal-line);
+  border-radius: var(--urd-radius-md);
+}
+
+.urd-cal-daycard .urd-cal-signup,
+.urd-cal-daycard .urd-cal-chip {
+  align-self: flex-start;
+}
+
+.urd-cal-daycard-first .urd-cal-signup {
+  margin: 0;
+  padding: 8px 14px;
+  color: var(--urd-cal-s-card, var(--urd-cal-accent));
+  background: var(--urd-cal-s-cardText, var(--urd-color-accent-text));
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-photo-date {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 6px 10px;
+  font-size: 0.75em;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--urd-cal-s-badgeText, var(--urd-color-text));
+  background: var(--urd-cal-s-badge, var(--urd-color-bg));
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-photo-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0.9em 1em 1em;
+}
+
+.urd-cal-photo .urd-cal-signup {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 7px 12px;
+  color: var(--urd-cal-accent-text);
+  background: var(--urd-cal-accent);
+  border-radius: var(--urd-radius-sm);
+}
+
+/* A6 Grid on cream (ApeironLF): cream cards with a navy head */
+.urd-cal-d-apGrid {
+  --urd-cal-ap-gold: var(--urd-cal-s-gold, #d0a74a);
+  --urd-cal-ap-head: var(--urd-cal-s-head, #1c2340);
+}
+
+.urd-cal-apcard-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6em;
+  padding: 0.8em 1.1em;
+  color: var(--urd-cal-ap-gold);
+  background: var(--urd-cal-ap-head);
+  border-bottom: 2px solid var(--urd-cal-ap-gold);
+}
+
+.urd-cal-apcard-when strong {
+  font-family: var(--urd-font-heading);
+  font-size: 1.6em;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.urd-cal-apcard-when .urd-cal-f-date {
+  font-size: 0.7em;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--urd-cal-s-card, #f3ecd8);
+}
+
+.urd-cal-apcard-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  padding: 1em 1.1em 1.1em;
+}
+
+.urd-cal-d-apGrid .urd-cal-signup {
+  margin: 0;
+  color: var(--urd-cal-ap-head);
+}
+
+.urd-cal-bento-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5em;
+  min-width: 0;
+  padding: 1.1em;
+  background: var(--urd-cal-s-tile, var(--urd-cal-surface));
+  border: 1px solid var(--urd-cal-line);
+  border-radius: 22px;
+}
+
+.urd-cal-bento-hero {
+  position: relative;
+  grid-row: span 2;
+  grid-column: span 2;
+  justify-content: flex-end;
+  padding-top: 3.2em;
+  overflow: hidden;
+  color: var(--urd-cal-s-heroText, var(--urd-color-bg));
+  background: var(--urd-cal-s-hero, var(--urd-color-text));
+  border-color: transparent;
+}
+
+.urd-cal-bento-pill {
+  position: absolute;
+  top: 1.1em;
+  left: 1.3em;
+  padding: 6px 12px;
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--urd-cal-accent-text);
+  background: var(--urd-cal-accent);
+  border-radius: 999px;
+}
+
+.urd-cal-bento-when strong {
+  font-family: var(--urd-font-heading);
+  font-size: 3.8em;
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+
+.urd-cal-bento-when span {
+  margin-left: 8px;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.urd-cal-bento-hero .urd-cal-signup {
+  align-self: flex-start;
+  margin: 0;
+  padding: 8px 14px;
+  color: var(--urd-cal-s-hero, var(--urd-color-text));
+  background: var(--urd-cal-s-heroText, var(--urd-color-bg));
+  border-radius: 999px;
+}
+
+.urd-cal-bento-day i {
+  display: grid;
+  place-items: center;
+  width: 1.9em;
+  height: 1.9em;
+  font-style: normal;
+  border-radius: 50%;
+}
+
+.urd-cal-bento-row-when strong {
+  font-size: 1.6em;
+  line-height: 1;
+}
+
+.urd-cal-bento-row-when span {
+  margin-left: 4px;
+  font-size: 0.75em;
+  font-weight: 600;
+}
+
+.urd-cal-bento-row .urd-cal-signup {
+  flex: none;
+  margin: 0;
+  padding: 9px 14px;
+  color: var(--urd-color-bg);
+  background: var(--urd-color-text);
+  border-radius: 999px;
+}
+
+.urd-cal-wstrip-label strong {
+  display: block;
+  font-family: var(--urd-font-heading);
+  font-size: 1.15em;
+}
+
+.urd-cal-wstrip-label > span {
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+.urd-cal-wstrip-day {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 9em;
+  padding: 0.6em 0.5em;
+  background: var(--urd-cal-surface);
+  border: 1px solid var(--urd-cal-line);
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-wstrip-today .urd-cal-wstrip-wd {
+  color: var(--urd-cal-accent);
+  opacity: 1;
+}
+
+.urd-cal-wstrip-pill {
+  min-width: 0;
+  padding: 5px 7px;
+  overflow-wrap: anywhere;
+  font-size: 0.72em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--urd-cal-color-text, var(--urd-cal-s-pillText, var(--urd-cal-accent-text)));
+  background: var(--urd-cal-color, var(--urd-cal-s-pill, var(--urd-cal-accent)));
+  border-radius: 6px;
+}
+
+.urd-cal-wplan-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.8em 1em;
+  border-bottom: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-wplan-today {
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 0.8em;
+  font-weight: 700;
+  color: var(--urd-cal-accent);
+  background: var(--urd-cal-s-todayBg, color-mix(in srgb, var(--urd-cal-accent) 12%, var(--urd-cal-surface)));
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.urd-cal-wplan-day {
+  padding: 0.6em 0;
+  font-size: 0.7em;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.urd-cal-wplan-day strong {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--urd-font-heading);
+  font-size: 1.6em;
+  letter-spacing: 0;
+}
+
+.urd-cal-wplan-day.urd-cal-wplan-istoday strong {
+  display: inline-grid;
+  place-items: center;
+  width: 1.9em;
+  height: 1.9em;
+  color: var(--urd-cal-accent-text);
+  background: var(--urd-cal-accent);
+  border-radius: 50%;
+}
+
+.urd-cal-wplan-hour,
+.urd-cal-dplan-hour {
+  padding: 4px 8px 0 0;
+  font-size: 0.68em;
+  font-weight: 700;
+  text-align: right;
+  opacity: 0.6;
+  border-bottom: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-wplan-cell,
+.urd-cal-dplan-cell {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  align-content: start;
+  padding: 3px;
+  border-bottom: 1px solid var(--urd-cal-line);
+  border-left: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-wplan-pill,
+.urd-cal-dplan-pill {
+  min-width: 0;
+  padding: 4px 6px;
+  overflow-wrap: anywhere;
+  font-size: 0.7em;
+  font-weight: 700;
+  line-height: 1.2;
+  background: var(--urd-cal-color-bg, color-mix(in srgb, var(--urd-cal-color, var(--urd-cal-accent)) 18%, transparent));
+  border-radius: 6px;
+}
+
+.urd-cal-plan-event {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1px;
+  min-height: calc(var(--urd-cal-plan-span, 1) * 3.2em);
+  padding: 5px 7px;
+  font-size: 0.72em;
+  line-height: 1.2;
+  background: var(--urd-cal-color-bg, var(--urd-cal-s-event, color-mix(in srgb, var(--urd-cal-color, var(--urd-cal-accent)) 18%, var(--urd-cal-surface))));
+  border-radius: 8px;
+}
+
+.urd-cal-plan-event .urd-cal-signup {
+  margin: 0;
+  font-size: 1em;
+}
+
+.urd-cal-layers-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6em 1em;
+  padding: 0.8em 1em;
+  border-bottom: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-layers-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px 5px 7px;
+  font: inherit;
+  font-size: 0.78em;
+  font-weight: 700;
+  color: inherit;
+  background: var(--urd-cal-surface);
+  border: 1px solid var(--urd-cal-line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.urd-cal-layers-corner,
+.urd-cal-layers-dow {
+  padding: 0.7em 0;
+  font-size: 0.68em;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  opacity: 0.7;
+  border-bottom: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-layers-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.9em 1em;
+  font-size: 0.8em;
+  font-weight: 700;
+  border-bottom: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-layers-lane {
+  position: relative;
+  display: grid;
+  grid-column: span 7;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px 0;
+  min-height: 3.6em;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--urd-cal-line);
+  border-left: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-layers-bar {
+  grid-column: calc(var(--urd-cal-bar-from) + 1) / span var(--urd-cal-bar-span);
+  margin: 0 4px;
+  padding: 6px 8px;
+  font-size: 0.72em;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--urd-cal-color-text, var(--urd-cal-accent-text));
+  background: var(--urd-cal-color, var(--urd-cal-accent));
+  border-radius: 8px;
+}
+
+.urd-cal-side-main {
+  display: grid;
+  align-content: start;
+  gap: 0.4em;
+  padding: 1em 0.8em 0.8em;
+}
+
+.urd-cal-side-day {
+  display: grid;
+  gap: 3px;
+  align-content: start;
+  min-width: 0;
+  padding: 4px 5px;
+  font: inherit;
+  font-size: 0.7em;
+  font-weight: 600;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.urd-cal-side-chip {
+  padding: 2px 5px;
+  font-size: 0.92em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--urd-cal-s-chip, color-mix(in srgb, var(--urd-cal-chip-color, var(--urd-cal-color, var(--urd-cal-accent))) 22%, transparent));
+  border-radius: 5px;
+}
+
+.urd-cal-side-panel {
+  display: grid;
+  align-content: start;
+  gap: 0.8em;
+  padding: 1em;
+  background: var(--urd-cal-s-panel, color-mix(in srgb, var(--urd-color-text) 4%, var(--urd-cal-surface)));
+  border-left: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-side-chosen .urd-cal-f-date {
+  display: block;
+  font-size: 0.65em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.urd-cal-side-chosen strong {
+  font-family: var(--urd-font-heading);
+  font-size: 1.4em;
+  line-height: 1.1;
+}
+
+.urd-cal-side-card {
+  display: grid;
+  gap: 2px;
+  padding: 0.7em 0.8em;
+  font-size: 0.9em;
+  background: var(--urd-cal-surface);
+  border: 1px solid var(--urd-cal-line);
+  border-left: 4px solid var(--urd-cal-color, var(--urd-cal-accent));
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-side-key i {
+  width: 10px;
+  height: 10px;
+  background: var(--urd-cal-color, var(--urd-cal-accent));
+  border-radius: 3px;
+}
+
+/* A7 Overview on cream (ApeironLF): the month on cream */
+.urd-cal-d-apMonth {
+  --urd-cal-ap-gold: var(--urd-cal-s-gold, #d0a74a);
+  --urd-cal-ap-grid: var(--urd-cal-s-grid, color-mix(in srgb, var(--urd-cal-s-gold, #d0a74a) 30%, transparent));
+}
+
+.urd-cal-apm-day {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 6px;
+  border-right: 1px solid var(--urd-cal-ap-grid);
+  border-bottom: 1px solid var(--urd-cal-ap-grid);
+}
+
+.urd-cal-apm-pill {
+  padding: 3px 6px;
+  font-size: 0.78em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--urd-cal-s-pill, color-mix(in srgb, var(--urd-cal-s-gold, #d0a74a) 18%, transparent));
+  border-left: 3px solid var(--urd-cal-color, var(--urd-cal-ap-gold));
+}
+
+/* F2 Day plan */
+.urd-cal-dplan-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 1em 1.1em 0.6em;
+}
+
+.urd-cal-dplan-strip {
+  display: flex;
+  gap: 6px;
+  padding: 0 1.1em 0.8em;
+}
+
+.urd-cal-dplan-pick {
+  flex: 1;
+  padding: 7px 0;
+  font: inherit;
+  font-size: 0.65em;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.urd-cal-dplan-pick strong {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--urd-font-heading);
+  font-size: 1.5em;
+  letter-spacing: 0;
+}
+
+.urd-cal-wheel-seg {
+  stroke: var(--urd-cal-s-ring, color-mix(in srgb, var(--urd-color-text) 10%, transparent));
+  cursor: pointer;
+  transition: stroke 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.urd-cal-wheel-seg:hover,
+.urd-cal-wheel-seg:focus-visible {
+  stroke: color-mix(in srgb, var(--urd-cal-accent) 70%, var(--urd-color-text));
+}
+
+/* A month shows focus in its own shape */
+.urd-cal-wheel-seg:focus {
+  outline: none;
+}
+
+.urd-cal-wheel-seg:focus-visible {
+  stroke-width: 48px;
+}
+
+.urd-cal-wheel-month {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  fill: currentcolor;
+  opacity: 0.6;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The «Show all» button under the month's list */
+.urd-cal-wheel-more {
+  justify-self: start;
+  padding: 6px 14px;
+  margin-inline-start: -14px;
+  font: inherit;
+  font-size: 0.9em;
+  font-weight: 600;
+  letter-spacing: var(--urd-cal-set-label-spacing);
+  color: var(--urd-cal-set-label);
+  text-transform: var(--urd-cal-set-label-case);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.urd-cal-wheel-card {
+  display: grid;
+  gap: 2px;
+  padding: 0.7em 0.9em;
+  font-size: 0.9em;
+  background: var(--urd-cal-surface);
+  border: 1px solid var(--urd-cal-line);
+  border-radius: var(--urd-radius-sm);
+}
+
+/* F3 Heat map */
+.urd-cal-heat {
+  display: grid;
+  gap: 1em;
+  padding: 1.2em 1.4em;
+  background: var(--urd-cal-surface);
+  border: 1px solid var(--urd-cal-line);
+  border-radius: var(--urd-radius-md);
+}
+
+.urd-cal-heat-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3em 1em;
+  padding: 0.7em 0.9em;
+  font-size: 0.82em;
+  background: var(--urd-cal-s-panel, color-mix(in srgb, var(--urd-color-text) 4%, transparent));
+  border-radius: var(--urd-radius-sm);
+}
+
+/* ---- The designs' own settings (calOptions) the sheet draws ---- */
+
+.urd-cal-o-panelSide-under .urd-cal-side {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.urd-cal-o-panelSide-under .urd-cal-side-panel {
+  border-top: 1px solid var(--urd-cal-line);
+  border-left: 0;
+}
+
+@supports not (container-type: inline-size) {
+  @media (min-width: 601px) {
+    .urd-cal-o-panelSide-left .urd-cal-side {
+      grid-template-columns: minmax(12em, 15em) minmax(0, 1fr);
+    }
+
+    .urd-cal-o-panelSide-left .urd-cal-side-panel {
+      order: -1;
+      border-right: 1px solid var(--urd-cal-line);
+      border-left: 0;
+    }
+
+    .urd-cal-o-columns-2 :is(.urd-cal-posters, .urd-cal-photos, .urd-cal-index) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .urd-cal-o-columns-3 :is(.urd-cal-posters, .urd-cal-photos, .urd-cal-index) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .urd-cal-o-columns-4 :is(.urd-cal-posters, .urd-cal-photos, .urd-cal-index) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+}
+
+@container urd-block (min-width: 601px) {
+  .urd-cal-o-panelSide-left .urd-cal-side {
+    grid-template-columns: minmax(12em, 15em) minmax(0, 1fr);
+  }
+
+  .urd-cal-o-panelSide-left .urd-cal-side-panel {
+    order: -1;
+    border-right: 1px solid var(--urd-cal-line);
+    border-left: 0;
+  }
+
+  .urd-cal-o-columns-2 :is(.urd-cal-posters, .urd-cal-photos, .urd-cal-index) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .urd-cal-o-columns-3 :is(.urd-cal-posters, .urd-cal-photos, .urd-cal-index) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .urd-cal-o-columns-4 :is(.urd-cal-posters, .urd-cal-photos, .urd-cal-index) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ---- Print: the events as a plain list ---- */
+
+.urd-cal-print {
+  display: none;
+}
+
+@media print {
+  html .urd-cal {
+    zoom: 1;
+    color: #000;
+    background: none;
+  }
+
+  .urd-cal > :not(.urd-cal-print),
+  .urd-cal-dialog {
+    display: none !important;
+  }
+
+  .urd-cal-print {
+    display: grid;
+    gap: 4pt;
+    padding: 0;
+    margin: 0;
+    font-size: 11pt;
+    line-height: 1.35;
+    list-style: none;
+  }
+
+  .urd-cal-print li {
+    break-inside: avoid;
+  }
+
+  .urd-cal-print .urd-cal-f-date {
+    font-weight: 700;
+  }
+}
+
+/* ---- The phone: day columns stacked, the months as dots ---- */
+
+/* The finding tools on a phone */
+.urd-cal-phone .urd-cal-tools {
+  flex-wrap: wrap;
+}
+
+.urd-cal-phone .urd-cal-switch {
+  display: flex;
+  flex: 1;
+  min-width: fit-content;
+}
+
+.urd-cal-phone .urd-cal-switch-btn {
+  flex: 1;
+  padding-right: 6px;
+  padding-left: 6px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.urd-cal-phone .urd-cal-searchbtn {
+  display: grid;
+}
+
+.urd-cal-phone .urd-cal-searchrow {
+  flex: none;
+  margin-left: auto;
+}
+
+.urd-cal-phone .urd-cal-searchrow:not(.urd-cal-search-open) .urd-cal-search {
+  display: none;
+}
+
+.urd-cal-phone .urd-cal-searchrow.urd-cal-search-open {
+  flex-basis: 100%;
+}
+
+.urd-cal-phone .urd-cal-search {
+  max-width: none;
+}
+
+.urd-cal-phone .urd-cal-chips {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.urd-cal-phone .urd-cal-chipbtn {
+  flex: none;
+}
+
+/* The poster wall and the picture cards in one column on a phone */
+.urd-cal-phone :is(.urd-cal-posters, .urd-cal-photos, .urd-cal-index) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* A word wider than the calendar breaks inside the text fields */
+.urd-cal :is(.urd-cal-f-title, .urd-cal-f-place, .urd-cal-f-description, .urd-cal-f-category) {
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-phone .urd-cal-ap-when strong {
+  font-size: 1.6em;
+}
+
+.urd-cal-phone .urd-cal-apv-when strong {
+  font-size: 1.8em;
+}
+
+.urd-cal-phone .urd-cal-bb-tile > span {
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+}
+
+/* The phone design (calPhoneDesign): one stacked agenda */
+.urd-cal-pa {
+  display: grid;
+  color: var(--urd-cal-set-ink);
+  font-family: var(--urd-cal-set-font);
+}
+
+.urd-cal-pa-head {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 8px;
+}
+
+.urd-cal-pa-title {
+  font-family: var(--urd-cal-set-title-font);
+  font-size: 1.4em;
+  font-weight: var(--urd-cal-set-title-weight);
+  line-height: 1.1;
+}
+
+.urd-cal-pa-next {
+  font-size: 0.82em;
+  color: var(--urd-cal-set-muted);
+}
+
+.urd-cal-pa-row {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+  padding: 12px 0;
+  border-top: 1px solid var(--urd-cal-set-line);
+}
+
+.urd-cal-pa-when {
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: var(--urd-cal-set-label-spacing);
+  color: var(--urd-cal-set-label);
+  text-transform: var(--urd-cal-set-label-case);
+}
+
+.urd-cal-pa-name {
+  font-family: var(--urd-cal-set-title-font);
+  font-size: 1.15em;
+  font-weight: var(--urd-cal-set-title-weight);
+  line-height: 1.15;
+}
+
+.urd-cal-pa-place {
+  color: var(--urd-cal-set-muted);
+}
+
+.urd-cal-pa-row .urd-cal-signup {
+  margin-top: 6px;
+  padding: 7px 12px;
+  font-size: 0.85em;
+  font-weight: 700;
+  color: var(--urd-cal-set-accent-text);
+  text-decoration: none;
+  background: var(--urd-cal-set-accent);
+  border-radius: var(--urd-cal-set-chip-radius);
+}
+
+.urd-cal-wplan-prow {
+  display: grid;
+  grid-template-columns: 3.2em minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 10px 12px 10px 0;
+  border-bottom: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-wplan-pday strong {
+  font-family: var(--urd-font-heading);
+  font-size: 1.6em;
+}
+
+.urd-cal-phone .urd-cal-day {
+  justify-items: center;
+  min-height: 44px;
+  padding: 4px 0;
+}
+
+.urd-cal-pday-num {
+  font-size: 0.9em;
+  font-style: normal;
+}
+
+.urd-cal-pday-today .urd-cal-pday-num {
+  font-weight: 700;
+  color: var(--urd-cal-accent);
+}
+
+.urd-cal-day.urd-cal-pday-today,
+.urd-cal-day.urd-cal-pday[aria-pressed="true"] {
+  border-color: var(--urd-cal-accent);
+}
+
+.urd-cal-pday[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--urd-cal-accent) 18%, transparent);
+}
+
+.urd-cal-dots {
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+  min-height: 6px;
+}
+
+.urd-cal-dots i {
+  width: 6px;
+  height: 6px;
+  background: var(--urd-cal-color, var(--urd-cal-accent));
+  border-radius: 50%;
+}
+
+.urd-cal-apm .urd-cal-dots i {
+  background: var(--urd-cal-color, var(--urd-cal-ap-gold));
+}
+
+.urd-cal-daylist {
+  display: grid;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.urd-cal-daylist:empty {
+  display: none;
+}
+
+.urd-cal-daylist-head {
+  font-family: var(--urd-font-heading);
+}
+
+.urd-cal-daylist-rows {
+  display: grid;
+  gap: 6px;
+}
+
+.urd-cal-daylist-row {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  background: var(--urd-cal-color-bg, color-mix(in srgb, var(--urd-cal-color, var(--urd-cal-accent)) 14%, transparent));
+  border-left: 3px solid var(--urd-cal-color, var(--urd-cal-accent));
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-daylist-time,
+.urd-cal-daylist-place {
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
+.urd-cal-daylist-none {
+  margin: 0;
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+
+.urd-cal-pad-head {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75em 1.4em;
+  font-family: var(--urd-cal-pad-display);
+  font-stretch: condensed;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--urd-cal-pad-paper);
+  text-transform: uppercase;
+  background: var(--urd-cal-pad-head);
+}
+
+.urd-cal-pad-day {
+  padding: 0.6em 1.4em 0;
+  text-align: center;
+  border-bottom: 2px dotted var(--urd-cal-pad-rule);
+}
+
+.urd-cal-pad-wd {
+  display: block;
+  padding: 0.35em 0 0.8em;
+  font-family: var(--urd-cal-pad-display);
+  font-stretch: condensed;
+  font-size: 1.1em;
+  letter-spacing: 0.3em;
+  color: var(--urd-cal-pad-head);
+  text-transform: uppercase;
+}
+
+.urd-cal-pad-body {
+  padding: 1em 1.4em 1.25em;
+}
+
+.urd-cal-pad .urd-cal-pad-signup,
+.urd-cal-pad-add {
+  margin: 0;
+  padding: 0.6em 1em;
+  font-family: var(--urd-cal-pad-display);
+  font-stretch: condensed;
+  font-size: 0.82em;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.urd-cal-pad-row-date {
+  flex: 0 0 4.8em;
+  font-family: var(--urd-cal-pad-display);
+  font-stretch: condensed;
+  font-size: 0.95em;
+  letter-spacing: 0.04em;
+  color: var(--urd-cal-pad-head);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.urd-cal-pad-row-title {
+  flex: 1 1 5em;
+  min-width: 0;
+  font-size: 0.92em;
+}
+
+.urd-cal-pad-row-time {
+  margin-left: auto;
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+/* R2 Index cards: typewritten cards on lined paper */
+.urd-cal-index {
+  --urd-cal-index-card: var(--urd-cal-s-card, #fdfbf3);
+  --urd-cal-index-rule: var(--urd-cal-s-rule, #c9483b);
+  --urd-cal-index-line: var(--urd-cal-s-line, #b9d2e8);
+  --urd-cal-index-ink: var(--urd-cal-s-ink, #2a2622);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: 22px 26px;
+  padding: 8px;
+  font-family: var(--urd-cal-set-font);
+  color: var(--urd-cal-index-ink);
+}
+
+.urd-cal-index-card {
+  position: relative;
+  padding: 0 16px 14px;
+  font-size: 15px;
+  line-height: 28px;
+  background-color: var(--urd-cal-index-card);
+  background-image: repeating-linear-gradient(var(--urd-cal-index-card) 0 27px, var(--urd-cal-index-line) 27px 28px);
+  background-position: 0 46px;
+  box-shadow: 0 6px 14px rgb(0 0 0 / 22%);
+}
+
+.urd-cal-index-head > * {
+  padding-top: 16px;
+}
+
+/* A design drawn as another block's phone view (.urd-cal-pd) */
+.urd-cal-pd {
+  color: var(--urd-cal-set-ink);
+}
+
+.urd-cal-dep-cardtop .urd-cal-dialog-title {
+  margin: 0;
+}
+
+.urd-cal-tk-cardday strong {
+  font-size: 2.8em;
+  font-weight: 800;
+}
+
+.urd-cal-tk-cardday span {
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.urd-cal-nb-cardday::before {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  content: '';
+  background: var(--urd-cal-s-pinAlt, #2f6fd6);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 35%);
+}
+
+.urd-cal-nb-cardday strong {
+  font-size: 2.3em;
+  font-weight: 800;
+}
+
+.urd-cal-nb-cardday span {
+  font-size: 0.8em;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.urd-cal-mq-row.urd-cal-cancelled {
+  opacity: 0.45;
+}
+
+/* The marquee's set card: the board's paper in the red frame */
+.urd-cal-set-marquee.urd-cal-dialog .urd-cal-dialog-title {
+  font-stretch: condensed;
+  text-transform: uppercase;
+}
+
+.urd-cal-set-marquee.urd-cal-dialog a.urd-cal-dialog-primary {
+  font-family: var(--urd-cal-set-title-font);
+  font-stretch: condensed;
+  text-transform: uppercase;
+  border-radius: 4px;
+}
+
+/* A cancelled row is struck through, its status line left whole. */
+.urd-cal-rc-event.urd-cal-cancelled {
+  opacity: 1;
+}
+
+.urd-cal-sv-row.urd-cal-cancelled {
+  opacity: 0.55;
+}
+
+/* A cancelled row is dimmed like a cancelled event in the other designs. */
+.urd-cal-line-row.urd-cal-cancelled,
+.urd-cal-earlier-row.urd-cal-cancelled {
+  opacity: 0.6;
+}
+
+/* ---- The ApeironLF set: the colours its designs share ---- */
+
+/* The ApeironLF colours, shared by every design of the set */
+.urd-cal-d-apNow,
+.urd-cal-d-apNavy,
+.urd-cal-d-apSeries,
+.urd-cal-d-apList,
+.urd-cal-d-apGrid,
+.urd-cal-d-apMonth {
+  --urd-cal-ap-gold: var(--urd-cal-s-gold, #d0a74a);
+  --urd-cal-ap-golddark: var(--urd-cal-s-goldDark, #8f6a1e);
+}
+
+/* The ApeironLF empty state: a pill, a dashed box, a gold button */
+.urd-cal-apempty {
+  display: grid;
+  justify-items: center;
+  gap: 1.1em;
+  text-align: center;
+  color: var(--urd-color-text);
+}
+
+.urd-cal-apempty-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+  padding: 0.7em 1.4em;
+  border: 1px solid var(--urd-cal-ap-gold, #d0a74a);
+  border-radius: 999px;
+}
+
+.urd-cal-apempty-kicker {
+  font-size: 0.65em;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--urd-cal-ap-gold, #d0a74a);
+}
+
+.urd-cal-apempty-title {
+  font-family: var(--urd-font-heading);
+  font-size: 1.15em;
+}
+
+.urd-cal-apempty .urd-cal-empty {
+  max-width: 26em;
+  font-style: italic;
+}
+
+.urd-cal-apempty .urd-cal-empty-icon {
+  color: var(--urd-cal-ap-gold, #d0a74a);
+}
+
+.urd-cal-apempty ~ .urd-cal-subscribe {
+  justify-content: center;
+}
+
+.urd-cal-apempty ~ .urd-cal-subscribe .urd-cal-sub-btn {
+  padding: 0.8em 1.5em;
+  font-weight: 600;
+  color: var(--urd-cal-s-head, #1c2340);
+  background: var(--urd-cal-ap-gold, #d0a74a);
+  border-color: transparent;
+}

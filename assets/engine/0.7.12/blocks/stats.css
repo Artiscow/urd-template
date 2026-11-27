@@ -1,0 +1,84 @@
+/*
+ * The stats block's own rules (blocks/stats.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* What stretch gives each block type that can use the height */
+.urd-block[data-urd-align="stretch"] > .urd-stats-box > .urd-stats {
+  flex: 1 0 auto;
+  justify-content: center;
+}
+
+/* The stat */
+.urd-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  text-align: center;
+}
+
+.urd-stat-number {
+  font-family: var(--urd-font-heading);
+  font-size: 2.1em;
+  font-weight: 750;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: baseline;
+  gap: 0.06em;
+}
+
+.urd-stat-value {
+  color: var(--urd-color-text);
+}
+
+.urd-stat-label {
+  font-size: 0.74em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* The figure stands in a box of its own */
+.urd-stats-box {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The figure's two dressed variants */
+.urd-stats-box:has(> .urd-stats-cards, > .urd-stats-band) {
+  min-height: 100%;
+}
+
+.urd-stats-cards,
+.urd-stats-band {
+  box-sizing: border-box;
+  flex: 1 0 auto;
+  justify-content: center;
+  padding: 1.1rem 1rem;
+}
+
+.urd-stats-cards {
+  background: var(--urd-color-surface);
+  border: 1px solid color-mix(in srgb, var(--urd-color-text) 12%, transparent);
+  border-radius: var(--urd-radius-md);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 8%);
+}
+
+.urd-stats-band {
+  background: var(--urd-color-accent);
+  color: var(--urd-color-accent-text, #fff);
+}
+
+/* A very narrow block */
+@container urd-block (max-width: 220px) {
+  .urd-stat-number {
+    font-size: 1.7em;
+  }
+
+  .urd-stats-cards,
+  .urd-stats-band {
+    padding: 0.8rem 0.6rem;
+  }
+
+}

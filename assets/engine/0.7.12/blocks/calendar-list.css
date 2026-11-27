@@ -1,0 +1,474 @@
+/*
+ * The list designs' own rules, loaded with blocks/calendar-list.js.
+ * Its reasoning stands in docs/STYLES.md, under blocks/calendar-list.css.
+ */
+.urd-cal-d-glass .urd-cal-switch {
+  background: var(--urd-cal-glass);
+  border-color: var(--urd-cal-glass-line);
+  backdrop-filter: blur(16px);
+}
+
+/* ---- The list designs (blocks/calendar-list.js) ---- */
+
+/* 01 Timeline */
+.urd-cal-tl {
+  display: grid;
+  grid-template-columns: max-content 2px minmax(0, 1fr);
+  column-gap: 1.2em;
+}
+
+.urd-cal-tl-rail {
+  position: relative;
+  background: var(--urd-cal-line);
+}
+
+.urd-cal-tl-dot {
+  position: absolute;
+  top: 8px;
+  left: -6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--urd-cal-color, var(--urd-cal-s-dot, color-mix(in srgb, var(--urd-color-text) 30%, transparent)));
+  box-shadow: 0 0 0 4px var(--urd-color-bg);
+}
+
+.urd-cal-tl-dot-first {
+  background: var(--urd-cal-color, var(--urd-cal-accent));
+}
+
+.urd-cal-tl-title {
+  font-size: 1.1em;
+}
+
+.urd-cal-tl-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* 05 Table */
+.urd-cal-table-wrap {
+  overflow-x: auto;
+}
+
+.urd-cal-table {
+  width: 100%;
+  font-size: 0.95em;
+  border-collapse: collapse;
+}
+
+.urd-cal-table td {
+  padding: 0.85em 0.8em;
+  vertical-align: top;
+  border-bottom: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-table tbody tr:nth-child(even) {
+  background: var(--urd-cal-s-zebra, color-mix(in srgb, var(--urd-color-text) 4%, transparent));
+}
+
+.urd-cal-table-date {
+  white-space: nowrap;
+}
+
+.urd-cal-table .urd-cal-f-time,
+.urd-cal-table .urd-cal-f-place {
+  opacity: 0.75;
+}
+
+.urd-cal-table .urd-cal-chip {
+  margin-left: 6px;
+}
+
+.urd-cal-table-act {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.urd-cal-booklet-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4em 1em;
+  margin-bottom: 1.2em;
+  padding-bottom: 0.7em;
+  border-bottom: 2px solid var(--urd-cal-s-rule, var(--urd-color-text));
+}
+
+.urd-cal-booklet-title {
+  margin: 0;
+  font-family: var(--urd-font-heading);
+  font-size: 1.9em;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.urd-cal-booklet-span {
+  font-family: var(--urd-font-heading);
+  font-weight: 700;
+  color: var(--urd-cal-accent);
+}
+
+.urd-cal-booklet-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 1.2em 2.4em;
+}
+
+.urd-cal-booklet-month {
+  display: grid;
+  align-content: start;
+  gap: 1.1em;
+}
+
+.urd-cal-booklet-mname {
+  margin: 0;
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--urd-cal-accent);
+}
+
+.urd-cal-booklet-row {
+  display: flex;
+  gap: 0.9em;
+}
+
+.urd-cal-booklet-day {
+  flex: 0 0 2.2em;
+  font-family: var(--urd-font-heading);
+  font-size: 2em;
+  line-height: 1;
+  color: var(--urd-cal-accent);
+}
+
+.urd-cal-booklet-body {
+  min-width: 0;
+}
+
+.urd-cal-booklet-name {
+  display: block;
+}
+
+.urd-cal-booklet-text {
+  margin: 4px 0 0;
+  font-size: 0.85em;
+  line-height: 1.45;
+}
+
+/* 10 Numbered programme */
+.urd-cal-numbered {
+  display: grid;
+}
+
+.urd-cal-numbered-count {
+  justify-self: end;
+  margin-bottom: 6px;
+  font-size: 0.78em;
+  font-weight: 700;
+  opacity: 0.7;
+}
+
+.urd-cal-numbered-row:last-child {
+  border-bottom: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-numbered-n {
+  font-family: var(--urd-font-heading);
+  font-size: 1.9em;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--urd-cal-s-number, var(--urd-cal-accent));
+}
+
+.urd-cal-numbered-title {
+  font-size: 1.1em;
+}
+
+.urd-cal-numbered-side {
+  max-width: 45%;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-d-apList .urd-cal-ap-row {
+  color: var(--urd-cal-s-text, #f3ecd8);
+}
+
+.urd-cal-ap {
+  display: grid;
+  gap: 0.9em;
+}
+
+.urd-cal-ap-when {
+  flex: 0 0 4.4em;
+  padding-right: 1.1em;
+  text-align: center;
+  border-right: 1px solid var(--urd-cal-ap-line);
+}
+
+.urd-cal-ap-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.urd-cal-ap-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75em;
+  font-size: 0.85em;
+}
+
+.urd-cal-ap-top .urd-cal-meta {
+  font-size: 1em;
+  opacity: 0.85;
+}
+
+.urd-cal-ap-top .urd-cal-f-place {
+  border-bottom: 1px solid var(--urd-cal-ap-gold);
+}
+
+.urd-cal-d-apList .urd-cal-rec {
+  color: var(--urd-cal-s-rec, var(--urd-cal-ap-gold));
+  border-color: var(--urd-cal-s-rec, var(--urd-cal-ap-gold));
+}
+
+.urd-cal-d-apList .urd-cal-chip {
+  font-size: 0.65em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--urd-cal-color, var(--urd-cal-ap-gold));
+  background: transparent;
+  border-color: var(--urd-cal-color, var(--urd-cal-ap-gold));
+}
+
+.urd-cal-ap-title {
+  display: block;
+  margin-top: 0.3em;
+  font-family: var(--urd-font-heading);
+  font-size: 1.4em;
+  font-weight: 500;
+}
+
+.urd-cal-d-apList .urd-cal-chipbtn,
+.urd-cal-d-apList .urd-cal-sub-btn {
+  color: var(--urd-cal-s-text, #f3ecd8);
+  background: var(--urd-cal-s-row, #1c2340);
+  border-color: var(--urd-cal-ap-line);
+}
+
+.urd-cal-d-apList .urd-cal-chipbtn.selected {
+  color: var(--urd-cal-color-text, var(--urd-cal-s-row, #1c2340));
+  background: var(--urd-cal-color, var(--urd-cal-ap-gold));
+  border-color: var(--urd-cal-color, var(--urd-cal-ap-gold));
+}
+
+.urd-cal-glass-blob {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.urd-cal-glass-blob-a {
+  top: -90px;
+  left: -60px;
+  width: 320px;
+  height: 320px;
+  background: var(--urd-cal-s-blobA, #ff8a65);
+  opacity: 0.9;
+}
+
+.urd-cal-glass-blob-b {
+  right: -40px;
+  bottom: -120px;
+  width: 360px;
+  height: 360px;
+  background: var(--urd-cal-s-blobB, #7fd1c4);
+  opacity: 0.85;
+}
+
+.urd-cal-glass-blob-c {
+  top: 40px;
+  right: 180px;
+  width: 200px;
+  height: 200px;
+  background: var(--urd-cal-s-blobC, #ffd36b);
+  opacity: 0.7;
+}
+
+.urd-cal-glass-list {
+  display: grid;
+  gap: 10px;
+}
+
+.urd-cal-glass-when {
+  flex: 0 0 3.4em;
+  text-align: center;
+}
+
+.urd-cal-glass-body {
+  flex: 1;
+  min-width: 10em;
+}
+
+.urd-cal-glass-title {
+  display: block;
+  font-family: var(--urd-font-heading);
+}
+
+.urd-cal-d-glass .urd-cal-chip {
+  padding: 5px 11px;
+  font-weight: 700;
+  background: var(--urd-cal-s-chip, rgb(0 0 0 / 8%));
+  border: 0;
+}
+
+.urd-cal-d-glass .urd-cal-chipbtn,
+.urd-cal-d-glass .urd-cal-sub-btn {
+  background: var(--urd-cal-glass);
+  border-color: var(--urd-cal-glass-line);
+  backdrop-filter: blur(16px);
+}
+
+.urd-cal-d-glass .urd-cal-chipbtn.selected {
+  color: var(--urd-color-bg);
+  background: var(--urd-color-text);
+  border-color: var(--urd-color-text);
+}
+
+.urd-cal-o-zebra-off .urd-cal-table tbody tr:nth-child(even) {
+  background: transparent;
+}
+
+/* The designs a phone is too narrow for with long titles take less room */
+.urd-cal-phone.urd-cal-d-apList .urd-cal-signup {
+  flex-basis: 100%;
+}
+
+.urd-cal-phone .urd-cal-ap-row {
+  gap: 0.8em;
+  padding: 0.8em 0.9em;
+}
+
+.urd-cal-phone .urd-cal-ap-when {
+  flex-basis: 3em;
+  padding-right: 0.7em;
+}
+
+.urd-cal-phone .urd-cal-ap-title {
+  font-size: 1.15em;
+}
+
+/* 07 Programme booklet's card: a page out of the booklet */
+.urd-cal-dialog.urd-cal-dlg-booklet {
+  padding-left: 2.4rem;
+  background-image: linear-gradient(90deg, rgb(0 0 0 / 12%), transparent 22px);
+  border: 0;
+  border-radius: 2px 6px 6px 2px;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 45%);
+}
+
+.urd-cal-dialog.urd-cal-dlg-booklet::before,
+.urd-cal-dialog.urd-cal-dlg-booklet::after {
+  position: absolute;
+  left: 10px;
+  width: 3px;
+  height: 26px;
+  content: '';
+  background: linear-gradient(90deg, #8a8f94, #d9dde0, #8a8f94);
+  border-radius: 2px;
+}
+
+.urd-cal-dialog.urd-cal-dlg-booklet::before {
+  top: 70px;
+}
+
+.urd-cal-dialog.urd-cal-dlg-booklet::after {
+  bottom: 70px;
+}
+
+.urd-cal-bk-cardhead {
+  margin-bottom: 0.9rem;
+  padding: 0 3rem 0.5rem 0;
+  font-family: var(--urd-font-heading);
+  font-size: 1.35em;
+  font-weight: 800;
+  border-bottom: 2px solid var(--urd-cal-s-rule, var(--urd-color-text));
+}
+
+.urd-cal-dlg-booklet .urd-cal-dialog-title {
+  font-size: 1.8em;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.urd-cal-dlg-booklet .urd-cal-dialog-facts dt {
+  font-weight: 700;
+}
+
+.urd-cal-dlg-booklet a.urd-cal-dialog-primary {
+  color: var(--urd-cal-set-bg);
+  background: var(--urd-cal-set-ink);
+  border-radius: 6px;
+}
+
+/* M2 Glass's card: a frosted glass plate over the colour blobs */
+.urd-cal-dialog.urd-cal-dlg-glass {
+  --urd-cal-gl-line: var(--urd-cal-s-glassLine, rgb(255 255 255 / 80%));
+  background:
+    linear-gradient(rgb(255 255 255 / 55%), rgb(255 255 255 / 55%)),
+    radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--urd-cal-s-blobA, #ff8a65) 70%, transparent), transparent 45%),
+    radial-gradient(circle at 92% 100%, color-mix(in srgb, var(--urd-cal-s-blobB, #7fd1c4) 70%, transparent), transparent 50%),
+    radial-gradient(circle at 78% 40%, color-mix(in srgb, var(--urd-cal-s-blobC, #ffd36b) 50%, transparent), transparent 32%);
+  border: 1px solid var(--urd-cal-gl-line);
+  border-radius: 26px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 95%), 0 30px 60px rgb(23 22 26 / 28%);
+  backdrop-filter: blur(24px) saturate(1.4);
+}
+
+.urd-cal-dlg-glass .urd-cal-dialog-date {
+  display: inline-block;
+  margin-right: 3rem;
+  padding: 6px 12px;
+  font-size: 0.82em;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: inherit;
+  text-transform: none;
+  background: rgb(255 255 255 / 60%);
+  border: 1px solid var(--urd-cal-gl-line);
+  border-radius: 999px;
+}
+
+.urd-cal-dlg-glass .urd-cal-dialog-title {
+  margin-top: 0.9rem;
+  font-size: 1.6em;
+  font-weight: 600;
+}
+
+.urd-cal-dlg-glass .urd-cal-dialog-close {
+  border-color: var(--urd-cal-gl-line);
+}
+
+.urd-cal-dlg-glass .urd-cal-dialog-facts {
+  padding: 12px 14px;
+  background: rgb(255 255 255 / 50%);
+  border: 1px solid var(--urd-cal-gl-line);
+  border-radius: 16px;
+}
+
+.urd-cal-dlg-glass .urd-cal-dialog-facts dt {
+  align-self: center;
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}

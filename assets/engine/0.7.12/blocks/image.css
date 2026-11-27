@@ -1,0 +1,55 @@
+/*
+ * The image block's own rules (blocks/image.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* Empty image block */
+.urd-image-empty {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.6;
+  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 30%, transparent);
+  border-radius: var(--urd-radius-md);
+}
+
+/* The image frame */
+.urd-image-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* An image given a shape in the image editor */
+.urd-image-frame.urd-image-shaped {
+  height: auto;
+}
+
+/* A shaped picture or film with its own phone height fills its box */
+.urd-block[data-urd-phone-h] > .urd-image-frame.urd-image-shaped,
+.urd-block[data-urd-phone-h] > a > .urd-image-frame.urd-image-shaped {
+  height: 100%;
+  aspect-ratio: auto !important;
+}
+
+.urd-block[data-urd-phone-h] .urd-image-frame.urd-image-own:not(.urd-pic-turned) img {
+  height: 100%;
+}
+
+/* The picture's own shape */
+.urd-image-frame.urd-image-own:not(.urd-pic-turned) img {
+  height: auto;
+}
+
+/* A picture that blends with what lies behind its block */
+.urd-image-blend {
+  mix-blend-mode: var(--urd-blend);
+}
+
+/* The blend's strength */
+.urd-image-blend > :is(.urd-image-frame, a) {
+  opacity: var(--urd-blend-strength, 1);
+}

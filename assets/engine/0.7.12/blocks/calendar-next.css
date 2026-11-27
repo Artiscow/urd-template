@@ -1,0 +1,1353 @@
+/*
+ * The «Coming up» designs' own rules, loaded with blocks/calendar-next.js.
+ * Its reasoning stands in docs/STYLES.md, under blocks/calendar-next.css.
+ */
+.urd-cal-band-track.urd-cal-band-still {
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.urd-cal-phone .urd-cal-bb {
+  padding: 1.2em;
+}
+
+.urd-cal-phone .urd-cal-bb-title {
+  font-size: 1.7em;
+}
+
+/* N1 Billboard's card: a lit billboard in a dark frame */
+.urd-cal-dialog.urd-cal-dlg-billboard {
+  background-image:
+    radial-gradient(ellipse 130px 120px at 22% 0, rgb(255 250 220 / 22%), transparent 70%),
+    radial-gradient(ellipse 130px 120px at 78% 0, rgb(255 250 220 / 22%), transparent 70%);
+  border: 8px solid #2c3532;
+  border-radius: 10px;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 50%);
+}
+
+.urd-cal-dialog.urd-cal-dlg-billboard::before {
+  position: absolute;
+  top: -24px;
+  right: 70px;
+  left: 70px;
+  height: 10px;
+  content: '';
+  background: linear-gradient(90deg, #3a4642 0 44px, transparent 44px calc(100% - 44px), #3a4642 calc(100% - 44px));
+  border-radius: 3px;
+}
+
+.urd-cal-dialog.urd-cal-dlg-billboard::after {
+  position: absolute;
+  right: 90px;
+  bottom: -42px;
+  left: 90px;
+  height: 34px;
+  content: '';
+  background: linear-gradient(90deg, #232b28, #3a4642 7px, #232b28 14px, transparent 14px calc(100% - 14px), #232b28 calc(100% - 14px), #3a4642 calc(100% - 7px), #232b28);
+}
+
+.urd-cal-bb-carddot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 8px;
+  vertical-align: 0.1em;
+  background: var(--urd-cal-s-pulse, var(--urd-cal-set-label));
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--urd-cal-s-pulse, var(--urd-cal-set-label)) 30%, transparent);
+}
+
+.urd-cal-dlg-billboard .urd-cal-dialog-date {
+  font-size: 0.8em;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.urd-cal-dlg-billboard .urd-cal-dialog-title {
+  font-size: 2em;
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.urd-cal-dlg-billboard .urd-cal-dialog-facts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.urd-cal-bb-cardtile {
+  padding: 10px 12px;
+  color: var(--urd-cal-s-tileText, inherit);
+  background: var(--urd-cal-s-tile, var(--urd-cal-set-surface));
+  border-radius: 10px;
+}
+
+.urd-cal-bb-cardtile:last-child:nth-child(odd) {
+  grid-column: span 2;
+}
+
+.urd-cal-dlg-billboard .urd-cal-bb-cardtile dt {
+  display: block;
+  font-size: 0.75em;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--urd-cal-set-label);
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.urd-cal-dlg-billboard .urd-cal-dialog-text {
+  color: var(--urd-cal-set-muted);
+}
+
+.urd-cal-dlg-billboard a.urd-cal-dialog-primary {
+  color: var(--urd-cal-s-buttonText, var(--urd-cal-set-accent-text));
+  background: var(--urd-cal-s-button, var(--urd-cal-set-accent));
+  border-radius: 10px;
+}
+
+/* N3 Noticeboard's card: a note pinned to the board */
+.urd-cal-dialog.urd-cal-dlg-noticeboard {
+  padding-top: 1.5rem;
+  transform: none;
+  rotate: 1deg;
+}
+
+.urd-cal-nb-cardday {
+  position: absolute;
+  top: -26px;
+  left: -14px;
+  z-index: 1;
+  display: grid;
+  padding: 12px 14px 10px;
+  line-height: 0.9;
+  color: var(--urd-cal-s-noteAltText, #17201d);
+  text-align: center;
+  background: var(--urd-cal-s-noteAlt, #d9ecff);
+  box-shadow: 0 6px 14px rgb(0 0 0 / 30%);
+  rotate: -7deg;
+}
+
+.urd-cal-dlg-noticeboard .urd-cal-dialog-date {
+  padding-left: 4.4rem;
+  color: color-mix(in srgb, var(--urd-cal-set-label) 66%, #000);
+}
+
+.urd-cal-dlg-noticeboard .urd-cal-dialog-facts dt {
+  font-weight: 700;
+  color: color-mix(in srgb, var(--urd-cal-set-label) 66%, #000);
+  opacity: 1;
+}
+
+.urd-cal-dlg-noticeboard a.urd-cal-dialog-primary {
+  color: var(--urd-cal-s-buttonText, var(--urd-cal-set-accent-text));
+  background: var(--urd-cal-s-button, var(--urd-cal-set-accent));
+  border-radius: 6px;
+}
+
+/* M5 Dark glass's card: smoked glass lit along its edges */
+.urd-cal-dialog.urd-cal-dlg-darkGlass {
+  --urd-cal-dgc-a: var(--urd-cal-s-blobA, var(--urd-color-accent));
+  --urd-cal-dgc-b: var(--urd-cal-s-blobB, #3fb8a4);
+  background:
+    radial-gradient(circle at 0 0, color-mix(in srgb, var(--urd-cal-dgc-a) 22%, transparent), transparent 45%) padding-box,
+    radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--urd-cal-dgc-b) 20%, transparent), transparent 45%) padding-box,
+    linear-gradient(160deg, rgb(28 28 34 / 94%), rgb(16 16 20 / 97%)) padding-box,
+    linear-gradient(135deg, var(--urd-cal-dgc-a), rgb(255 255 255 / 15%) 35%, rgb(255 255 255 / 8%) 65%, var(--urd-cal-dgc-b)) border-box;
+  border: 1.5px solid transparent;
+  border-radius: 22px;
+  box-shadow: 0 30px 70px rgb(0 0 0 / 60%), -6px -6px 30px -10px var(--urd-cal-dgc-a), 6px 6px 30px -10px var(--urd-cal-dgc-b);
+}
+
+.urd-cal-dlg-darkGlass .urd-cal-dialog-date::before {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  vertical-align: 0.05em;
+  content: '';
+  background: var(--urd-cal-set-label);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--urd-cal-set-label) 25%, transparent);
+}
+
+.urd-cal-dlg-darkGlass .urd-cal-dialog-title {
+  font-size: 1.7em;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 0 1px rgb(255 255 255 / 80%), 0 0 14px var(--urd-cal-dgc-a);
+}
+
+/* ---- The «Coming up» designs (blocks/calendar-next.js) ---- */
+
+/* Shared: a one-line later row */
+.urd-cal-nx-later-title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.urd-cal-nx-later-time {
+  opacity: 0.7;
+}
+
+.urd-cal-nx-when {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.urd-cal-nx-notice-label {
+  display: block;
+  font-size: 0.68em;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.urd-cal-nx-notice-title {
+  display: block;
+  margin-top: 6px;
+  line-height: 1.2;
+}
+
+.urd-cal-nx-notice-text {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.85em;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+
+.urd-cal-nx-notice-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.85em;
+  font-weight: 700;
+  color: inherit;
+}
+
+/* N1 Billboard */
+.urd-cal-bb {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1em;
+  padding: 1.8em;
+  color: var(--urd-cal-s-text, var(--urd-color-bg));
+  background: var(--urd-cal-s-bg, var(--urd-color-text));
+  border-radius: 18px;
+}
+
+.urd-cal-bb-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72em;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--urd-cal-s-label, var(--urd-cal-accent));
+}
+
+.urd-cal-bb-pulse,
+.urd-cal-dg-pulse,
+.urd-cal-nbento-dot {
+  --urd-cal-pulse-ring: color-mix(in srgb, var(--urd-cal-s-pulse, var(--urd-cal-accent)) 30%, transparent);
+  width: 9px;
+  height: 9px;
+  background: var(--urd-cal-s-pulse, var(--urd-cal-accent));
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--urd-cal-pulse-ring);
+  animation: urd-cal-pulse 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-cal-bb-pulse,
+  .urd-cal-dg-pulse,
+  .urd-cal-nbento-dot {
+    animation: none;
+  }
+}
+
+.urd-cal-bb-title {
+  font-family: var(--urd-font-heading);
+  font-size: 2.2em;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.urd-cal-bb-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.urd-cal-bb-tile {
+  padding: 0.8em 0.5em;
+  text-align: center;
+  color: var(--urd-cal-s-tileText, inherit);
+  background: var(--urd-cal-s-tile, color-mix(in srgb, currentcolor 10%, transparent));
+  border-radius: 12px;
+}
+
+.urd-cal-bb-tile strong {
+  display: block;
+  font-family: var(--urd-font-heading);
+  font-size: 2.1em;
+  line-height: 1;
+}
+
+.urd-cal-bb-tile > span {
+  font-size: 0.68em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.urd-cal-bb .urd-cal-bb-button {
+  display: block;
+  margin: 0;
+  padding: 0.85em;
+  font-size: 0.95em;
+  text-align: center;
+  color: var(--urd-cal-s-buttonText, var(--urd-cal-accent-text));
+  background: var(--urd-cal-s-button, var(--urd-cal-accent));
+  border-radius: 12px;
+}
+
+.urd-cal-bb-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em 1em;
+  font-size: 0.78em;
+  opacity: 0.85;
+}
+
+.urd-cal-bb-program {
+  color: var(--urd-cal-s-label, var(--urd-cal-accent));
+}
+
+.urd-cal-bb .urd-cal-sub-btn {
+  padding: 0;
+  font-weight: 700;
+  color: var(--urd-cal-s-label, var(--urd-cal-accent));
+  background: transparent;
+  border: 0;
+}
+
+/* N2 Stacked cards */
+.urd-cal-stack {
+  display: grid;
+  gap: 0.9em;
+}
+
+.urd-cal-stack-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.urd-cal-stack-label,
+.urd-cal-split-label,
+.urd-cal-ring-label,
+.urd-cal-line-label,
+.urd-cal-dg-label,
+.urd-cal-nbento-label {
+  font-size: 0.72em;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.urd-cal-stack-label {
+  color: var(--urd-cal-accent);
+}
+
+.urd-cal-stack-count {
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+.urd-cal-stack-pile {
+  position: relative;
+  display: grid;
+  padding: 0 calc(var(--urd-cal-stack-n, 1) * 12px) calc(var(--urd-cal-stack-n, 1) * 12px) 0;
+}
+
+.urd-cal-stack-card {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 1.2em;
+  color: var(--urd-cal-s-cardText, var(--urd-color-text));
+  background: var(--urd-cal-s-card, var(--urd-cal-surface));
+  border: 1px solid var(--urd-cal-line);
+  border-radius: 14px;
+  box-shadow: 0 14px 30px rgb(0 0 0 / 12%);
+  transform: translate(calc(var(--urd-cal-stack-depth, 0) * 12px), calc(var(--urd-cal-stack-depth, 0) * 12px)) rotate(calc(var(--urd-cal-stack-depth, 0) * -1.5deg));
+  transition: transform 0.35s ease, opacity 0.35s ease;
+  z-index: calc(10 - var(--urd-cal-stack-depth, 0));
+}
+
+.urd-cal-stack-card:not(.urd-cal-stack-front) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.urd-cal-stack-card:not(.urd-cal-stack-front)[style*="--urd-cal-stack-depth: 1"] {
+  background: var(--urd-cal-s-cardMid, color-mix(in srgb, var(--urd-cal-accent) 14%, var(--urd-cal-surface)));
+  opacity: 1;
+}
+
+.urd-cal-stack-card:not(.urd-cal-stack-front)[style*="--urd-cal-stack-depth: 2"] {
+  background: var(--urd-cal-s-cardBack, color-mix(in srgb, var(--urd-cal-accent) 7%, var(--urd-cal-surface)));
+  opacity: 1;
+}
+
+.urd-cal-stack-card:not(.urd-cal-stack-front) > * {
+  visibility: hidden;
+}
+
+.urd-cal-stack-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.urd-cal-stack-badge {
+  padding: 4px 10px;
+  font-size: 0.68em;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--urd-cal-color-text, var(--urd-cal-s-badgeText, var(--urd-cal-accent-text)));
+  background: var(--urd-cal-color, var(--urd-cal-s-badge, var(--urd-cal-accent)));
+  border-radius: 999px;
+}
+
+.urd-cal-stack-in,
+.urd-cal-split-in,
+.urd-cal-line-in,
+.urd-cal-nbento-in,
+.urd-cal-nb-in {
+  font-size: 0.8em;
+  font-weight: 700;
+  color: var(--urd-cal-accent);
+}
+
+.urd-cal-stack-title {
+  margin-top: 4px;
+  font-family: var(--urd-font-heading);
+  font-size: 1.45em;
+  line-height: 1.1;
+}
+
+.urd-cal-stack-card .urd-cal-signup,
+.urd-cal-split .urd-cal-signup,
+.urd-cal-nb .urd-cal-signup,
+.urd-cal-oneline .urd-cal-signup,
+.urd-cal-ring .urd-cal-signup {
+  align-self: flex-start;
+  margin: 0;
+  padding: 8px 14px;
+  color: var(--urd-cal-s-buttonText, var(--urd-cal-accent-text));
+  background: var(--urd-cal-s-button, var(--urd-cal-accent));
+  border-radius: var(--urd-radius-sm);
+}
+
+.urd-cal-stack-card .urd-cal-signup {
+  margin-top: auto;
+}
+
+.urd-cal-stack-later,
+.urd-cal-ring-later {
+  display: grid;
+  gap: 8px;
+}
+
+.urd-cal-stack-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.7em 0.9em;
+  font-size: 0.9em;
+  background: var(--urd-cal-surface);
+  border: 1px solid var(--urd-cal-line);
+  border-radius: 10px;
+}
+
+.urd-cal-stack-row .urd-cal-f-date,
+.urd-cal-ring-row .urd-cal-f-date,
+.urd-cal-split-row .urd-cal-f-date {
+  flex: 0 0 4em;
+  color: var(--urd-cal-color, var(--urd-cal-accent));
+}
+
+.urd-cal-stack-browse {
+  justify-self: center;
+  padding: 0;
+  font: inherit;
+  font-size: 0.8em;
+  font-weight: 700;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+/* N3 Noticeboard */
+.urd-cal-nb {
+  display: grid;
+  gap: 1.1em;
+  padding: 1.6em;
+  color: var(--urd-cal-s-boardText, #f3ead8);
+  background: var(--urd-cal-s-board, #8a5a3c);
+  border-radius: 14px;
+}
+
+.urd-cal-nb-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72em;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.urd-cal-nb-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--urd-cal-s-pin, #d33a2c);
+  border-radius: 50%;
+}
+
+.urd-cal-nb-note {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 1.3em 1.2em 1.1em;
+  color: var(--urd-cal-s-noteText, #17201d);
+  background: var(--urd-cal-s-note, #fff7cc);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 18%);
+  transform: rotate(-1.2deg);
+}
+
+.urd-cal-nb-notice {
+  color: var(--urd-cal-s-noteAltText, #17201d);
+  background: var(--urd-cal-s-noteAlt, #d9ecff);
+  transform: rotate(1deg);
+}
+
+.urd-cal-nb-pin {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  background: var(--urd-cal-s-pin, #d33a2c);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 35%);
+}
+
+.urd-cal-nb-pin-alt {
+  left: 28px;
+  width: 16px;
+  height: 16px;
+  margin-left: 0;
+  background: var(--urd-cal-s-pinAlt, #2f6fd6);
+}
+
+.urd-cal-nb-kicker {
+  font-size: 0.68em;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--urd-cal-s-noteLabel, #b4452f);
+}
+
+.urd-cal-nb-title {
+  font-family: var(--urd-font-heading);
+  font-size: 1.45em;
+  line-height: 1.1;
+}
+
+.urd-cal-nb .urd-cal-meta {
+  opacity: 0.8;
+}
+
+.urd-cal-nb-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  margin-top: 6px;
+}
+
+.urd-cal-nb-in {
+  color: var(--urd-cal-s-noteLabel, #b4452f);
+}
+
+.urd-cal-nb-strip {
+  display: grid;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 0.8em 0.9em;
+  font-size: 0.85em;
+  color: var(--urd-cal-s-stripText, #17201d);
+  background: var(--urd-cal-s-strip, #f3ead8);
+  border-radius: 8px;
+}
+
+.urd-cal-nb-strip .urd-cal-nb-kicker {
+  color: inherit;
+  opacity: 0.7;
+}
+
+.urd-cal-nb-row {
+  display: flex;
+  gap: 8px;
+}
+
+.urd-cal-nb-row .urd-cal-f-date {
+  flex: none;
+}
+
+/* N4 Split card */
+.urd-cal-split {
+  display: grid;
+  overflow: hidden;
+  background: var(--urd-cal-surface);
+  border: 1px solid var(--urd-cal-line);
+  border-radius: 18px;
+}
+
+.urd-cal-split-top {
+  display: grid;
+  grid-template-columns: minmax(9em, 12em) minmax(0, 1fr);
+}
+
+.urd-cal-split-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5em;
+  padding: 1.5em 1.3em;
+  color: var(--urd-cal-color-text, var(--urd-cal-s-panelText, var(--urd-cal-accent-text)));
+  background: var(--urd-cal-color, var(--urd-cal-s-panel, var(--urd-cal-accent)));
+}
+
+.urd-cal-split-label {
+  opacity: 0.85;
+}
+
+.urd-cal-split-wd,
+.urd-cal-split-month {
+  display: block;
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.urd-cal-split-when strong {
+  display: block;
+  font-family: var(--urd-font-heading);
+  font-size: 5.5em;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+
+.urd-cal-split-in {
+  color: inherit;
+  opacity: 0.9;
+}
+
+.urd-cal-split-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  padding: 1.5em 1.5em 1.3em;
+}
+
+.urd-cal-split-title {
+  font-family: var(--urd-font-heading);
+  font-size: 1.6em;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.urd-cal-split-text {
+  margin: 0;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+.urd-cal-split-later {
+  display: grid;
+  padding: 0.9em 1.5em 1.1em;
+  font-size: 0.9em;
+  background: var(--urd-cal-s-laterBg, color-mix(in srgb, var(--urd-color-text) 4%, var(--urd-cal-surface)));
+  border-top: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-split-kicker {
+  margin-bottom: 6px;
+  font-size: 0.72em;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.urd-cal-split-row {
+  display: flex;
+  gap: 10px;
+  padding: 7px 0;
+  border-top: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-split-row:first-of-type {
+  border-top: 0;
+}
+
+/* N5 Band */
+.urd-cal-band {
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  color: var(--urd-cal-s-bandText, var(--urd-cal-accent-text));
+  background: var(--urd-cal-s-band, var(--urd-cal-accent));
+}
+
+.urd-cal-band-tag {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 0 1.1em;
+  font-size: 0.72em;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--urd-cal-s-tagText, var(--urd-color-bg));
+  background: var(--urd-cal-s-tag, var(--urd-color-text));
+}
+
+.urd-cal-band-dot {
+  width: 8px;
+  height: 8px;
+  background: currentcolor;
+  border-radius: 50%;
+}
+
+.urd-cal-band-track {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.urd-cal-band-run {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2.2em;
+  padding: 0.9em 1.6em;
+  font-size: 0.95em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.urd-cal-band-sep {
+  width: 7px;
+  height: 7px;
+  background: var(--urd-cal-s-dot, currentcolor);
+  border-radius: 50%;
+  opacity: 0.8;
+}
+
+.urd-cal-band-rolling .urd-cal-band-run {
+  animation: urd-cal-band-roll var(--urd-cal-band-s, 24s) linear infinite;
+}
+
+.urd-cal-band-rolling:hover .urd-cal-band-run,
+.urd-cal-band-rolling:focus-within .urd-cal-band-run,
+.urd-cal-band-rolling.urd-cal-band-paused .urd-cal-band-run {
+  animation-play-state: paused;
+}
+
+/* The band's pause: a round button at the band's right edge */
+.urd-cal-band-pause {
+  display: grid;
+  flex: none;
+  place-items: center;
+  align-self: center;
+  width: 28px;
+  height: 28px;
+  margin: 0 0.6em;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: 1.5px solid color-mix(in srgb, currentcolor 55%, transparent);
+  border-radius: 50%;
+}
+
+.urd-cal-band-pause:hover {
+  background: color-mix(in srgb, currentcolor 14%, transparent);
+}
+
+.urd-cal-band-pause:focus-visible {
+  outline: 2px solid currentcolor;
+  outline-offset: 2px;
+}
+
+.urd-cal-band-touch .urd-cal-band-pause:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip-path: inset(50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-cal-band-rolling .urd-cal-band-run {
+    animation: none;
+  }
+}
+
+/* N6 One line */
+.urd-cal-oneline {
+  display: grid;
+  gap: 10px;
+}
+
+.urd-cal-line-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5em 1em;
+  padding: 0.9em 1.2em;
+  background: var(--urd-cal-surface);
+  border: 1px solid var(--urd-cal-line);
+  border-left: 5px solid var(--urd-cal-line);
+  border-radius: 12px;
+  opacity: 0.85;
+}
+
+.urd-cal-line-now,
+.urd-cal-stripes .urd-cal-line-now {
+  border-left-color: var(--urd-cal-color, var(--urd-cal-accent));
+  border-left-width: 5px;
+  opacity: 1;
+}
+
+.urd-cal-line-dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  background: var(--urd-cal-line);
+  border-radius: 50%;
+}
+
+.urd-cal-line-now .urd-cal-line-dot {
+  background: var(--urd-cal-color, var(--urd-cal-accent));
+  box-shadow: 0 0 0 5px var(--urd-cal-s-ring, color-mix(in srgb, var(--urd-cal-accent) 25%, transparent));
+}
+
+.urd-cal-line-label {
+  flex: none;
+  opacity: 0.7;
+}
+
+.urd-cal-line-now .urd-cal-line-label {
+  color: var(--urd-cal-accent);
+  opacity: 1;
+}
+
+.urd-cal-line-text {
+  flex: 1;
+  min-width: 10em;
+  font-size: 0.95em;
+}
+
+.urd-cal-line-text .urd-cal-f-date,
+.urd-cal-line-text .urd-cal-f-time,
+.urd-cal-line-text .urd-cal-f-place {
+  opacity: 0.7;
+}
+
+.urd-cal-line-in {
+  flex: none;
+}
+
+.urd-cal-line-row:not(.urd-cal-line-now) .urd-cal-line-in {
+  color: inherit;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+/* M4 Countdown ring */
+.urd-cal-ring {
+  display: grid;
+  gap: 1.1em;
+  padding: 1.5em;
+  background: var(--urd-cal-surface);
+  border: 1px solid var(--urd-cal-line);
+  border-radius: 24px;
+  box-shadow: 0 16px 40px rgb(0 0 0 / 8%);
+}
+
+.urd-cal-ring-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.urd-cal-ring-label {
+  opacity: 0.7;
+}
+
+.urd-cal-ring-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.4em;
+}
+
+.urd-cal-ring-figure {
+  position: relative;
+  flex: 0 0 132px;
+  height: 132px;
+}
+
+.urd-cal-ring-figure svg {
+  display: block;
+  width: 132px;
+  height: 132px;
+}
+
+.urd-cal-ring-track {
+  fill: none;
+  stroke: var(--urd-cal-s-track, color-mix(in srgb, var(--urd-cal-accent) 15%, var(--urd-cal-surface)));
+  stroke-width: 10;
+}
+
+.urd-cal-ring-arc {
+  fill: none;
+  stroke: var(--urd-cal-color, var(--urd-cal-accent));
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.6s ease;
+}
+
+.urd-cal-ring-centre {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.urd-cal-ring-centre strong {
+  font-family: var(--urd-font-heading);
+  font-size: 2.4em;
+  letter-spacing: -0.03em;
+}
+
+.urd-cal-ring-centre > span {
+  margin-top: 4px;
+  font-size: 0.68em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.urd-cal-ring-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 10em;
+}
+
+.urd-cal-ring-title {
+  font-family: var(--urd-font-heading);
+  font-size: 1.35em;
+  line-height: 1.15;
+}
+
+.urd-cal-ring-place {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.urd-cal-ring-body .urd-cal-signup {
+  margin-top: 8px;
+  border-radius: 999px;
+}
+
+.urd-cal-ring-later {
+  padding-top: 0.9em;
+  border-top: 1px solid var(--urd-cal-line);
+}
+
+.urd-cal-ring-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9em;
+}
+
+.urd-cal-ring-rowdot {
+  width: 8px;
+  height: 8px;
+  background: var(--urd-cal-color, var(--urd-cal-s-track, color-mix(in srgb, var(--urd-cal-accent) 30%, transparent)));
+  border-radius: 50%;
+}
+
+/* M5 Dark glass */
+.urd-cal-dg {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--urd-cal-s-text, #f5f5f7);
+  background: var(--urd-cal-s-ground, rgb(18 18 22 / 55%));
+  border: 1px solid var(--urd-cal-s-edge, rgb(255 255 255 / 14%));
+  border-radius: 24px;
+  backdrop-filter: blur(18px);
+}
+
+.urd-cal-dg-blob {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.urd-cal-dg-blob-a {
+  top: -70px;
+  right: -50px;
+  width: 260px;
+  height: 260px;
+  background: var(--urd-cal-s-blobA, var(--urd-cal-accent));
+  opacity: 0.7;
+}
+
+.urd-cal-dg-blob-b {
+  bottom: -90px;
+  left: -60px;
+  width: 240px;
+  height: 240px;
+  background: var(--urd-cal-s-blobB, #3fb8a4);
+  opacity: 0.55;
+}
+
+.urd-cal-dg-inner {
+  display: grid;
+  gap: 1em;
+  padding: 1.5em;
+  backdrop-filter: blur(20px);
+}
+
+.urd-cal-dg-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.urd-cal-dg-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--urd-cal-s-label, var(--urd-cal-accent));
+}
+
+.urd-cal-dg-pulse {
+  --urd-cal-pulse-ring: color-mix(in srgb, var(--urd-cal-s-label, var(--urd-cal-accent)) 30%, transparent);
+  background: var(--urd-cal-s-label, var(--urd-cal-accent));
+}
+
+.urd-cal-dg-clock {
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.8em;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+.urd-cal-dg-title {
+  font-family: var(--urd-font-heading);
+  font-size: 1.6em;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+.urd-cal-dg-progress {
+  display: grid;
+  gap: 6px;
+}
+
+.urd-cal-dg-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.urd-cal-dg-bar {
+  height: 6px;
+  overflow: hidden;
+  background: var(--urd-cal-s-track, rgb(255 255 255 / 14%));
+  border-radius: 999px;
+}
+
+.urd-cal-dg-bar i {
+  display: block;
+  height: 100%;
+  background: var(--urd-cal-s-label, var(--urd-cal-accent));
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+.urd-cal-dg-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.urd-cal-dg-buttons .urd-cal-signup,
+.urd-cal-dg-buttons .urd-cal-sub-btn {
+  flex: 1;
+  margin: 0;
+  padding: 0.8em;
+  font-size: 0.85em;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 14px;
+}
+
+.urd-cal-dg-buttons .urd-cal-signup {
+  color: var(--urd-cal-s-buttonText, #121216);
+  background: var(--urd-cal-s-button, #f5f5f7);
+}
+
+.urd-cal-dg-buttons .urd-cal-subscribe {
+  display: contents;
+}
+
+.urd-cal-dg-buttons .urd-cal-sub-btn {
+  color: inherit;
+  background: var(--urd-cal-s-glass, rgb(255 255 255 / 7%));
+  border: 1px solid var(--urd-cal-s-edge, rgb(255 255 255 / 14%));
+}
+
+.urd-cal-dg-later {
+  display: grid;
+  gap: 8px;
+  padding: 0.9em;
+  font-size: 0.9em;
+  background: var(--urd-cal-s-glass, rgb(255 255 255 / 7%));
+  border: 1px solid var(--urd-cal-s-edge, rgb(255 255 255 / 14%));
+  border-radius: 16px;
+}
+
+.urd-cal-dg-kicker {
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.urd-cal-dg-row {
+  display: flex;
+  gap: 10px;
+}
+
+.urd-cal-dg-row .urd-cal-f-date {
+  flex: none;
+}
+
+/* M6 Coming up bento */
+.urd-cal-nbento {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(140px, auto);
+  gap: 10px;
+}
+
+.urd-cal-nbento-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.6em;
+  min-width: 0;
+  padding: 1.1em;
+  background: var(--urd-cal-s-tile, var(--urd-cal-surface));
+  border: 1px solid var(--urd-cal-line);
+  border-radius: 20px;
+}
+
+.urd-cal-nbento-hero {
+  grid-column: span 2;
+  color: var(--urd-cal-color-text, var(--urd-cal-s-accentText, var(--urd-cal-accent-text)));
+  background: var(--urd-cal-color, var(--urd-cal-accent));
+  border-color: transparent;
+}
+
+.urd-cal-nbento-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.urd-cal-nbento-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.urd-cal-nbento-dot {
+  --urd-cal-pulse-ring: rgb(255 255 255 / 30%);
+  background: currentcolor;
+}
+
+.urd-cal-nbento-hero .urd-cal-nbento-in {
+  color: inherit;
+  opacity: 0.9;
+}
+
+.urd-cal-nbento-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.6em 1em;
+}
+
+.urd-cal-nbento-words {
+  min-width: 0;
+}
+
+.urd-cal-nbento-title {
+  display: block;
+  font-family: var(--urd-font-heading);
+  font-size: 1.35em;
+  line-height: 1.15;
+}
+
+.urd-cal-nbento-hero .urd-cal-meta {
+  opacity: 0.9;
+}
+
+.urd-cal-nbento-hero .urd-cal-signup {
+  flex: none;
+  margin: 0;
+  padding: 10px 14px;
+  color: var(--urd-cal-color, var(--urd-cal-accent));
+  background: var(--urd-cal-s-accentText, var(--urd-color-accent-text));
+  border-radius: 999px;
+}
+
+.urd-cal-nbento-when strong {
+  font-family: var(--urd-font-heading);
+  font-size: 1.9em;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.urd-cal-nbento-when span {
+  margin-left: 4px;
+  font-size: 0.75em;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.urd-cal-nbento-small {
+  display: block;
+  font-family: var(--urd-font-heading);
+  font-size: 0.95em;
+  line-height: 1.2;
+}
+
+.urd-cal-nbento-sub {
+  display: block;
+  font-size: 0.78em;
+  opacity: 0.7;
+}
+
+.urd-cal-nbento-dark {
+  color: var(--urd-color-bg);
+  background: var(--urd-color-text);
+  border-color: transparent;
+}
+
+.urd-cal-nbento-link {
+  background: var(--urd-cal-s-soft, color-mix(in srgb, var(--urd-cal-accent) 25%, var(--urd-cal-surface)));
+  border-color: transparent;
+}
+
+.urd-cal-nbento-arrow {
+  font-size: 1.3em;
+  line-height: 1;
+}
+
+.urd-cal-nbento-link .urd-cal-subscribe {
+  gap: 4px;
+}
+
+.urd-cal-nbento-link .urd-cal-sub-btn {
+  padding: 0;
+  font-size: 0.78em;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+}
+
+@supports not (container-type: inline-size) {
+  @media (max-width: 600px) {
+    .urd-cal-split-top {
+      grid-template-columns: minmax(0, 1fr);
+    }
+}
+}
+
+@container urd-block (max-width: 600px) {
+  .urd-cal-split-top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The calendar's moving parts move only for those who allow motion. */
+@media (prefers-reduced-motion: reduce) {
+  .urd-cal-stack-card,
+  .urd-cal-ring-arc,
+  .urd-cal-dg-bar i {
+    transition: none;
+  }
+}

@@ -1,11 +1,9 @@
 /**
- * GET /api/github/callback
- * OAuth return: validates state against the cookie, exchanges code for a
- * token SERVER-SIDE (with client_secret), stores the token in the httpOnly
- * cookie 'urd_gh' and redirects to /admin/. The token never reaches browser JS.
+ * GET /api/github/callback: checks the OAuth state against its cookie, trades the code for a token on the server and keeps it in the httpOnly cookie urd_gh.
  */
 import { cfg } from '../../_lib/github.js';
-import { serializeCookie, expireCookie, readCookie } from '../../_lib/cookies.js';
+import { expireCookie, readCookie } from '../../_lib/cookies.js';
+import { sessionCookies, nowSeconds } from '../../_lib/session.js';
 
 export async function onRequestGet({ request, env }) {
   let config;
@@ -31,19 +29,17 @@ export async function onRequestGet({ request, env }) {
       code,
     }),
   });
-  // GitHub can answer with an error status or an HTML error page instead of
-  // JSON (service disruptions): the sign-in is then rejected gracefully rather
-  // than throwing a 500.
-  let token;
+  // An error status or an HTML page from GitHub refuses the sign-in.
+  let answer;
   try {
-    if (tokenRes.ok) token = (await tokenRes.json()).access_token;
+    if (tokenRes.ok) answer = await tokenRes.json();
   } catch { /* an unreadable response is treated as a rejected sign-in */ }
-  if (!token) {
+  if (typeof answer?.access_token !== 'string' || !answer.access_token) {
     return new Response('GitHub rejected the sign-in (expired code?)', { status: 401 });
   }
 
   const headers = new Headers({ location: '/admin/' });
-  headers.append('set-cookie', serializeCookie('urd_gh', token));
+  for (const cookie of sessionCookies(answer, nowSeconds())) headers.append('set-cookie', cookie);
   headers.append('set-cookie', expireCookie('urd_state'));
   return new Response(null, { status: 302, headers });
 }

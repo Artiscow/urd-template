@@ -1,6 +1,4 @@
 /**
- * Stable plugin API path (see ADR-0013): re-exports the theme-driven dropdown
- * (ADR-0009) from the versioned engine. Never hardcode the versioned path in
- * a plugin.
+ * Stable plugin API path (ADR-0013): the theme-driven dropdown (ADR-0009) from the versioned engine.
  */
-export * from '../engine/0.7.11/dropdown.js';
+export * from '../engine/0.7.12/dropdown.js';

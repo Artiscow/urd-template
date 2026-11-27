@@ -1,6 +1,5 @@
 /**
- * GET /api/github/redirects
- * The `_redirects` file as the repository holds it ({ text }, or { text: null } when there is none), so the editor can read a file written by hand into its list of redirects before publishing first writes the file (ADR-0015). Signed in only, as the media listing is.
+ * GET /api/github/redirects: the _redirects file as the repository holds it, { text } or { text: null } where there is none, for a signed-in user.
  */
 import { cfg, gh } from '../../_lib/github.js';
 import { readCookie } from '../../_lib/cookies.js';

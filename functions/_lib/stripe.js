@@ -1,16 +1,7 @@
 /**
- * The Stripe part of the optional payment layer (ADR-0028): reading the
- * configuration, the form fields of a Checkout Session on Stripe's hosted
- * page, the reading of a finished session, and the webhook signature check.
- * The order logic every provider shares is in order.js; no fetch here, the
- * endpoints under api/pay/stripe/ handle the network. Tested in
- * tests/stripe.test.mjs.
- *
- * The buyer pays on checkout.stripe.com with the methods the owner switches
- * on in the Stripe dashboard (card, Apple Pay, Google Pay, Klarna, MobilePay
- * and the rest), so the site needs no script, frame or connect-src of its own.
+ * Stripe in the payment layer (ADR-0028): the configuration, a Checkout Session's form fields, a finished session's reading and the webhook signature check.
  */
-import { orderLineItems, orderDescription, returnUrl, cancelUrl } from './order.js';
+import { orderLineItems, orderDescription, returnUrl, cancelUrl, THREE_DECIMAL } from './order.js';
 import { sameText } from './net.js';
 
 /** Reads the configuration from env; null when Stripe is not set up. */
@@ -30,11 +21,7 @@ export function stripeConfig(env) {
 /** The page languages Stripe's hosted page knows, among those an Urd site may be written in. */
 const STRIPE_LOCALES = ['bg', 'cs', 'da', 'de', 'el', 'en', 'en-GB', 'es', 'et', 'fi', 'fr', 'hr', 'hu', 'it', 'ja', 'ko', 'lt', 'lv', 'mt', 'nb', 'nl', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sv', 'tr', 'zh'];
 
-/**
- * The language of Stripe's page from the site's language: bokmål for the
- * Norwegian and Sami codes Stripe lacks, the site's own code when Stripe
- * has it, its base language next, and the buyer's browser otherwise.
- */
+/** The language of Stripe's page: bokmål for Norwegian and Sami codes, the site's code or its base when Stripe has it, the buyer's browser otherwise. */
 export function stripeLocale(lang) {
   const code = String(lang ?? '');
   if (/^(no|nb|nn|se|smj|sma)(-|$)/i.test(code)) return 'nb';
@@ -47,12 +34,7 @@ export function stripeLocale(lang) {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * The form fields for POST {apiBase}/v1/checkout/sessions, in order, as
- * [name, value] pairs (the API takes application/x-www-form-urlencoded):
- * one-off payment mode, the order lines as price data in the site's
- * currency, the return to the checkout page with the reference and the
- * provider, the cancel back to the plain checkout page, the reference on the
- * session and the payment, and a hold when the block captures at shipping.
+ * The form fields of POST {apiBase}/v1/checkout/sessions as [name, value] pairs, with a hold on the payment when the block captures at shipping.
  * @param {object} args
  * @param {'ship'|'now'} [args.capture] When the money is taken
  * @param {string} [args.lang] The site's language, for Stripe's page
@@ -78,11 +60,21 @@ export function sessionForm({ order, catalogs, currency = 'NOK', reference, cont
     fields.push(
       [`line_items[${i}][quantity]`, String(item.qty)],
       [`line_items[${i}][price_data][currency]`, currency.toLowerCase()],
-      [`line_items[${i}][price_data][unit_amount]`, String(item.unit)],
+      [`line_items[${i}][price_data][unit_amount]`, String(stripeAmount(item.unit, currency))],
       [`line_items[${i}][price_data][product_data][name]`, item.name.slice(0, 250)],
     );
   });
   return fields;
+}
+
+/**
+ * An amount in a currency's minor unit as Stripe takes it: thousandths in the three-decimal currencies, rounded to whole hundredths.
+ * @param {number} minor
+ * @param {string} currency
+ * @returns {number}
+ */
+export function stripeAmount(minor, currency) {
+  return THREE_DECIMAL.has(String(currency ?? '').toUpperCase()) ? Math.round(minor / 10) * 10 : minor;
 }
 
 /** The Checkout Session ids Stripe makes (anchored, the CodeQL lesson). */
@@ -91,12 +83,7 @@ export function isSessionId(value) {
 }
 
 /**
- * Reads what the checkout page needs from GET {apiBase}/v1/checkout/sessions/{id}
- * with the PaymentIntent expanded: whether the money is taken or held, whether
- * the buyer may still be paying, and the details Stripe collected. A held
- * payment's PaymentIntent waits in `requires_capture`, a captured one is
- * `succeeded`; a method that settles over days stays `processing` and is not
- * confirmed here.
+ * Reads what the checkout page needs from a Checkout Session with its PaymentIntent expanded: paid once the money is held or taken, never while `processing`.
  * @returns {{paid: boolean, open: boolean, state: string, buyer: {name: string, email: string, phone: string}, reference: string}|null} null for an answer without a status
  */
 export function sessionSummary(session) {
@@ -117,9 +104,7 @@ export function sessionSummary(session) {
 }
 
 /**
- * The parts of a Stripe-Signature header: the timestamp and every v1
- * signature (several while a signing secret is being rolled); other schemes
- * are ignored, as Stripe asks, so a v0 test signature never passes.
+ * The parts of a Stripe-Signature header: the timestamp and every v1 signature; other schemes are ignored, so a v0 test signature never passes.
  * @returns {{t: number, v1: string[]}|null}
  */
 export function parseStripeSignature(header) {
@@ -149,10 +134,7 @@ export async function stripeSignature(t, body, secret) {
 export const SIGNATURE_TOLERANCE = 300;
 
 /**
- * Whether a webhook delivery is signed with the destination's secret and
- * recent: one of the header's v1 signatures must be the one stripeSignature
- * computes, and its timestamp within the tolerance of now, so a captured
- * delivery cannot be replayed later.
+ * Whether a webhook delivery is signed with the destination's secret and recent: one v1 signature matches and its timestamp is within the tolerance.
  * @param {{header: string|null, body: string, now?: number}} delivery now in Unix seconds
  * @param {string} secret
  * @returns {Promise<boolean>}

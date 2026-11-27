@@ -1,0 +1,2158 @@
+/*
+ * The retro designs' own rules, loaded with blocks/calendar-retro.js.
+ * Its reasoning stands in docs/STYLES.md, under blocks/calendar-retro.css.
+ */
+.urd-cal-dlg-pad::before {
+  content: '';
+  display: block;
+  height: 16px;
+  margin: 0 -1.3rem;
+  background: radial-gradient(circle at center, rgb(10 10 14 / 55%) 5px, transparent 5.5px) 50% 0 / 34px 16px repeat-x;
+}
+
+.urd-cal-dlg-pad .urd-cal-dialog-close {
+  top: 1.5rem;
+  color: var(--urd-cal-set-accent-text);
+  border-color: transparent;
+}
+
+.urd-cal-dlg-index::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  background: rgb(10 10 14 / 55%);
+  border-radius: 50%;
+  box-shadow: inset 0 2px 3px rgb(0 0 0 / 50%);
+}
+
+.urd-cal-dlg-index .urd-cal-dialog-facts,
+.urd-cal-dlg-index .urd-cal-dialog-text {
+  gap: 0 12px;
+  line-height: 26px;
+  background-image: linear-gradient(transparent 25px, var(--urd-cal-set-line) 25px, var(--urd-cal-set-line) 26px);
+  background-size: 100% 26px;
+}
+
+.urd-cal-dlg-index .urd-cal-dialog-facts dt {
+  opacity: 1;
+}
+
+/* R3 Departure board's card: condensed capitals, the button in amber */
+.urd-cal-dlg-departures .urd-cal-dialog-title {
+  font-stretch: condensed;
+  text-transform: uppercase;
+}
+
+/* ---- The retro designs (blocks/calendar-retro.js) ---- */
+
+/* R1 Tear-off pad: the paper page over its stack of torn pages */
+.urd-cal-pad {
+  --urd-cal-pad-paper: var(--urd-cal-s-paper, #fbf7ee);
+  --urd-cal-pad-head: var(--urd-cal-s-head, #c4302b);
+  --urd-cal-pad-ink: var(--urd-cal-s-ink, #1d1b18);
+  --urd-cal-pad-rule: var(--urd-cal-s-rule, #cfc6b3);
+  --urd-cal-pad-edge: var(--urd-cal-s-edge, #d9d0bd);
+  --urd-cal-pad-display: var(--urd-cal-set-title-font);
+  position: relative;
+  max-width: 30em;
+  margin: 0 auto 14px;
+  overflow: hidden;
+  font-family: var(--urd-cal-set-font);
+  color: var(--urd-cal-pad-ink);
+  background: var(--urd-cal-pad-paper);
+  border-radius: 6px 6px 3px 3px;
+  box-shadow: 0 2px 0 var(--urd-cal-pad-edge), 0 5px 0 var(--urd-cal-pad-paper), 0 7px 0 var(--urd-cal-pad-edge), 0 10px 0 var(--urd-cal-pad-paper), 0 12px 0 var(--urd-cal-pad-edge), 0 22px 30px rgb(0 0 0 / 35%);
+}
+
+.urd-cal-pad-num {
+  display: block;
+  font-family: var(--urd-cal-pad-display);
+  font-stretch: condensed;
+  font-size: 9.4em;
+  font-weight: 700;
+  line-height: 0.95;
+}
+
+.urd-cal-pad-in {
+  display: block;
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--urd-cal-pad-head);
+  text-transform: uppercase;
+}
+
+.urd-cal-pad-title {
+  display: block;
+  margin-top: 0.2em;
+  font-size: 1.4em;
+  line-height: 1.2;
+}
+
+.urd-cal-pad .urd-cal-pad-when {
+  margin-top: 0.3em;
+  font-size: 0.9em;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.urd-cal-pad-text {
+  margin: 0.45em 0 0;
+  font-size: 0.82em;
+  line-height: 1.4;
+}
+
+.urd-cal-pad-text a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.urd-cal-pad-more {
+  white-space: nowrap;
+}
+
+.urd-cal-pad-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 0.9em;
+}
+
+.urd-cal-pad .urd-cal-pad-signup {
+  color: var(--urd-cal-pad-paper);
+  background: var(--urd-cal-pad-head);
+  border: 1px solid var(--urd-cal-pad-head);
+}
+
+.urd-cal-pad-add {
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--urd-cal-pad-ink);
+}
+
+.urd-cal-pad-later {
+  margin-top: 1em;
+}
+
+/* A row out of width keeps its title whole, the time wraps under it */
+.urd-cal-pad-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2em 10px;
+  align-items: baseline;
+  padding: 0.6em 0;
+  border-top: 1px dashed var(--urd-cal-pad-rule);
+}
+
+.urd-cal-index-tilt-0 {
+  rotate: -0.8deg;
+}
+
+.urd-cal-index-tilt-1 {
+  rotate: 0.6deg;
+}
+
+.urd-cal-index-tilt-2 {
+  rotate: -0.4deg;
+}
+
+.urd-cal-index-tilt-3 {
+  rotate: 0.9deg;
+}
+
+/* The head grows a ruled line at a time with a category that wraps */
+.urd-cal-index-head {
+  display: flex;
+  gap: 1em;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: linear-gradient(var(--urd-cal-index-rule), var(--urd-cal-index-rule)) 0 42px / 100% 2px no-repeat;
+}
+
+.urd-cal-index-cat {
+  color: var(--urd-cal-index-rule);
+}
+
+.urd-cal-index-title {
+  display: block;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.urd-cal-index-line {
+  display: block;
+}
+
+.urd-cal-index .urd-cal-signup,
+.urd-cal-index .urd-cal-open,
+.urd-cal-index .urd-cal-rec {
+  display: block;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  letter-spacing: 0;
+  color: inherit;
+  text-transform: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  opacity: 1;
+}
+
+.urd-cal-index .urd-cal-signup {
+  text-decoration: underline;
+}
+
+.urd-cal-index-text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 28px;
+}
+
+.urd-cal-index-text a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.urd-cal-index-more {
+  white-space: nowrap;
+}
+
+.urd-cal-index-stamp {
+  position: absolute;
+  right: 14px;
+  bottom: 30px;
+  padding: 4px 12px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.14em;
+  color: var(--urd-cal-index-rule);
+  text-transform: uppercase;
+  border: 3px solid var(--urd-cal-index-rule);
+  opacity: 0.85;
+  rotate: -12deg;
+}
+
+/* R3 Departure board: split-flap rows on a dark board */
+.urd-cal-dep,
+.urd-cal-dlg-departures,
+.urd-cal-dlg-depHead,
+.urd-cal-dlg-depTitle,
+.urd-cal-dlg-depScreen {
+  --urd-cal-dep-board: var(--urd-cal-s-board, #111315);
+  --urd-cal-dep-flap: var(--urd-cal-s-flap, #23272c);
+  --urd-cal-dep-text: var(--urd-cal-s-text, #f4f1e6);
+  --urd-cal-dep-amber: var(--urd-cal-s-amber, #ffb000);
+  --urd-cal-dep-alert: var(--urd-cal-s-cancelled, #ff5a4f);
+  --urd-cal-dep-cell: 15px;
+  --urd-cal-dep-gap: 2px;
+  --urd-cal-dep-step: 17px;
+}
+
+.urd-cal-dep {
+  padding: 18px 20px 20px;
+  overflow-x: auto;
+  font-family: var(--urd-cal-set-font);
+  font-size: 15px;
+  color: var(--urd-cal-dep-text);
+  background: var(--urd-cal-dep-board);
+  border: 3px solid var(--urd-cal-dep-flap);
+  border-radius: 10px;
+}
+
+.urd-cal-dep-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1em;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.urd-cal-dep-title {
+  font-family: var(--urd-cal-set-title-font);
+  font-stretch: condensed;
+  font-size: 1.6em;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--urd-cal-dep-amber);
+  text-transform: uppercase;
+}
+
+.urd-cal-dep-updated {
+  font-size: 0.87em;
+  opacity: 0.7;
+}
+
+.urd-cal-dep-cols,
+.urd-cal-dep-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.urd-cal-dep-cols {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.urd-cal-dep-cols .urd-cal-dep-cells {
+  line-height: 1.4;
+  background: none;
+}
+
+.urd-cal-dep-rows {
+  display: grid;
+  gap: 8px;
+}
+
+.urd-cal-dep-row {
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.urd-cal-dep-cells {
+  flex: none;
+  box-sizing: border-box;
+  width: calc(var(--n) * var(--urd-cal-dep-step) - var(--urd-cal-dep-gap));
+  overflow: hidden;
+  line-height: 24px;
+  letter-spacing: calc(var(--urd-cal-dep-step) - 1ch);
+  text-transform: uppercase;
+  white-space: pre;
+  background:
+    linear-gradient(transparent 48%, var(--urd-cal-dep-board) 48% 52%, transparent 52%),
+    repeating-linear-gradient(90deg, var(--urd-cal-dep-flap) 0 var(--urd-cal-dep-cell), transparent var(--urd-cal-dep-cell) var(--urd-cal-dep-step));
+  padding-left: calc((var(--urd-cal-dep-cell) - 1ch) / 2);
+}
+
+.urd-cal-dep .urd-cal-open {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  text-transform: inherit;
+  background: none;
+  border: 0;
+  opacity: 1;
+}
+
+.urd-cal-dep-amber {
+  color: var(--urd-cal-dep-amber);
+}
+
+.urd-cal-dep-alert {
+  color: var(--urd-cal-dep-alert);
+}
+
+/* A cancelled title on flaps is dimmed, not struck through */
+.urd-cal-dep-cells .urd-cal-cancelled.urd-cal-f-title {
+  text-decoration: none;
+  opacity: 0.6;
+}
+
+/* The small flaps of the compact board and the cards' status. */
+.urd-cal-dep-small {
+  --urd-cal-dep-cell: 13px;
+  --urd-cal-dep-step: 15px;
+  font-size: 13px;
+  line-height: 21px;
+}
+
+/* Without rewriting, the rows hold the calendar's own text whole */
+.urd-cal-dep-plain .urd-cal-dep-row {
+  align-items: baseline;
+  white-space: normal;
+}
+
+.urd-cal-dep-plain .urd-cal-dep-row .urd-cal-dep-cells {
+  flex: 0 1 auto;
+  width: auto;
+  min-width: calc(var(--n) * 1.9ch);
+  padding-left: 0;
+  overflow: visible;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+  background: none;
+}
+
+/* With subgrid the plain rows share one set of columns with the heads */
+@supports (grid-template-columns: subgrid) {
+  .urd-cal-dep-plain .urd-cal-dep-rows {
+    grid-template-columns: max-content max-content minmax(8em, 2fr) minmax(6em, 1fr) max-content;
+    column-gap: 14px;
+  }
+
+  .urd-cal-dep-plain .urd-cal-dep-cols,
+  .urd-cal-dep-plain .urd-cal-dep-row {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+  }
+
+  .urd-cal-dep-plain .urd-cal-dep-text {
+    grid-column: 1 / -1;
+  }
+
+  .urd-cal-dep-plain .urd-cal-dep-row .urd-cal-dep-cells,
+  .urd-cal-dep-plain .urd-cal-dep-cols .urd-cal-dep-cells {
+    width: auto;
+    min-width: 0;
+  }
+}
+
+.urd-cal-dep-text {
+  margin: 0 0 4px;
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: normal;
+  opacity: 0.85;
+}
+
+.urd-cal-dep-text a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.urd-cal-dep-more {
+  white-space: nowrap;
+}
+
+.urd-cal-dep-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6em 18px;
+  align-items: baseline;
+  margin-top: 16px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.urd-cal-dep-foot .urd-cal-subscribe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 0;
+}
+
+.urd-cal-dep-foot .urd-cal-sub-btn {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  color: var(--urd-cal-dep-amber);
+  text-decoration: none;
+  background: none;
+  border: 0;
+}
+
+.urd-cal-dep-foot .urd-cal-sub-btn::before {
+  content: '\25B8 ';
+}
+
+.urd-cal-dep-hint {
+  opacity: 0.6;
+}
+
+/* The board on a phone: the compact board and the strip */
+.urd-cal-dep-event {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0;
+  cursor: pointer;
+  border-top: 1px solid var(--urd-cal-dep-flap);
+}
+
+.urd-cal-dep-compact .urd-cal-dep-row,
+.urd-cal-dep-strip .urd-cal-dep-row,
+.urd-cal-dep-compact .urd-cal-dep-cols,
+.urd-cal-dep-strip .urd-cal-dep-cols {
+  gap: 10px;
+}
+
+.urd-cal-dep-compact,
+.urd-cal-dep-strip {
+  padding: 16px 16px 16px;
+}
+
+.urd-cal-dep-compact .urd-cal-dep-title,
+.urd-cal-dep-strip .urd-cal-dep-title {
+  font-size: 1.35em;
+}
+
+.urd-cal-dep-place {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.urd-cal-dep-strip .urd-cal-dep-event {
+  gap: 2px;
+  padding: 12px 0;
+}
+
+.urd-cal-dep-strip .urd-cal-dep-row {
+  margin-bottom: 6px;
+}
+
+.urd-cal-dep-name {
+  display: block;
+  font-family: var(--urd-cal-set-title-font);
+  font-stretch: condensed;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.urd-cal-dep-strip .urd-cal-dep-place {
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 0.75;
+}
+
+/* The board's three card designs (CAL_CARD_DESIGNS) */
+.urd-cal-dlg-depHead .urd-cal-dialog-title,
+.urd-cal-dlg-depScreen .urd-cal-dialog-title {
+  font-stretch: condensed;
+  text-transform: uppercase;
+}
+.urd-cal-dep-cardrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 2.6rem 0.8rem 0;
+}
+
+.urd-cal-dlg-depHead .urd-cal-dialog-facts dt {
+  padding-top: 2px;
+  font-size: 0.8em;
+  letter-spacing: 0.14em;
+  color: var(--urd-cal-set-accent);
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.urd-cal-dlg-depTitle .urd-cal-dialog-date {
+  font-size: 0.8em;
+  letter-spacing: 0.16em;
+}
+
+.urd-cal-dep-cardtitle {
+  display: grid;
+  gap: 4px;
+  margin-right: 0;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.urd-cal-dlg-depTitle .urd-cal-dialog-facts {
+  padding-top: 0.8rem;
+  border-top: 2px solid var(--urd-cal-set-accent);
+}
+
+.urd-cal-dlg-depTitle a.urd-cal-dialog-primary {
+  color: var(--urd-cal-set-accent);
+  background: transparent;
+  border: 2px solid var(--urd-cal-set-accent);
+}
+
+.urd-cal-dlg-depScreen {
+  padding-top: 0;
+  background-image: repeating-linear-gradient(transparent 0 3px, rgb(255 255 255 / 3%) 3px 4px);
+}
+
+.urd-cal-dep-cardband {
+  display: flex;
+  align-items: center;
+  min-height: 2.6rem;
+  margin: 0 -1.3rem 1rem;
+  padding: 0.5rem 3.4rem 0.5rem 1.3rem;
+  background: var(--urd-cal-set-surface);
+}
+
+.urd-cal-dlg-depScreen .urd-cal-dialog-date {
+  padding: 0;
+  font-size: 0.8em;
+  letter-spacing: 0.18em;
+}
+
+.urd-cal-dlg-depScreen .urd-cal-dialog-close {
+  top: 0.45rem;
+  border-color: transparent;
+}
+
+.urd-cal-dep-cardtop {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: 0 0 0.9rem;
+}
+
+.urd-cal-dlg-depScreen .urd-cal-dialog-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.urd-cal-dlg-depScreen a.urd-cal-dialog-primary {
+  margin: 0;
+  border-radius: 4px;
+}
+
+.urd-cal-dlg-depScreen .urd-cal-dialog-add summary {
+  display: block;
+  padding: 0.7rem 0.6rem;
+  font-family: var(--urd-cal-set-title-font);
+  font-stretch: condensed;
+  text-align: center;
+  text-transform: uppercase;
+  background: var(--urd-cal-set-surface);
+  border-radius: 4px;
+}
+
+/* R4 Cinema marquee: a letter board in a red frame between bulbs */
+.urd-cal-mq,
+.urd-cal-mqp,
+.urd-cal-dlg-marquee {
+  --urd-cal-mq-frame: var(--urd-cal-s-frame, #7a1420);
+  --urd-cal-mq-bulb: var(--urd-cal-s-bulb, #ffd76a);
+  --urd-cal-mq-board: var(--urd-cal-s-board, #f6f1e4);
+  --urd-cal-mq-ink: var(--urd-cal-s-ink, #17120f);
+  --urd-cal-mq-display: var(--urd-cal-set-title-font);
+  --urd-cal-mq-bulbs: radial-gradient(circle, var(--urd-cal-mq-bulb) 0 3px, color-mix(in srgb, var(--urd-cal-mq-bulb) 45%, transparent) 4px, transparent 6px);
+}
+
+.urd-cal-mq {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  font-family: var(--urd-cal-mq-display);
+  font-stretch: condensed;
+  color: var(--urd-cal-mq-ink);
+  background: var(--urd-cal-mq-frame);
+  border-radius: 14px;
+}
+
+.urd-cal-mq::before,
+.urd-cal-mq::after {
+  display: block;
+  height: 12px;
+  content: '';
+  background-image: var(--urd-cal-mq-bulbs);
+  background-repeat: space no-repeat;
+  background-size: 18px 12px;
+}
+
+.urd-cal-mq-board {
+  padding: 14px 18px 16px;
+  background-color: var(--urd-cal-mq-board);
+  background-image: repeating-linear-gradient(transparent 0 43px, rgb(0 0 0 / 12%) 43px 45px);
+  cursor: pointer;
+}
+
+.urd-cal-mq-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3em 1em;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.urd-cal-mq-now,
+.urd-cal-mq-soon {
+  display: block;
+  font-size: 0.9em;
+  letter-spacing: 0.2em;
+  color: var(--urd-cal-mq-frame);
+  text-transform: uppercase;
+}
+
+.urd-cal-mq-now::before {
+  content: '\2605\00a0';
+}
+
+.urd-cal-mq-now::after {
+  content: '\00a0\2605';
+}
+
+.urd-cal-mq-in {
+  font-size: 0.85em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.urd-cal-mq-title {
+  display: block;
+  font-size: 2em;
+  font-size: clamp(1.5em, 4cqi, 2.4em);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.urd-cal-mq-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1em;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 1em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.urd-cal-mq .urd-cal-mq-when,
+.urd-cal-mqp .urd-cal-mqp-when {
+  font-size: 1em;
+  opacity: 1;
+}
+
+.urd-cal-mq .urd-cal-mq-signup {
+  margin: 0;
+  padding: 4px 16px 2px;
+  font-size: 1em;
+  font-weight: 400;
+  color: var(--urd-cal-mq-board);
+  text-decoration: none;
+  background: var(--urd-cal-mq-frame);
+}
+
+.urd-cal-mq-text {
+  margin: 6px 0 0;
+  font-family: var(--urd-cal-set-font);
+  font-stretch: normal;
+  font-size: 1em;
+  line-height: 1.4;
+}
+
+.urd-cal-mq-text a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.urd-cal-mq-more {
+  white-space: nowrap;
+}
+
+.urd-cal-mq-soon {
+  margin-top: 14px;
+}
+
+.urd-cal-mq-rows {
+  font-size: 1em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* A row: the date, the name and the time in three columns */
+.urd-cal-mq-row {
+  display: grid;
+  grid-template-columns: minmax(7.5em, max-content) minmax(0, 1fr) max-content;
+  column-gap: 16px;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 2px solid var(--urd-cal-mq-ink);
+}
+
+.urd-cal-mq-row-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-mq-row-time {
+  text-align: right;
+}
+
+/* With subgrid the rows share one set of columns */
+@supports (grid-template-columns: subgrid) {
+  .urd-cal-mq-rows {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr) max-content;
+    column-gap: 16px;
+  }
+
+  .urd-cal-mq-row {
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+  }
+}
+
+/* The marquee on a phone: the letter board in its frame as a list of rows. */
+.urd-cal-mqp {
+  padding: 18px 18px 16px;
+  font-family: var(--urd-cal-set-font);
+  line-height: 1.35;
+  color: var(--urd-cal-mq-ink);
+  background: var(--urd-cal-mq-board);
+  border: 8px solid var(--urd-cal-mq-frame);
+  border-radius: 4px;
+}
+
+.urd-cal-mqp-head {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.urd-cal-mqp-now {
+  min-width: 0;
+  font-family: var(--urd-cal-mq-display);
+  font-stretch: condensed;
+  font-size: 1.3em;
+  line-height: 1.1;
+  color: var(--urd-cal-mq-frame);
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-mqp-in {
+  flex: none;
+  font-size: 0.82em;
+  opacity: 0.8;
+}
+
+.urd-cal-mqp-row {
+  display: grid;
+  gap: 2px;
+  padding: 12px 0;
+  cursor: pointer;
+  border-top: 1px solid var(--urd-cal-mq-frame);
+}
+
+.urd-cal-mqp .urd-cal-mqp-when {
+  font-size: 0.82em;
+  opacity: 1;
+  letter-spacing: 0.1em;
+  color: var(--urd-cal-mq-frame);
+  text-transform: uppercase;
+}
+
+.urd-cal-mqp-title {
+  font-family: var(--urd-cal-mq-display);
+  font-stretch: condensed;
+  font-size: 1.15em;
+  font-weight: 400;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.urd-cal-mqp-place {
+  opacity: 0.8;
+}
+
+.urd-cal-mqp-text {
+  margin: 6px 0 0;
+  font-size: 0.95em;
+  line-height: 1.4;
+}
+
+.urd-cal-mqp .urd-cal-mqp-signup {
+  justify-self: start;
+  margin-top: 8px;
+  padding: 6px 12px;
+  font-family: var(--urd-cal-mq-display);
+  font-stretch: condensed;
+  font-size: 0.95em;
+  font-weight: 400;
+  color: var(--urd-cal-mq-board);
+  text-decoration: none;
+  text-transform: uppercase;
+  background: var(--urd-cal-mq-frame);
+  border-radius: 4px;
+}
+
+.urd-cal-mqp-foot {
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--urd-cal-mq-frame);
+}
+
+.urd-cal-mqp-foot .urd-cal-sub-btn {
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  text-decoration: underline;
+  background: none;
+  border: 0;
+}
+
+/* R4 Cinema marquee's own card: a cinema ticket with bulbs and a stub */
+.urd-cal-dialog.urd-cal-dlg-marquee {
+  padding-top: 0.9rem;
+  border-width: 34px 8px 8px;
+  border-radius: 6px;
+}
+
+.urd-cal-dialog.urd-cal-dlg-marquee::before {
+  position: absolute;
+  top: -26px;
+  right: 3.2rem;
+  left: 4px;
+  height: 16px;
+  content: '';
+  background-image: var(--urd-cal-mq-bulbs);
+  background-repeat: space no-repeat;
+  background-size: 18px 16px;
+}
+
+.urd-cal-dlg-marquee .urd-cal-dialog-close {
+  top: -38px;
+  right: -6px;
+  color: var(--urd-cal-mq-board);
+  border-color: transparent;
+}
+
+.urd-cal-mq-cardticket {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4.5rem;
+  margin: 0 -1.3rem 0.9rem;
+  padding: 0 0 0.9rem 1.3rem;
+  border-bottom: 2px dashed var(--urd-cal-mq-frame);
+}
+
+.urd-cal-mq-cardface {
+  padding-right: 1rem;
+  border-right: 2px dashed var(--urd-cal-mq-frame);
+}
+
+.urd-cal-mq-cardstub {
+  display: grid;
+  place-content: center;
+  line-height: 0.9;
+  color: var(--urd-cal-mq-frame);
+  text-align: center;
+  font-family: var(--urd-cal-mq-display);
+  font-stretch: condensed;
+  text-transform: uppercase;
+}
+
+.urd-cal-mq-cardstub strong {
+  font-size: 2.2em;
+  font-weight: 400;
+}
+
+.urd-cal-mq-cardstub span {
+  font-size: 1.1em;
+  letter-spacing: 0.14em;
+}
+
+.urd-cal-dlg-marquee .urd-cal-dialog-date {
+  padding-right: 0;
+  font-family: var(--urd-cal-mq-display);
+  font-stretch: condensed;
+  font-size: 0.95em;
+  letter-spacing: 0.14em;
+}
+
+.urd-cal-dlg-marquee .urd-cal-dialog-title {
+  margin-right: 0;
+  font-size: 1.6em;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+}
+
+.urd-cal-dlg-marquee .urd-cal-dialog-facts {
+  margin-bottom: 0;
+}
+
+.urd-cal-dlg-marquee .urd-cal-dialog-facts dt {
+  font-family: var(--urd-cal-mq-display);
+  font-stretch: condensed;
+  letter-spacing: 0.14em;
+  color: var(--urd-cal-mq-frame);
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.urd-cal-dlg-marquee a.urd-cal-dialog-primary {
+  font-size: 1.05em;
+  letter-spacing: 0.08em;
+  border-radius: 0;
+}
+
+/* R5 Receipt: a till receipt on paper with a torn bottom edge */
+.urd-cal-rc,
+.urd-cal-dlg-receipt {
+  --urd-cal-rc-paper: var(--urd-cal-s-paper, #fbfaf6);
+  --urd-cal-rc-ink: var(--urd-cal-s-ink, #1b1b1b);
+  --urd-cal-rc-rule: 2px dashed var(--urd-cal-rc-ink);
+  --urd-cal-rc-dots: '........................................................................................................................................................................................................';
+  --urd-cal-rc-torn:
+    linear-gradient(var(--urd-cal-rc-paper) 0 0) top / 100% calc(100% - 0.5em + 1px) no-repeat,
+    conic-gradient(from -45deg at bottom, var(--urd-cal-rc-paper) 90deg, transparent 0) bottom / 1em 0.5em round no-repeat;
+}
+
+/* The slip: a till's paper wide at most, centred as the pad is */
+.urd-cal-rc {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 30em;
+  margin-inline: auto;
+  padding: 1em 1.05em 1.55em;
+  font-family: var(--urd-cal-set-font);
+  line-height: 1.1;
+  color: var(--urd-cal-rc-ink);
+  text-transform: uppercase;
+  background: var(--urd-cal-rc-torn);
+  filter: drop-shadow(0 6px 12px rgb(0 0 0 / 22%));
+}
+
+.urd-cal-d-receipt .urd-cal-fold-summary {
+  margin-inline: auto;
+}
+
+.urd-cal-rc-head {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-rc-program {
+  font-size: 1.5em;
+  line-height: 1.1;
+  letter-spacing: 0.1em;
+}
+
+.urd-cal-rc-rows,
+.urd-cal-rc-totals,
+.urd-cal-rc-foot {
+  margin-top: 0.45em;
+  padding-top: 0.45em;
+  border-top: var(--urd-cal-rc-rule);
+}
+
+.urd-cal-rc-rows {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 0.15em;
+}
+
+/* A row: the date, the title and the time over one dot leader */
+.urd-cal-rc {
+  --urd-cal-rc-date: minmax(5ch, max-content);
+}
+
+.urd-cal-rc-plain {
+  --urd-cal-rc-date: minmax(7ch, max-content);
+}
+
+.urd-cal-rc-event {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--urd-cal-rc-date) minmax(0, 1fr) max-content;
+  column-gap: 0.32em;
+  align-items: baseline;
+}
+
+/* With subgrid the rows share one set of columns */
+@supports (grid-template-columns: subgrid) {
+  .urd-cal-rc-rows {
+    grid-template-columns: var(--urd-cal-rc-date) minmax(0, 1fr) max-content;
+    column-gap: 0.32em;
+  }
+
+  .urd-cal-rc-event {
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+  }
+}
+
+.urd-cal-rc-event::before {
+  position: absolute;
+  inset: 0;
+  grid-row: 1;
+  grid-column: 2 / -1;
+  overflow: hidden;
+  white-space: nowrap;
+  content: var(--urd-cal-rc-dots);
+}
+
+.urd-cal-rc-date {
+  white-space: nowrap;
+}
+
+/* The title cut to its row, the time to the right, on the dots' grid */
+.urd-cal-rc .urd-cal-rc-title,
+.urd-cal-rc-time {
+  position: relative;
+  box-sizing: border-box;
+  background: var(--urd-cal-rc-paper);
+}
+
+.urd-cal-rc .urd-cal-rc-title {
+  justify-self: start;
+  max-width: calc(100% - 0.75em);
+  padding-right: 1ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.urd-cal-rc-time {
+  justify-self: end;
+  padding-left: 1ch;
+  white-space: nowrap;
+}
+
+.urd-cal-rc-sub,
+.urd-cal-rc-text {
+  grid-column: 2 / -1;
+}
+
+.urd-cal-rc-sub {
+  opacity: 0.75;
+  overflow-wrap: anywhere;
+}
+
+/* The place in the calendar's own letters */
+.urd-cal-rc .urd-cal-rc-place {
+  text-transform: none;
+}
+
+.urd-cal-rc .urd-cal-signup,
+.urd-cal-rc .urd-cal-rec {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  letter-spacing: 0;
+  color: inherit;
+  text-decoration: none;
+  text-transform: inherit;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.urd-cal-rc .urd-cal-signup:hover {
+  text-decoration: underline;
+}
+
+.urd-cal-rc-event.urd-cal-cancelled::before,
+.urd-cal-rc-event.urd-cal-cancelled > :is(.urd-cal-rc-date, .urd-cal-rc-time) {
+  text-decoration: line-through;
+}
+
+.urd-cal-rc-text {
+  margin: 0.15em 0 0.1em;
+  font-size: 0.84em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-rc-text a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.urd-cal-rc-more {
+  white-space: nowrap;
+}
+
+/* Without rewriting, the rows hold the calendar's own text */
+.urd-cal-rc-plain :is(.urd-cal-rc-date, .urd-cal-rc-time, .urd-cal-rc-text) {
+  text-transform: none;
+}
+
+.urd-cal-rc-plain .urd-cal-rc-title {
+  text-transform: none;
+  white-space: normal;
+}
+
+.urd-cal-rc-total {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.6em;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-rc-value {
+  margin-left: auto;
+  text-align: right;
+}
+
+.urd-cal-rc-entry {
+  font-size: 1.37em;
+  line-height: 1.1;
+}
+
+.urd-cal-rc-foot {
+  display: grid;
+  gap: 0.4em;
+  justify-items: center;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* The subscribe link as the barcode with its words under it */
+.urd-cal-rc .urd-cal-rc-code {
+  display: grid;
+  gap: 0.2em;
+  justify-items: center;
+  width: 100%;
+  margin: 0;
+}
+
+.urd-cal-rc-code .urd-cal-sub-btn {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.urd-cal-rc-code .urd-cal-sub-btn:first-child {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+}
+
+.urd-cal-rc-code .urd-cal-sub-btn:first-child::before {
+  display: block;
+  height: 2.3em;
+  margin-bottom: 0.42em;
+  content: '';
+  background: repeating-linear-gradient(90deg, var(--urd-cal-rc-ink) 0 2px, transparent 2px 4px, var(--urd-cal-rc-ink) 4px 7px, transparent 7px 9px, var(--urd-cal-rc-ink) 9px 10px, transparent 10px 14px);
+}
+
+.urd-cal-rc-code .urd-cal-sub-btn:first-child:hover {
+  text-decoration: underline;
+}
+
+/* In the fold the receipt goes on: the rows alone on a piece of their own. */
+.urd-cal-rc-rest .urd-cal-rc-rows {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* R5 Receipt's own card: a receipt with its torn edge and its shadow */
+.urd-cal-dialog.urd-cal-dlg-receipt {
+  padding-top: 1.9rem;
+  padding-bottom: 1.7rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+  background: var(--urd-cal-rc-torn);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  filter: drop-shadow(0 18px 24px rgb(0 0 0 / 45%));
+}
+
+.urd-cal-dlg-receipt .urd-cal-dialog-close {
+  top: 0.15rem;
+  right: 0.15rem;
+  width: 44px;
+  height: 44px;
+  border-color: transparent;
+}
+
+.urd-cal-rc-cardno {
+  display: block;
+  margin: 0 2.4rem;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+.urd-cal-dlg-receipt .urd-cal-dialog-title {
+  margin: 0.1em 0 0;
+  font-size: 1.37em;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-dlg-receipt .urd-cal-dialog-facts {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.1em;
+  margin: 0.6em 0;
+  padding: 0.6em 0;
+  border-block: var(--urd-cal-rc-rule);
+}
+
+.urd-cal-rc-fact {
+  display: flex;
+  column-gap: 0.4em;
+  align-items: baseline;
+}
+
+.urd-cal-rc-fact dt {
+  display: flex;
+  flex: 1 1 0;
+  opacity: 1;
+}
+
+.urd-cal-rc-fact dt::after {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 1em;
+  margin-left: 0.4em;
+  overflow: hidden;
+  white-space: nowrap;
+  content: var(--urd-cal-rc-dots);
+  opacity: 0.5;
+}
+
+.urd-cal-rc-fact dd {
+  flex: 0 1 auto;
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-rc-fact .urd-cal-chip {
+  padding: 0;
+  font-size: 1em;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.urd-cal-dlg-receipt .urd-cal-dialog-text {
+  font-size: 0.9em;
+  line-height: 1.15;
+}
+
+.urd-cal-dlg-receipt a.urd-cal-dialog-primary {
+  flex: 1 1 100%;
+  padding: 0.55em 0.75em;
+  font-size: 1.05em;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--urd-cal-rc-paper);
+  text-align: center;
+  background: var(--urd-cal-rc-ink);
+  border-radius: 0;
+}
+
+.urd-cal-dlg-receipt .urd-cal-dialog-add summary {
+  margin-inline: auto;
+}
+
+.urd-cal-dlg-receipt .urd-cal-dialog-address input {
+  text-transform: none;
+}
+
+.urd-cal-rc-cardthanks {
+  margin: 0.9em 0 0;
+  font-size: 0.85em;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.urd-cal-dlg-receipt.urd-cal-rc-own :is(.urd-cal-dialog-title, .urd-cal-rc-fact dd, .urd-cal-dialog-text, .urd-cal-dialog-source) {
+  text-transform: none;
+}
+
+/* R6 Seventies poster: a cream poster with a sunrise and pills */
+.urd-cal-sv,
+.urd-cal-dlg-seventies {
+  --urd-cal-sv-cream: var(--urd-cal-s-cream, #f6e7c8);
+  --urd-cal-sv-orange: var(--urd-cal-s-orange, #e2711d);
+  --urd-cal-sv-brown: var(--urd-cal-s-brown, #5a3320);
+  --urd-cal-sv-mustard: var(--urd-cal-s-mustard, #e0aa2a);
+  --urd-cal-sv-display: var(--urd-cal-set-title-font);
+}
+
+.urd-cal-sv {
+  --urd-cal-sv-sun: 4.8em;
+  padding: 0 1.6em 1.5em;
+  font-family: var(--urd-cal-set-font);
+  line-height: 1.35;
+  color: var(--urd-cal-sv-brown);
+  background: var(--urd-cal-sv-cream);
+  border-radius: 1.85em;
+}
+
+/* The sunrise: rings of colour around a point on the bottom edge */
+.urd-cal-sv::before {
+  --s: var(--urd-cal-sv-sun);
+  display: block;
+  height: var(--s);
+  margin: 0 -1.6em;
+  content: '';
+  background: radial-gradient(circle at 50% 100%,
+    var(--urd-cal-sv-cream) 0 calc(var(--s) * 0.27), var(--urd-cal-sv-mustard) calc(var(--s) * 0.27 + 1px) calc(var(--s) * 0.41),
+    var(--urd-cal-sv-orange) calc(var(--s) * 0.41 + 1px) calc(var(--s) * 0.56), var(--urd-cal-sv-brown) calc(var(--s) * 0.56 + 1px) calc(var(--s) * 0.71),
+    var(--urd-cal-sv-cream) calc(var(--s) * 0.71 + 1px) calc(var(--s) * 0.85), var(--urd-cal-sv-mustard) calc(var(--s) * 0.85 + 1px) var(--s), transparent calc(var(--s) + 1px));
+}
+
+.urd-cal-sv-rest {
+  padding-top: 1.6em;
+}
+
+.urd-cal-sv-rest::before {
+  content: none;
+}
+
+.urd-cal-sv-head {
+  display: block;
+  margin: 0.2em 0 0.1em;
+  font-family: var(--urd-cal-sv-display);
+  font-size: 2em;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--urd-cal-sv-orange);
+  text-align: center;
+}
+
+/* The line under the heading: a plain block of centred text */
+.urd-cal-sv .urd-cal-sv-period {
+  display: block;
+  margin: 0;
+  font-size: 0.9em;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.urd-cal-sv-panel {
+  display: grid;
+  gap: 0.55em;
+  margin-top: 0.9em;
+  padding: 0.8em;
+  background: var(--urd-cal-sv-mustard);
+  border-radius: 2.1em;
+}
+
+.urd-cal-sv-rest .urd-cal-sv-panel {
+  margin-top: 0;
+}
+
+/* A pill: the badge, then the text with the sign-up at its end */
+.urd-cal-sv-row {
+  display: flex;
+  gap: 0.9em;
+  align-items: center;
+  padding: 0.5em 1.1em 0.5em 0.5em;
+  cursor: pointer;
+  background: var(--urd-cal-sv-cream);
+  border-radius: 2.05em;
+}
+
+.urd-cal-sv-badge {
+  display: grid;
+  flex: none;
+  place-content: center;
+  width: 3.1em;
+  height: 3.1em;
+  font-family: var(--urd-cal-sv-display);
+  line-height: 0.95;
+  color: var(--urd-cal-sv-cream);
+  text-align: center;
+  background: var(--urd-cal-sv-orange);
+  border-radius: 50%;
+}
+
+.urd-cal-sv-tone-1 .urd-cal-sv-badge {
+  background: var(--urd-cal-sv-mustard);
+}
+
+.urd-cal-sv-tone-2 .urd-cal-sv-badge {
+  background: var(--urd-cal-sv-brown);
+}
+
+.urd-cal-sv-day {
+  font-size: 1.4em;
+  font-weight: 400;
+}
+
+.urd-cal-sv-mon {
+  font-size: 0.75em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* The text and the sign-up, which goes under it at one width */
+.urd-cal-sv-main {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 0.5em 1em;
+  align-items: center;
+  min-width: 0;
+}
+
+.urd-cal-sv-body {
+  flex: 1 1 10em;
+  min-width: 0;
+}
+
+.urd-cal-sv-title {
+  display: block;
+  font-family: var(--urd-cal-sv-display);
+  font-size: 1.2em;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.urd-cal-sv-when {
+  font-size: 0.9em;
+}
+
+.urd-cal-sv-text {
+  margin: 0.25em 0 0;
+  font-size: 0.88em;
+  line-height: 1.4;
+}
+
+.urd-cal-sv-text a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.urd-cal-sv-more {
+  white-space: nowrap;
+}
+
+.urd-cal-sv .urd-cal-sv-signup {
+  flex: none;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.55em 1em;
+  font-size: 0.86em;
+  font-weight: 700;
+  color: var(--urd-cal-sv-cream);
+  text-decoration: none;
+  background: var(--urd-cal-sv-brown);
+  border-radius: 999px;
+}
+
+.urd-cal-sv-foot {
+  justify-content: center;
+  gap: 0.4em 1.4em;
+  margin-top: 1em;
+}
+
+.urd-cal-sv-foot .urd-cal-sub-btn {
+  padding: 0;
+  font-family: var(--urd-cal-sv-display);
+  font-size: 1.14em;
+  color: var(--urd-cal-sv-orange);
+  text-align: center;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.urd-cal-sv-foot .urd-cal-sub-btn::after {
+  content: '\00a0\2192';
+}
+
+.urd-cal-sv-foot .urd-cal-sub-btn:hover {
+  text-decoration: underline;
+}
+
+/* A narrow calendar: less room around the panel and the pills */
+.urd-cal-phone .urd-cal-sv {
+  padding: 0 1em 1.4em;
+}
+
+.urd-cal-phone .urd-cal-sv::before {
+  margin: 0 -1em;
+}
+
+.urd-cal-phone .urd-cal-sv-rest {
+  padding-top: 1em;
+}
+
+.urd-cal-phone .urd-cal-sv-panel {
+  gap: 0.5em;
+  padding: 0.5em;
+  border-radius: 1.8em;
+}
+
+.urd-cal-phone .urd-cal-sv-row {
+  gap: 0.7em;
+  padding-right: 0.9em;
+}
+
+/* The fold under the poster is set in the poster's face. */
+.urd-cal-d-seventies .urd-cal-fold-summary {
+  font-family: var(--urd-cal-set-font);
+}
+
+/* R6 Seventies poster's own card: a striped band, matches, a pill */
+.urd-cal-dialog.urd-cal-dlg-seventies {
+  padding: 0 1.5em;
+  line-height: 1.45;
+}
+
+.urd-cal-dlg-seventies .urd-cal-dialog-close {
+  z-index: 1;
+  top: 0.25rem;
+  right: 0.35rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--urd-cal-sv-cream);
+  border-color: transparent;
+}
+
+.urd-cal-sv-cardband {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  box-sizing: border-box;
+  min-height: 6.9em;
+  margin: 0 -1.5em 3.9em;
+  padding: 4.15em 1.4em 1.1em;
+  background: linear-gradient(var(--urd-cal-sv-brown) 0 1.27em, var(--urd-cal-sv-orange) 1.27em 2.54em, var(--urd-cal-sv-mustard) 2.54em 3.8em, var(--urd-cal-sv-cream) 3.8em 4.06em, var(--urd-cal-sv-brown) 4.06em);
+  border-radius: 10px 10px 0 0;
+}
+
+/* The matches: ten sticks with their heads, standing under the band. */
+.urd-cal-sv-cardband::after {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  width: 14.62em;
+  height: 3.05em;
+  margin: 0 auto;
+  content: '';
+  background:
+    radial-gradient(circle at 0.47em 0.485em, color-mix(in srgb, var(--urd-cal-sv-orange) 60%, var(--urd-cal-sv-brown)) 0 0.45em, transparent 0.48em) 0 0 / 1.52em 100% repeat-x,
+    linear-gradient(90deg, transparent 0.125em, color-mix(in srgb, var(--urd-cal-sv-mustard) 40%, var(--urd-cal-sv-cream)) 0.125em 0.815em, transparent 0.815em) 0 0.41em / 1.52em 2.62em repeat-x;
+}
+
+.urd-cal-sv-cardband .urd-cal-chip {
+  padding: 0;
+  font-family: var(--urd-cal-sv-display);
+  font-size: 1.5em;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  color: var(--urd-cal-sv-cream);
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.urd-cal-dlg-seventies .urd-cal-dialog-date {
+  padding-right: 0;
+  font-size: 0.86em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: inherit;
+}
+
+.urd-cal-dlg-seventies .urd-cal-dialog-title {
+  margin: 0.1em 0 0.6em;
+  font-size: 1.6em;
+  line-height: 1.1;
+}
+
+.urd-cal-dlg-seventies .urd-cal-dialog-facts dt {
+  opacity: 0.7;
+}
+
+.urd-cal-dlg-seventies a.urd-cal-dialog-primary {
+  flex: 1 1 100%;
+  padding: 0.55em 1em;
+  font-family: var(--urd-cal-sv-display);
+  font-size: 1.24em;
+  font-weight: 400;
+  color: var(--urd-cal-sv-cream);
+  text-align: center;
+  background: var(--urd-cal-sv-brown);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 3px var(--urd-cal-sv-mustard);
+}
+
+.urd-cal-dlg-seventies .urd-cal-dialog-add summary {
+  margin: 0 auto;
+}
+
+.urd-cal-dialog.urd-cal-dlg-seventies::after {
+  display: block;
+  height: 1.5em;
+  margin: 1.25em -1.5em 0;
+  content: '';
+  background: radial-gradient(rgb(255 255 255 / 25%) 0.07em, transparent 0.1em) 0 0 / 0.345em 0.345em, var(--urd-cal-sv-brown);
+  border-radius: 0 0 10px 10px;
+}
+
+/* R7 Art deco: a programme in a gold double frame on black */
+.urd-cal-deco,
+.urd-cal-dlg-deco {
+  --urd-cal-deco-bg: var(--urd-cal-s-bg, #0e0e10);
+  --urd-cal-deco-gold: var(--urd-cal-s-gold, #d4af6a);
+  --urd-cal-deco-cream: var(--urd-cal-s-cream, #f3ead3);
+  --urd-cal-deco-display: var(--urd-cal-set-title-font);
+}
+
+.urd-cal-deco {
+  padding: 0.45em;
+  font-family: var(--urd-cal-set-font);
+  line-height: 1.35;
+  color: var(--urd-cal-deco-cream);
+  background: var(--urd-cal-deco-bg);
+}
+
+.urd-cal-deco-frame {
+  padding: 0 2em 1.3em;
+  border: 1px solid var(--urd-cal-deco-gold);
+  outline: 1px solid var(--urd-cal-deco-gold);
+  outline-offset: -5px;
+}
+
+/* The sunburst: fifteen gold rays cut to a half circle */
+.urd-cal-deco-frame::before {
+  display: block;
+  height: 4.2em;
+  margin: 0 -2em;
+  content: '';
+  background:
+    radial-gradient(circle at 50% 100%, transparent 4em, var(--urd-cal-deco-bg) calc(4em + 1px)),
+    repeating-conic-gradient(from -85deg at 50% 100%, var(--urd-cal-deco-gold) 0 1.7deg, transparent 2.3deg 12deg);
+}
+
+/* The spaced words stand in the middle */
+.urd-cal-deco-heading {
+  display: block;
+  margin: 0.3em 0 0.1em;
+  padding-left: 0.24em;
+  font-family: var(--urd-cal-deco-display);
+  font-size: 2em;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0.24em;
+  color: var(--urd-cal-deco-gold);
+  text-align: center;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-deco .urd-cal-deco-season {
+  display: block;
+  margin: 0 0 1.2em;
+  padding-left: 0.4em;
+  font-size: 0.8em;
+  letter-spacing: 0.4em;
+  text-align: center;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-deco-season::before {
+  content: '\25c6\00a0';
+}
+
+.urd-cal-deco-season::after {
+  content: '\00a0\25c6';
+}
+
+.urd-cal-deco-rows {
+  border-bottom: 1px solid var(--urd-cal-deco-gold);
+}
+
+/* A row: the day, the event and the countdown in three columns */
+.urd-cal-deco-row {
+  display: grid;
+  grid-template-columns: 5em minmax(0, 1fr) max-content;
+  column-gap: 1em;
+  align-items: center;
+  padding: 0.65em 0;
+  cursor: pointer;
+  border-top: 1px solid var(--urd-cal-deco-gold);
+}
+
+/* With subgrid the rows share one set of columns */
+@supports (grid-template-columns: subgrid) {
+  .urd-cal-deco-rows {
+    display: grid;
+    grid-template-columns: minmax(5em, max-content) minmax(0, 1fr) max-content;
+    column-gap: 1em;
+  }
+
+  .urd-cal-deco-row {
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+  }
+}
+
+.urd-cal-deco-date {
+  display: grid;
+  justify-items: center;
+  border-right: 1px solid var(--urd-cal-deco-gold);
+  text-align: center;
+}
+
+.urd-cal-deco-day {
+  font-family: var(--urd-cal-deco-display);
+  font-size: 1.9em;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--urd-cal-deco-gold);
+}
+
+.urd-cal-deco-month {
+  padding-left: 0.3em;
+  font-size: 0.75em;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.urd-cal-deco-body {
+  min-width: 0;
+}
+
+.urd-cal-deco-title {
+  display: block;
+  font-family: var(--urd-cal-deco-display);
+  font-size: 1.25em;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-deco-row .urd-cal-deco-title.urd-cal-cancelled {
+  opacity: 0.5;
+}
+
+.urd-cal-deco-meta {
+  display: block;
+  font-size: 0.9em;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+  overflow-wrap: anywhere;
+}
+
+/* The diamond goes with the place, so a line breaks before it */
+.urd-cal-deco-meta > * + *::before {
+  content: '\0020\25c6\00a0';
+}
+
+.urd-cal-deco-text {
+  margin: 0.4em 0 0;
+  line-height: 1.4;
+  opacity: 0.85;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-deco-text a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.urd-cal-deco-more {
+  white-space: nowrap;
+}
+
+.urd-cal-deco-in {
+  font-size: 0.8em;
+  letter-spacing: 0.2em;
+  color: var(--urd-cal-deco-gold);
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.urd-cal-deco-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8em 1em;
+  justify-content: center;
+  padding-top: 1em;
+}
+
+.urd-cal-deco .urd-cal-deco-signup,
+.urd-cal-deco-foot .urd-cal-sub-btn {
+  margin: 0;
+  padding: 0.75em 1.6em;
+  font-size: 0.8em;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  color: var(--urd-cal-deco-gold);
+  text-decoration: none;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--urd-cal-deco-gold);
+  border-radius: 0;
+}
+
+.urd-cal-deco .urd-cal-deco-signup {
+  font-weight: 700;
+  color: var(--urd-cal-deco-bg);
+  background: var(--urd-cal-deco-gold);
+}
+
+/* The events a list folds away: rows alone in the frame */
+.urd-cal-deco-rest .urd-cal-deco-frame {
+  padding-block: 0.4em;
+}
+
+.urd-cal-deco-rest .urd-cal-deco-frame::before {
+  content: none;
+}
+
+.urd-cal-deco-rest .urd-cal-deco-rows {
+  border-bottom: 0;
+}
+
+.urd-cal-deco-rest .urd-cal-deco-row:first-child {
+  border-top: 0;
+}
+
+/* A narrow calendar: less side room, the countdown under the event */
+@container urd-block (max-width: 480px) {
+  .urd-cal-deco-frame {
+    padding-inline: 1.1em;
+  }
+
+  .urd-cal-deco-frame::before {
+    margin-inline: -1.1em;
+  }
+
+  .urd-cal-deco-row {
+    grid-template-columns: 4.2em minmax(0, 1fr);
+  }
+
+  @supports (grid-template-columns: subgrid) {
+    .urd-cal-deco-rows {
+      grid-template-columns: minmax(4.2em, max-content) minmax(0, 1fr);
+    }
+
+    .urd-cal-deco-row {
+      grid-template-columns: subgrid;
+    }
+}
+
+  .urd-cal-deco-date {
+    grid-row: span 2;
+  }
+
+  .urd-cal-deco-in {
+    grid-column: 2;
+    text-align: left;
+  }
+}
+
+@supports not (container-type: inline-size) {
+  @media (max-width: 480px) {
+    .urd-cal-deco-frame {
+      padding-inline: 1.1em;
+    }
+
+    .urd-cal-deco-frame::before {
+      margin-inline: -1.1em;
+    }
+
+    .urd-cal-deco-row {
+      grid-template-columns: 4.2em minmax(0, 1fr);
+    }
+
+    @supports (grid-template-columns: subgrid) {
+      .urd-cal-deco-rows {
+        grid-template-columns: minmax(4.2em, max-content) minmax(0, 1fr);
+      }
+
+      .urd-cal-deco-row {
+        grid-template-columns: subgrid;
+      }
+}
+
+    .urd-cal-deco-date {
+      grid-row: span 2;
+    }
+
+    .urd-cal-deco-in {
+      grid-column: 2;
+      text-align: left;
+    }
+}
+}
+
+/* R7 Art deco's own card: a gold double frame with fans in its corners */
+.urd-cal-dialog.urd-cal-dlg-deco {
+  padding: 2rem 2.2rem 2rem;
+  line-height: 1.45;
+  text-align: center;
+  border: 0;
+  border-radius: 0;
+}
+
+.urd-cal-dialog.urd-cal-dlg-deco::before {
+  position: absolute;
+  inset: 10px;
+  content: '';
+  pointer-events: none;
+  border: 1px solid var(--urd-cal-deco-gold);
+  outline: 1px solid var(--urd-cal-deco-gold);
+  outline-offset: -6px;
+}
+
+.urd-cal-deco-corner {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  pointer-events: none;
+  fill: none;
+  stroke: var(--urd-cal-deco-gold);
+  stroke-width: 1;
+}
+
+.urd-cal-deco-corner-tl {
+  top: 18px;
+  left: 18px;
+}
+
+.urd-cal-deco-corner-tr {
+  top: 18px;
+  right: 18px;
+  rotate: 90deg;
+}
+
+.urd-cal-deco-corner-bl {
+  bottom: 18px;
+  left: 18px;
+  rotate: 270deg;
+}
+
+.urd-cal-deco-corner-br {
+  right: 18px;
+  bottom: 18px;
+  rotate: 180deg;
+}
+
+.urd-cal-deco-cardfan {
+  display: block;
+  width: 7.5rem;
+  height: 2.1rem;
+  margin: 0 auto 0.5rem;
+  fill: none;
+  stroke: var(--urd-cal-deco-gold);
+  stroke-width: 1;
+}
+
+.urd-cal-dlg-deco .urd-cal-dialog-close {
+  top: 22px;
+  right: 50px;
+  width: 44px;
+  height: 44px;
+  border-color: transparent;
+}
+
+.urd-cal-dlg-deco .urd-cal-dialog-date {
+  padding-right: 0;
+  font-size: 0.83em;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+}
+
+.urd-cal-dlg-deco .urd-cal-dialog-title {
+  margin: 0.3em 0 0.4em;
+  font-size: 1.65em;
+  line-height: 1.15;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.urd-cal-deco-cardrule {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 0 2rem 0.9rem;
+}
+
+.urd-cal-deco-cardrule::before,
+.urd-cal-deco-cardrule::after {
+  flex: 1;
+  height: 1px;
+  content: '';
+  background: var(--urd-cal-deco-gold);
+}
+
+.urd-cal-deco-cardrule i {
+  width: 8px;
+  height: 8px;
+  background: var(--urd-cal-deco-gold);
+  rotate: 45deg;
+}
+
+.urd-cal-dlg-deco .urd-cal-dialog-facts {
+  gap: 2px 12px;
+  text-align: left;
+}
+
+.urd-cal-dlg-deco .urd-cal-dialog-facts dt {
+  letter-spacing: 0.1em;
+  color: var(--urd-cal-deco-gold);
+  opacity: 1;
+}
+
+.urd-cal-dlg-deco :is(.urd-cal-dialog-text, .urd-cal-dialog-source) {
+  text-align: left;
+}
+
+.urd-cal-dlg-deco .urd-cal-dialog-meta {
+  justify-content: center;
+}
+
+.urd-cal-dlg-deco .urd-cal-dialog-meta :is(.urd-cal-chip, .urd-cal-rec) {
+  border-color: var(--urd-cal-deco-gold);
+  border-radius: 0;
+}
+
+.urd-cal-dlg-deco .urd-cal-dialog-img {
+  border-radius: 0;
+}
+
+.urd-cal-dlg-deco .urd-cal-dialog-actions {
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.urd-cal-dlg-deco a.urd-cal-dialog-primary {
+  display: block;
+  padding: 0.7rem 1rem;
+  font-family: var(--urd-cal-deco-display);
+  font-size: 1.1em;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-align: center;
+  text-transform: uppercase;
+  border-radius: 0;
+}
+
+.urd-cal-dlg-deco .urd-cal-dialog-add summary {
+  margin-inline: auto;
+}
+
+.urd-cal-dlg-deco .urd-cal-dialog-choices {
+  justify-items: center;
+}

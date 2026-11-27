@@ -1,6 +1,5 @@
 /**
- * What the payment layer's provider helpers share: fetch with a timeout, so a provider that does not answer never holds a function open past the platform's limit; the rule for keeping an access token until shortly before it expires; the constant-time comparison a signature check needs; and the host of an address, by which a provider's test environment is told.
- * Tested in tests/vipps.test.mjs and tests/paypal.test.mjs.
+ * What the payment providers' helpers share: a fetch with a timeout, an access token's cache rule, a constant-time comparison and an address's host.
  */
 
 /** The host of an address, or '' when it is no address: the test environment is told by its host, never by a substring. */
@@ -28,9 +27,7 @@ export async function fetchWithin(url, init = {}, ms = TIMEOUT_MS) {
 const TOKEN_MARGIN = 60;
 
 /**
- * The access token to keep from a provider's token answer, with the time it
- * may be used until: the absolute expires_on when the answer gives one (Vipps
- * MobilePay), else expires_in seconds from now (Vipps MobilePay, PayPal).
+ * The access token to keep from a provider's token answer and the time it may be used until: expires_on where given, else expires_in seconds from now.
  * @param {{access_token?: string, expires_on?: string|number, expires_in?: string|number}} answer
  * @param {number} now Unix seconds
  * @returns {{token: string, until: number}|null}

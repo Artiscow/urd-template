@@ -1,22 +1,6 @@
 /**
- * The picture list from a shared folder: the background layers (image gallery
- * and floating photos) ask this route what a folder holds, and get back paths
- * on this site's own origin, never the folder host's.
- *
- * Four kinds of folder:
- * - drive: a publicly shared Google Drive folder, read with the Drive API and
- *   the owner's DRIVE_API_KEY (an API key reaches public folders only, which
- *   is exactly the access this needs).
- * - gphotos: a Google Photos shared album. The Library API no longer serves
- *   shared albums to a key, so the album's own public page is read and the
- *   picture addresses are taken from it.
- * - nextcloud: a public share on Nextcloud or ownCloud, listed over WebDAV
- *   with the share token as the user name (the way a public share works).
- * - json: any other address that answers with a list of pictures, for the
- *   services the four above do not cover.
- *
- * The last two reach hosts the owner names, so they require the host to be in
- * the PHOTO_HOSTS environment variable (the calendar's ICS_HOSTS model).
+ * GET /api/photos: the pictures a shared folder holds (drive, gphotos, nextcloud or json), as paths on this site.
+ * The last two need the host in PHOTO_HOSTS.
  */
 import {
   json, photoLimit, photoSort, byName, hostAllowed, safeTarget, readCapped, fetchWithTimeout, refuseCrossSite, edgeCached, RedirectRefused,
@@ -36,11 +20,7 @@ const plainPhoto = (url) => `/api/photo?p=u&u=${encodeURIComponent(url)}`;
 const redirectRefused = () =>
   json({ error: 'The folder host redirected to a host that is not allowed', code: 'photoRedirectBlocked' }, 502);
 
-/**
- * A publicly shared Drive folder. Drive sorts for us: by natural name, or by
- * the time last modified with the newest first (Google advises modifiedTime
- * over createdTime for large folders).
- */
+/** A publicly shared Drive folder, sorted by Drive: by natural name, or by modifiedTime with the newest first. */
 async function fromDrive(id, limit, sort, env) {
   if (!env.DRIVE_API_KEY) {
     return json({ error: 'Google Drive is not set up: the DRIVE_API_KEY environment variable is missing in the hosting setup', code: 'photoKeyMissing' }, 403);
@@ -111,15 +91,14 @@ async function fromGooglePhotos(id, key, limit) {
     found.add(match[0]);
     if (found.size > limit * 2) break;
   }
-  // The album's cover is one of the same pictures, so the set already holds
-  // each address once, in the order the page lists them.
+  // The album's cover is one of the same pictures, so the set already holds each address once, in the order the page lists them.
   const photos = [...found].slice(0, limit).map((url) => ({ src: googlePhoto(url), name: '' }));
   return photos;
 }
 
 /**
- * A public share on Nextcloud or ownCloud, listed over WebDAV. The listing
- * comes with each file's last-modified time, so both orders are sorted here.
+ * A public share on Nextcloud or ownCloud, listed over WebDAV.
+ * The listing comes with each file's last-modified time, so both orders are sorted here.
  */
 async function fromNextcloud(host, token, limit, sort, env) {
   if (!hostAllowed(env, host)) {
@@ -197,8 +176,7 @@ async function fromJson(raw, limit, env) {
   const photos = [];
   for (const item of list) {
     const url = typeof item === 'string' ? item : item?.src ?? item?.url;
-    // Every picture host has to be allowed in its own right: the list itself
-    // must not be able to point the byte route somewhere new.
+    // Every picture host has to be allowed in its own right: the list itself must not be able to point the byte route somewhere new.
     if (!safeTarget(url, env)) continue;
     photos.push({ src: plainPhoto(url), name: typeof item?.name === 'string' ? item.name : '' });
     if (photos.length >= limit) break;
@@ -220,8 +198,7 @@ async function listing(q, env) {
   // `host` is the share host for Nextcloud and the album key for Google Photos.
   const host = String(q.get('host') ?? '').toLowerCase();
   const limit = photoLimit(q.get('max'));
-  // The Google Photos page and a JSON list come in their own order; the
-  // random draw is the browser's, from this pool.
+  // The Google Photos page and a JSON list come in their own order; the random draw is the browser's, from this pool.
   const sort = photoSort(q.get('sort'));
 
   let result;

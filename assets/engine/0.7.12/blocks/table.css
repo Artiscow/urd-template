@@ -1,0 +1,19 @@
+/*
+ * The table block's own rules (blocks/table.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* The table */
+.urd-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.urd-table-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.urd-table-striped tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--urd-color-text) 6%, transparent);
+}

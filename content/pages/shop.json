@@ -225,6 +225,7 @@
             },
             "mobile": null
           },
+          "mobileHeight": 7301,
           "hover": {
             "type": "hover-lift",
             "version": 1,

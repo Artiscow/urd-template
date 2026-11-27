@@ -1,7 +1,4 @@
 /**
- * Stable runtime path (see ADR-0013): i18n.js and plugins.js (which is
- * bundled into admin) load the language pack module dynamically through this,
- * so the same absolute path works from both the engine and the editor bundle
- * regardless of engine version.
+ * Stable runtime path (ADR-0013): the engine and the editor bundle load the language pack module through it, whatever the engine version.
  */
-export * from '../engine/0.7.11/language-packs.js';
+export * from '../engine/0.7.12/language-packs.js';

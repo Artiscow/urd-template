@@ -1,21 +1,9 @@
 /**
  * GitHub API helpers for the publishing layer.
- *
- * The boundary here is deliberately vendor-shaped so GitLab/Gitea adapters can
- * be written after v1 without touching the endpoints.
- *
- * Configuration (environment variables at the host):
- *   GITHUB_REPO ("owner/name"), GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET,
- *   GITHUB_BRANCH (default "main"), GITHUB_SCOPE (default "public_repo"),
- *   ALLOWED_LOGINS (comma-separated),
- *   GITHUB_ROOT_DIR (optional: the subfolder in the repo that is the site root,
- *   e.g. "template" in the Urd monorepo; omitted when the site is at the root).
+ * GITHUB_ROOT_DIR is the repo's subfolder that is the site root, where the site is not at the root.
  */
 
-/** Reads and validates the configuration from env. Throws on missing variables.
- *  The errors carry a machine-readable `code` (and any parameters) that the
- *  endpoints pass on in the error response, so admin can translate them
- *  (the api.* keys). */
+/** The configuration from env, validated. A missing or bad variable throws an Error with a `code` (and its parameters) the admin translates as an api.* key. */
 export function cfg(env) {
   for (const key of ['GITHUB_REPO', 'GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET']) {
     if (!env[key]) {
@@ -43,10 +31,8 @@ export function cfg(env) {
 }
 
 /**
- * Authenticated call to api.github.com. Transient failures (5xx/429, such as
- * GitHub's "Unicorn" page) are retried automatically a couple of times.
- * Throws an Error with .status so the endpoints can tell "GitHub is down" from
- * "invalid token". Error text is truncated (never whole HTML pages).
+ * A call to api.github.com, retried twice on a 5xx or 429.
+ * A failure throws an Error with .status and at most 300 characters of a JSON answer, never an HTML page.
  */
 export async function gh(token, path, init = {}, attempt = 1) {
   const res = await fetch(`https://api.github.com${path}`, {
@@ -80,9 +66,8 @@ export function currentUser(token) {
 }
 
 /**
- * GraphQL call to GitHub: used by the updater to fetch MANY file contents in ONE subrequest (Blob.text via aliases), which REST would have needed one call per file for.
- * Same retry rule as gh().
- * With `partial`, the data is returned beside errors for single fields (an object the repository does not hold comes back as null), and only a reply without data throws.
+ * A GraphQL call to GitHub, retried as gh() is.
+ * With `partial`, the data comes back beside errors for single fields, and only a reply without data throws.
  */
 export async function ghGraphql(token, query, attempt = 1, { partial = false } = {}) {
   const res = await fetch('https://api.github.com/graphql', {
@@ -115,11 +100,7 @@ export function cleanBase64(b64) {
   return String(b64 ?? '').replace(/\s/g, '');
 }
 
-/**
- * Optional explicit deploy trigger (DEPLOY_HOOK_URL) in addition to the git
- * webhook, which the host can miss. A failure here never topples the call -
- * the commit is already safely in the repo.
- */
+/** Posts to DEPLOY_HOOK_URL, where set, beside the git webhook; a failure is only logged. */
 export async function triggerDeploy(env) {
   if (!env.DEPLOY_HOOK_URL) return;
   try {
@@ -130,26 +111,13 @@ export async function triggerDeploy(env) {
 }
 
 /**
- * Commits several files as ONE commit via the Git Data API:
- *   1. Fetch the branch ref and the base commit
- *   2. Create one blob per file (deletion: a tree entry with sha: null)
- *   3. Create a tree with base_tree = the base commit's tree
- *   4. Create a commit with the base commit as parent
- *   5. Update the ref (force: false - fails safely if HEAD has moved)
- *
- * Files with `delete: true` are removed from the repo. Paths that do not exist
- * in the base tree are skipped silently (GitHub rejects the whole tree
- * otherwise), so a deletion can never topple publishing the rest.
- * A deletion of a folder (a plugin's, the only one the guard lets through)
- * removes every file under it.
- *
- * With `expect` set, HEAD is required to be exactly there (Error with status
- * 409 otherwise): it closes the editor's conflict-check-to-commit window.
+ * Commits files as one commit by the Git Data API, without force.
+ * A deletion the base tree lacks is skipped; with `expect`, a HEAD elsewhere throws 409.
  *
  * @param {string} token
  * @param {{repo: string, branch: string}} config From cfg(env)
  * @param {{message: string, files: Array<{path: string, content?: string, encoding?: 'utf-8'|'base64', delete?: boolean, from?: string}>, expect?: string}} payload
- *   A file with `from` is a move: the blob the source holds in the base tree is written at the path and the source deleted, so the bytes never travel; a source the tree does not hold throws 404 with the code `moveMissing`.
+ *   A file with `from` takes the source's blob in the base tree and deletes the source; a source the tree lacks throws 404 `moveMissing`.
  * @returns {Promise<{sha: string}>} The new commit SHA
  */
 export async function commitFiles(token, config, { message, files, expect }) {
@@ -164,13 +132,10 @@ export async function commitFiles(token, config, { message, files, expect }) {
   }
   const baseCommit = await gh(token, `/repos/${repo}/git/commits/${baseSha}`);
 
-  // Deletions are validated against the base tree: sha:null for an unknown
-  // path gives 422 from GitHub. (recursive can be truncated in enormous repos;
-  // then the deletion is skipped, which is the harmless direction.) A move
-  // takes its blob's sha from the same tree.
+  // Deletions, moves and copies (copyOf: a page's copy of index.html) read their paths and blob shas from the base tree.
   let existing = null;
   let blobs = null;
-  if (files.some((f) => f.delete || f.from)) {
+  if (files.some((f) => f.delete || f.from || f.copyOf)) {
     const baseTree = await gh(token, `/repos/${repo}/git/trees/${baseCommit.tree.sha}?recursive=1`);
     const items = baseTree.tree.filter((t) => t.type === 'blob');
     existing = items.map((t) => t.path);
@@ -180,6 +145,12 @@ export async function commitFiles(token, config, { message, files, expect }) {
   const tree = [];
   const gone = new Set();
   for (const file of files) {
+    if (file.copyOf) {
+      const sha = blobs?.get(file.copyOf);
+      if (!sha) throw new Error(`The file '${file.copyOf}' is not in the repository`);
+      tree.push({ path: file.path, mode: '100644', type: 'blob', sha });
+      continue;
+    }
     if (file.from) {
       const sha = blobs?.get(file.from);
       if (!sha) {
@@ -238,12 +209,7 @@ export async function commitFiles(token, config, { message, files, expect }) {
 }
 
 /**
- * The updater's commit path (ADR-0014): like commitFiles, but the tree entries
- * are built with INLINE `content` (or a ready-made blob `sha`) instead of one
- * blob POST per file - that is what keeps a ~90-file engine update under
- * Cloudflare's subrequest limit. Large entry counts are split into CHAINED
- * trees (base_tree = the previous tree), still as ONE commit.
- * With `orphan`, the branch is made by this commit: a first tree with no base, a commit with no parent, and the ref created, which fails with 409 where the branch exists already (the saved drafts' branch, ADR-0032).
+ * The updater's commit (ADR-0014): inline `content` or blob `sha` entries in chained trees, as one commit; `orphan` creates the branch, 409 where it exists.
  *
  * @param {string} token
  * @param {{repo: string, branch: string}} config

@@ -1,0 +1,1 @@
+function e(e){let t=e.nextElementSibling;if(!(t instanceof HTMLElement))return;let n=()=>{let n=t.offsetHeight;e.style.width=n?`${n}px`:``,e.style.height=n?`${n}px`:``},r=new ResizeObserver(n);return r.observe(t),n(),()=>r.disconnect()}export{e as t};

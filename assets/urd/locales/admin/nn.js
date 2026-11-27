@@ -1,6 +1,4 @@
 /**
- * Stabil kjøretids-sti (se ADR-0013): admin-ordboka kjøretids-lastes via
- * denne fra både editor-bundelen og preview-chromen, uavhengig av
- * motorversjon. Selve tekstene bor i den versjonerte motoren.
+ * Stable runtime path (ADR-0013): the editor and the preview load the admin dictionary through it, whatever the engine version.
  */
-export { default } from '../../../engine/0.7.11/locales/admin/nn.js';
+export { default } from '../../../engine/0.7.12/locales/admin/nn.js';

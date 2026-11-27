@@ -1,9 +1,5 @@
 /**
- * Swedish visitor texts: the engine's own chrome (navigation, footer,
- * lightbox, gallery, video) and the calendar block's words. The file has the same shape as the engine's
- * locales/site/<code>.js and the keys are identical - the nb base sits
- * underneath, so a key missing here falls back to Norwegian instead of
- * disappearing.
+ * Swedish visitor texts, with the keys of the engine's locales/site/<code>.js; a key missing here falls back to the Bokmål base.
  */
 export default {
   lang: 'sv',
@@ -211,6 +207,7 @@ export default {
     'calendar.moreAbout': 'Mer om {name}',
     'calendar.openToAll': 'Öppet för alla',
     'calendar.showAll': 'Visa alla {n} ({m} till)',
+    'calendar.showFewer': 'Visa färre',
     'calendar.join': 'Anslut',
     'calendar.addEvent': 'Lägg till i kalender',
     'calendar.close': 'Stäng',

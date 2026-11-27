@@ -1,12 +1,7 @@
 /**
- * Optional payment layer (ADR-0020, ADR-0028): whether a payment on the
- * Vipps MobilePay ePayment API is reserved. The checkout page asks here on
- * its return from Vipps, with the reference the return address carries,
- * and empties the basket only for a reserved payment; the buyer's shared
- * contact details come along for the receipt on the page. The site stores
- * no order; the answer is read from Vipps each time.
+ * GET and POST /api/pay/vipps/session: whether the reference's Vipps MobilePay payment is reserved, read from Vipps on the buyer's return.
  */
-import { isReference, json } from '../../../_lib/order.js';
+import { isReference, hasBuyerKey, sessionAnswer, majorAmount, json } from '../../../_lib/order.js';
 import { vippsConfig, paymentSummary } from '../../../_lib/vipps.js';
 import { callVipps } from '../../../_lib/vipps-api.js';
 
@@ -20,7 +15,8 @@ export async function onRequestGet({ request, env }) {
   if (!answer.ok) return json({ error: answer.error, code: answer.code, status: answer.upstream }, answer.status);
   const summary = paymentSummary(answer.data);
   if (!summary) return json({ error: 'Unexpected response from Vipps', code: 'vippsUnexpected' }, 502);
-  return json(summary);
+  const amount = majorAmount(answer.data?.amount?.value, answer.data?.amount?.currency);
+  return json(sessionAnswer({ ...summary, amount }, await hasBuyerKey(request, config.clientSecret, reference)));
 }
 
 /** The checkout page asks every provider with a POST (PayPal's ask may capture); the answer is the same read. */

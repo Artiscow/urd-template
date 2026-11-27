@@ -1,16 +1,9 @@
 /**
- * POST /api/github/commit
- * The core of publishing. Body: { message, files: [{path, content, encoding?} | {path, delete: true} | {path, from}] }.
- * Commits all the files as ONE commit through the Git Data API; a move (`from`) takes the file's blob as it stands, so the bytes never travel.
- *
- * Protection (defence in depth, see ADR-0003):
- *  - requires a signed-in token AND that the user is in ALLOWED_LOGINS
- *  - every file path is validated against the path allowlist (content only, never code)
- *  - at most 200 files per commit
+ * POST /api/github/commit: publishes as one commit. Body: { message, expect?, files: [{path, content, encoding?} | {path, delete: true} | {path, from}] }.
  */
 import { commitFiles, triggerDeploy } from '../../_lib/github.js';
 import { requirePublisher } from '../../_lib/auth.js';
-import { isAllowedPath, isAllowedContent, isDeletablePath, isAllowedMove } from '../../_lib/guard.js';
+import { isAllowedPath, isAllowedContent, isDeletablePath, isAllowedMove, isPageIndexCopy } from '../../_lib/guard.js';
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -52,30 +45,31 @@ export async function onRequestPost({ request, env }) {
     if (!(file.delete === true ? isDeletablePath(file.path) : isAllowedPath(file.path))) {
       return json({ error: `The path '${file.path}' cannot be published from here`, code: 'pathNotAllowed', path: file.path }, 400);
     }
-    // A file whose content is checked (a PDF in media/) must be what its name says, and within its size.
+    // A file whose content is checked (a PDF or an SVG in media/, a feed in content/, the sitemap, `_redirects`) must be what its name says, and within its size.
     if (file.delete !== true && !isAllowedContent(file.path, file.content, file.encoding)) {
       if (file.path === '_redirects') return json({ error: 'The redirect file holds a line that is not a redirect Urd writes', code: 'redirectsNotAllowed', path: file.path }, 400);
+      if (/\.svg$/i.test(file.path)) return json({ error: `The SVG '${file.path}' holds a script, a link that runs code or a declaration`, code: 'svgNotAllowed', path: file.path }, 400);
+      if (/\.xml$/i.test(file.path)) return json({ error: `The file '${file.path}' holds a script, a stylesheet instruction or a declaration, or is not a feed or a sitemap`, code: 'xmlNotAllowed', path: file.path }, 400);
       return json({ error: `The file '${file.path}' is not a PDF, or is too large`, code: 'fileNotAllowed', path: file.path }, 400);
     }
   }
 
-  // The paths from the editor are relative to the SITE. When the site lives
-  // in a subfolder of the repo (GITHUB_ROOT_DIR, e.g. "template"), the paths
-  // are prefixed here - AFTER the validation above, which covers site paths.
+  // A page's copy of index.html (<slug>/index.html) is written from the index.html the repository holds, never from what is sent.
+  const written = files.map((f) => (f.delete !== true && typeof f.from !== 'string' && isPageIndexCopy(f.path) ? { path: f.path, copyOf: 'index.html' } : f));
+
+  // The editor's paths are relative to the site: the repository's root folder is prefixed here, after the checks above.
+  const prefix = (path) => `${config.rootDir}/${path}`;
   const repoFiles = config.rootDir
-    ? files.map((f) => ({ ...f, path: `${config.rootDir}/${f.path}`, ...(typeof f.from === 'string' ? { from: `${config.rootDir}/${f.from}` } : {}) }))
-    : files;
+    ? written.map((f) => ({ ...f, path: prefix(f.path), ...(typeof f.from === 'string' ? { from: prefix(f.from) } : {}), ...(f.copyOf ? { copyOf: prefix(f.copyOf) } : {}) }))
+    : written;
 
   try {
-    // expect (optional): the HEAD the editor's conflict check saw. If it has
-    // moved in the meantime, the commit is rejected with 409 instead of
-    // overwriting someone else's fresh publish.
+    // expect: the HEAD the editor's conflict check saw; a HEAD that has moved since answers 409.
     const { sha } = await commitFiles(token, config, { message, files: repoFiles, expect });
     await triggerDeploy(env);
     return json({ sha });
   } catch (err) {
-    // 409 from the expect check, or 422 non-fast-forward from the ref
-    // update (someone managed to publish inside the commit window itself).
+    // 409 from the expect check, or 422 non-fast-forward from the ref update (someone managed to publish inside the commit window itself).
     if (err.status === 409 || (err.status === 422 && /fast.?forward/i.test(err.message))) {
       return json({ error: 'Someone just published - try publishing again', code: 'publishRace' }, 409);
     }
@@ -84,8 +78,8 @@ export async function onRequestPost({ request, env }) {
       return json({ error: err.message, code: 'moveMissing' }, 400);
     }
     console.error('Urd publish:', err.message);
-    // GitHub's actual response is shown to the signed-in editor - without it
-    // debugging is impossible. The token is never part of the message.
+    // GitHub's actual response is shown to the signed-in editor - without it debugging is impossible.
+    // The token is never part of the message.
     return json({ error: `Could not commit to GitHub: ${err.message}`, code: 'commitFailed', detail: err.message }, 502);
   }
 }

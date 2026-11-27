@@ -1,0 +1,353 @@
+/*
+ * The back-to-top button's own rules (totop.js), loaded with it after base.css in ENGINE_SHEETS order (sheets.js).
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* The site's «Back to top» button */
+.urd-totop {
+  --urd-totop-side: 16px;
+  --urd-totop-size: var(--urd-totop-h, 44px);
+  position: fixed;
+  right: calc(var(--urd-totop-menu-r, 0px) + var(--urd-totop-side));
+  bottom: 16px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  box-sizing: border-box;
+  height: var(--urd-totop-size);
+  min-width: var(--urd-totop-size);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  font: 600 calc(var(--urd-totop-size) * 0.42) / 1 var(--urd-font-body, system-ui, sans-serif);
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s, visibility 0s 0.2s;
+}
+
+body.urd-mobile .urd-totop {
+  --urd-totop-size: var(--urd-totop-h-phone, var(--urd-totop-h, 44px));
+}
+
+.urd-totop.urd-totop-left {
+  right: auto;
+  left: calc(var(--urd-totop-menu-l, 0px) + var(--urd-totop-side));
+}
+
+/* A side column menu takes its width from the page on the desktop */
+body.urd-side-left:not(.urd-mobile) .urd-totop {
+  --urd-totop-menu-l: var(--urd-nav-side-width, 250px);
+}
+
+body.urd-side-right:not(.urd-mobile) .urd-totop {
+  --urd-totop-menu-r: var(--urd-nav-side-width, 250px);
+}
+
+/* By the content */
+body:not(.urd-mobile) .urd-totop.urd-totop-content {
+  --urd-totop-side: max(16px, var(--urd-canvas-gutter-desktop, 24px), calc((100% - var(--urd-totop-menu-l, 0px) - var(--urd-totop-menu-r, 0px) - var(--urd-canvas-w, 100%)) / 2));
+}
+
+/* Shown, it takes the pointer and the keyboard */
+.urd-totop.visible {
+  opacity: 0.85;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.2s;
+}
+
+.urd-totop.visible:focus-visible {
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .urd-totop.visible:hover {
+    opacity: 1;
+  }
+
+}
+
+.urd-totop:focus-visible {
+  outline: 2px solid var(--urd-color-accent);
+  outline-offset: 3px;
+}
+
+/* Hidden on phones where the owner asks */
+body.urd-mobile .urd-totop.urd-totop-nophone {
+  display: none;
+}
+
+/* The arrow and the words in their label, each in its own colour */
+.urd-totop-label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.urd-totop-mark,
+.urd-totop-text {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* The mark's size follows the owner's icon size: arrow, character, picture */
+.urd-totop-mark {
+  color: var(--urd-totop-arrow, currentColor);
+  font-size: calc(1em * var(--urd-totop-mark-scale, 1));
+}
+
+.urd-totop-text {
+  color: var(--urd-totop-words, currentColor);
+}
+
+.urd-totop-mark svg {
+  display: block;
+  width: 1.05em;
+  height: 1.05em;
+}
+
+/* The button's own mark in place of the arrow */
+.urd-totop-glyph {
+  font-size: calc(1.1em * var(--urd-totop-mark-scale, 1));
+  line-height: 1;
+}
+
+.urd-totop-own img {
+  display: block;
+  width: auto;
+  max-width: 2.4em;
+  height: 1.25em;
+  object-fit: contain;
+}
+
+/* The shaped designs */
+.urd-totop-shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: var(--urd-totop-bg, color-mix(in srgb, var(--urd-color-accent) 85%, black));
+}
+
+/* The shaped designs are as wide as they are high */
+.urd-totop-circle,
+.urd-totop-square,
+.urd-totop-ring {
+  width: var(--urd-totop-size);
+  border-radius: 50%;
+}
+
+.urd-totop.urd-totop-square {
+  border-radius: 24%;
+}
+
+/* Shaped designs: the mark at the shape's middle or the owner's place */
+.urd-totop-circle .urd-totop-mark,
+.urd-totop-square .urd-totop-mark,
+.urd-totop-ring .urd-totop-mark {
+  position: relative;
+  left: var(--urd-totop-mark-x, 0);
+  top: var(--urd-totop-mark-y, 0);
+}
+
+/* On a shaped design the mark stands inside the button */
+.urd-totop-circle .urd-totop-label,
+.urd-totop-square .urd-totop-label,
+.urd-totop-ring .urd-totop-label {
+  position: absolute;
+  inset: 0;
+  justify-content: center;
+  mask-image: var(--urd-totop-clip, none);
+  mask-size: 84% 84%;
+  mask-position: center;
+  mask-repeat: no-repeat;
+}
+
+.urd-totop-whole .urd-totop-label {
+  mask-size: 100% 100%;
+}
+
+.urd-totop-whole .urd-totop-shape {
+  display: none;
+}
+
+.urd-totop-whole .urd-totop-own {
+  position: absolute;
+  inset: 0;
+}
+
+.urd-totop-whole .urd-totop-own img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+/* The ring */
+.urd-totop.urd-totop-ring {
+  color: var(--urd-totop-ring, var(--urd-color-accent));
+}
+
+.urd-totop-ring .urd-totop-shape {
+  fill: var(--urd-totop-bg, color-mix(in srgb, var(--urd-color-bg) 70%, transparent));
+  stroke: var(--urd-totop-ring, var(--urd-color-accent));
+  stroke-width: 5;
+}
+
+/* The pill */
+.urd-totop.urd-totop-pill {
+  padding: 0 1.05em 0 0.85em;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--urd-totop-bg, color-mix(in srgb, var(--urd-color-accent) 85%, black));
+  font-size: calc(var(--urd-totop-size) * 0.34);
+}
+
+/* The words alone */
+.urd-totop.urd-totop-words {
+  height: auto;
+  min-width: 0;
+  padding: 0.3em 0.1em;
+  color: var(--urd-color-text);
+  font-size: calc(var(--urd-totop-size) * 0.34);
+  transition: opacity 0.2s, visibility 0s 0.2s, background-color 0.15s ease, box-shadow 0.35s ease, transform 0.15s ease, text-shadow 0.15s ease;
+}
+
+.urd-totop.urd-totop-words.visible {
+  transition: opacity 0.2s, background-color 0.15s ease, box-shadow 0.35s ease, transform 0.15s ease, text-shadow 0.15s ease;
+}
+
+.urd-totop-words .urd-totop-label {
+  padding-bottom: 0.25em;
+  border-bottom: var(--urd-totop-line-w, 1px) solid var(--urd-totop-line, color-mix(in srgb, var(--urd-totop-words, var(--urd-color-text)) 55%, transparent));
+}
+
+.urd-totop-line-none .urd-totop-label {
+  border-bottom: 0;
+}
+
+.urd-totop-line-dashed .urd-totop-label {
+  border-bottom-style: dashed;
+}
+
+.urd-totop-line-dotted .urd-totop-label {
+  border-bottom-style: dotted;
+}
+
+/* A double line needs three px to draw both of its lines */
+.urd-totop-line-double .urd-totop-label {
+  border-bottom-style: double;
+  border-bottom-width: max(3px, var(--urd-totop-line-w, 1px));
+}
+
+/* The words alone answer the mouse as the menu's links do */
+.urd-totop-hover-underline .urd-totop-label::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -0.2rem;
+  left: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--urd-totop-effect, var(--urd-color-accent));
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.2s ease;
+}
+
+.urd-totop.urd-totop-hover-pill {
+  padding-inline: 0.8em;
+  border-radius: 999px;
+}
+
+.urd-totop-hover-standard:focus-visible :is(.urd-totop-mark, .urd-totop-text) {
+  color: var(--urd-totop-effect, var(--urd-color-accent));
+}
+
+.urd-totop-hover-underline:focus-visible .urd-totop-label::after {
+  clip-path: inset(0);
+}
+
+.urd-totop-hover-pill:focus-visible {
+  background-color: color-mix(in srgb, var(--urd-totop-effect, var(--urd-color-accent)) 15%, transparent);
+}
+
+.urd-totop-hover-liftPlain:focus-visible,
+.urd-totop-hover-lift:focus-visible {
+  transform: translateY(-2px);
+}
+
+.urd-totop-hover-lift:focus-visible {
+  text-shadow: 0 4px 14px color-mix(in srgb, var(--urd-totop-effect, var(--urd-color-accent)) 60%, transparent);
+}
+
+@media (hover: hover) {
+  .urd-totop-hover-standard:hover :is(.urd-totop-mark, .urd-totop-text) {
+    color: var(--urd-totop-effect, var(--urd-color-accent));
+  }
+
+  .urd-totop-hover-underline:hover .urd-totop-label::after {
+    clip-path: inset(0);
+  }
+
+  .urd-totop-hover-pill:hover {
+    background-color: color-mix(in srgb, var(--urd-totop-effect, var(--urd-color-accent)) 15%, transparent);
+  }
+
+  .urd-totop-hover-liftPlain:hover,
+  .urd-totop-hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  .urd-totop-hover-lift:hover {
+    text-shadow: 0 4px 14px color-mix(in srgb, var(--urd-totop-effect, var(--urd-color-accent)) 60%, transparent);
+  }
+
+}
+
+/* And a touch on a phone as the menu's links answer it */
+body.urd-mobile .urd-totop[class*="urd-totop-press-"]:active {
+  transition-duration: 0s;
+}
+
+body.urd-mobile .urd-totop-press-tint:active {
+  --urd-totop-press-c: color-mix(in srgb, var(--urd-totop-effect, var(--urd-color-accent)) 22%, transparent);
+  border-radius: var(--urd-radius-sm, 6px);
+  background-color: var(--urd-totop-press-c);
+  box-shadow: 0 0 0 0.45rem var(--urd-totop-press-c);
+}
+
+body.urd-mobile .urd-totop-press-underline:active {
+  box-shadow: inset 0 -2px 0 var(--urd-totop-effect, var(--urd-color-accent));
+}
+
+body.urd-mobile .urd-totop-press-shrink:active {
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .urd-totop-hover-underline .urd-totop-label::after {
+    transition: none;
+  }
+
+  .urd-totop-hover-liftPlain:is(:hover, :focus-visible),
+  .urd-totop-hover-lift:is(:hover, :focus-visible),
+  body.urd-mobile .urd-totop-press-shrink:active {
+    transform: none;
+  }
+
+  .urd-totop.urd-totop-words {
+    transition: opacity 0.2s, visibility 0s 0.2s;
+  }
+
+  .urd-totop.urd-totop-words.visible {
+    transition: opacity 0.2s;
+  }
+
+}

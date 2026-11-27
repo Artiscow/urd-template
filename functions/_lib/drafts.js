@@ -1,8 +1,5 @@
 /**
- * Saved drafts (ADR-0032): the rules for the branch they live on, pure and node-tested (tests/drafts-branch.test.mjs).
- * The branch holds `index.json` and one file per part under `parts/`, written only by the drafts function (api/github/drafts.js) for an owner who may publish.
- * A part file holds the browser's stored draft texts as they are, keyed by the localStorage key the editor keeps them under, so a part taken in elsewhere is written where a reload reads it.
- * Every commit on the branch begins with the host's skip marker, so it is never built or deployed.
+ * Saved drafts (ADR-0032): the rules of their branch, which holds `index.json` and a file per part under `parts/`, each commit led by the host's skip marker.
  */
 
 /** The branch the saved drafts live on. */
@@ -16,7 +13,7 @@ export const INDEX_PATH = 'index.json';
 /** The file a part lives in on the branch. */
 export const partPath = (name) => `parts/${name}.json`;
 
-/** The largest part, in characters of its stored texts, and the most a request's part files may hold in all: a browser keeps about 5 MB of drafts, so these leave room without straining the function's memory. */
+/** The largest part, in characters of its stored texts, and the most a request's part files may hold in all. */
 export const MAX_PART = 6 * 1024 * 1024;
 export const MAX_REQUEST = 10 * 1024 * 1024;
 
@@ -90,7 +87,7 @@ export const partText = (keys) => JSON.stringify({ v: 1, keys });
 export const emptyIndex = () => ({ version: 1, parts: {} });
 
 /**
- * The index after a save: each written part with when and by whom it was saved (the server's own, never the request's), its hash, the live base it was made from, its title, whether it is kept for later, the owner's note on the save and the name of the browser it was saved from; each removed part gone.
+ * The index after a save: each written part with the server's time and login, never the request's, beside the fields the write carries; each removed part gone.
  * @param {{version?: number, parts?: Record<string, object>}|null} index
  * @param {Array<{name: string, hash?: string, base?: string|null, title?: string, later?: boolean, note?: string, device?: string}>} writes
  * @param {string[]} removes

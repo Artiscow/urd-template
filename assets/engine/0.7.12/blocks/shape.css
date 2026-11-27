@@ -1,0 +1,30 @@
+/*
+ * The shape block's own rules (blocks/shape.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* The chapter divider */
+.urd-shape-chapter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+}
+
+.urd-shape-chapter::before,
+.urd-shape-chapter::after {
+  content: '';
+  flex: 1;
+  height: var(--urd-shape-t, 2px);
+  background: currentColor;
+}
+
+.urd-shape-chapter-label {
+  flex: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}

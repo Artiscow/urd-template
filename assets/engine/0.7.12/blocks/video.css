@@ -1,0 +1,56 @@
+/*
+ * The video block's own rules (blocks/video.js), loaded with it after base.css in BLOCK_SHEETS order.
+ * Its reasoning stands in docs/STYLES.md.
+ */
+/* The video block */
+/* A video given a shape */
+.urd-video-ratio {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--urd-ratio, 1.7778);
+}
+
+.urd-video-ratio > .urd-video-file {
+  width: 100%;
+  height: 100%;
+}
+
+.urd-video-empty {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  opacity: 0.65;
+  border: 1px dashed color-mix(in srgb, var(--urd-color-text) 30%, transparent);
+  border-radius: var(--urd-radius-md);
+}
+
+/* The self-hosted film */
+.urd-video-file {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+/* The frame around a film that lies under an overlay */
+.urd-video-film {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The editor's desktop view: a press on the video selects the block */
+.urd-video-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.urd-block[data-urd-phone-h] > .urd-video-ratio {
+  height: 100%;
+  aspect-ratio: auto;
+}

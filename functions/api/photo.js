@@ -1,15 +1,5 @@
 /**
- * One picture from a shared folder, served from this site's own origin.
- *
- * The bytes go through here rather than straight from the folder host for
- * three reasons: the site's CSP allows `img-src 'self' data:` and stays
- * untouched, an API key or a share token never reaches the browser, and
- * Google says plainly that hotlinking a Drive picture may stop working
- * without warning, so the address it is fetched from is ours to change.
- *
- * Only the routes /api/photos built are answered: every address is checked
- * against the same host rules again here, so a folder listing can never point
- * this route at something new.
+ * GET /api/photo: one picture from a shared folder, served from the site's own origin, its address checked against the same host rules as /api/photos.
  */
 import {
   json, imageWidth, hostAllowed, safeTarget, fetchWithTimeout, refuseCrossSite, edgeCached, RedirectRefused,
@@ -24,9 +14,7 @@ function upstreamFor(q, env) {
   if (provider === 'drive') {
     const id = q.get('id') ?? '';
     if (!GOOGLE_ID.test(id)) return json({ error: 'Invalid picture address', code: 'photoBadAddress' }, 400);
-    // The sized variant, so an original of many megabytes is never proxied
-    // raw. Google's picture host is the one that resizes: a Nextcloud share
-    // and a listed address answer with the file as it is stored.
+    // Google's picture host serves the sized variant; a Nextcloud share and a listed address answer with the file as it is stored.
     return { url: `https://${GOOGLE_PHOTO_HOST}/d/${id}=w${width}` };
   }
 
@@ -75,7 +63,7 @@ function capped(body, max) {
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const refused = refuseCrossSite(request);
+  const refused = refuseCrossSite(request, { image: true });
   if (refused) return refused;
   return edgeCached(context, () => picture(new URL(request.url).searchParams, env));
 }
@@ -87,9 +75,7 @@ async function picture(q, env) {
 
   let res;
   try {
-    // A redirect may stay on the host that was asked, or go to Google's
-    // picture host or the allowlist; anywhere else is refused before the
-    // request goes out.
+    // A redirect may stay on the host that was asked, or go to Google's picture host or the allowlist; anywhere else is refused before the request goes out.
     res = await fetchWithTimeout(plan.url, { ...(plan.init ?? {}), headers: { accept: 'image/*', ...(plan.init?.headers ?? {}) } }, 12000,
       (host) => hostAllowed(env, host, [GOOGLE_PHOTO_HOST]));
   } catch (err) {
@@ -100,8 +86,7 @@ async function picture(q, env) {
   }
   if (!res.ok) return json({ error: `The picture source answered ${res.status}`, code: 'photoUpstreamStatus', status: res.status }, 502);
 
-  // Raster pictures only, and the type is written out from the allowlist
-  // rather than echoed.
+  // Raster pictures only, and the type is written out from the allowlist rather than echoed.
   const raster = RASTER_TYPE.exec(res.headers.get('content-type') ?? '');
   if (!raster) return json({ error: 'The address did not answer with a picture', code: 'photoNotImage' }, 502);
 
@@ -114,12 +99,10 @@ async function picture(q, env) {
     status: 200,
     headers: {
       'content-type': `image/${raster[1].toLowerCase()}`,
-      // An hour in the visitor's cache and a day at the edge (edgeCached), so
-      // the folder host is left alone meanwhile.
+      // An hour in the visitor's cache and a day at the edge (edgeCached), so the folder host is left alone meanwhile.
       'cache-control': 'public, max-age=3600, s-maxage=86400',
       'x-content-type-options': 'nosniff',
-      // The answer is a picture and nothing else: opened as a document it
-      // runs nothing, and no other site may embed it.
+      // The answer is a picture and nothing else: opened as a document it runs nothing, and no other site may embed it.
       'content-security-policy': "default-src 'none'; sandbox",
       'cross-origin-resource-policy': 'same-origin',
     },
